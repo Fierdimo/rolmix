@@ -1,0 +1,13 @@
+[
+  { "id": "longsword", "name": "Espada Larga", "slot": "weapon_main", "category": "weapon", "notes": "1d8 cortante (1d10 a dos manos)", "weight": 3, "cost": "15 gp" },
+  { "id": "shortsword", "name": "Espada Corta", "slot": "weapon_main", "category": "weapon", "notes": "1d6 perforante, sutil, ligera", "weight": 2, "cost": "10 gp" },
+  { "id": "greataxe", "name": "Hacha Grande", "slot": "weapon_main", "category": "weapon", "notes": "1d12 cortante, dos manos, pesada", "weight": 7, "cost": "30 gp" },
+  { "id": "longbow", "name": "Arco Largo", "slot": "weapon_main", "category": "weapon", "notes": "1d8 perforante, alcance 150/600", "weight": 2, "cost": "50 gp" },
+  { "id": "leather-armor", "name": "Armadura de Cuero", "slot": "armor", "category": "armor", "bonuses": [{ "target": "ac", "value": 11 }], "notes": "Ligera, +Des completo (CA = 11 + Des)", "weight": 10, "cost": "10 gp" },
+  { "id": "chain-mail", "name": "Cota de Mallas", "slot": "armor", "category": "armor", "bonuses": [{ "target": "ac", "value": 16 }], "notes": "Pesada, sin Des, desventaja Sigilo", "weight": 55, "cost": "75 gp" },
+  { "id": "plate", "name": "Armadura de Placas", "slot": "armor", "category": "armor", "bonuses": [{ "target": "ac", "value": 18 }], "notes": "Pesada, requiere Fue 15", "weight": 65, "cost": "1500 gp" },
+  { "id": "shield", "name": "Escudo", "slot": "shield", "category": "shield", "bonuses": [{ "target": "ac", "value": 2 }], "notes": "+2 CA", "weight": 6, "cost": "10 gp" },
+  { "id": "cloak-protection", "name": "Capa de Protección", "slot": "cloak", "category": "wondrous", "bonuses": [{ "target": "ac", "value": 1 }, { "target": "fort", "value": 1 }, { "target": "ref", "value": 1 }, { "target": "will", "value": 1 }], "notes": "Requiere sintonización", "cost": "rara" },
+  { "id": "amulet-health", "name": "Amuleto de Salud", "slot": "amulet", "category": "wondrous", "bonuses": [{ "target": "hp_max", "value": 19 }], "notes": "Tu Con se considera 19 (sintonización)", "cost": "rara" },
+  { "id": "boots-elvenkind", "name": "Botas Élficas", "slot": "boots", "category": "wondrous", "bonuses": [{ "target": "sk_stealth", "value": 5 }], "notes": "Ventaja a Sigilo silencioso", "cost": "infrecuente" }
+]

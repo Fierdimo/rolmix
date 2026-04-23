@@ -1,0 +1,328 @@
+[
+  {
+    "id": "appraise",
+    "name": "Appraise",
+    "ability": "Intelligence"
+  },
+  {
+    "id": "autohypnosis",
+    "name": "Autohypnosis",
+    "ability": "Wisdom",
+    "trainedOnly": true
+  },
+  {
+    "id": "balance",
+    "name": "Balance",
+    "ability": "Dexterity",
+    "armorCheck": true
+  },
+  {
+    "id": "bluff",
+    "name": "Bluff",
+    "ability": "Charisma",
+    "synergy": [
+      "Diplomacy",
+      "Disguise",
+      "Intimidate",
+      "Sleight of Hand"
+    ]
+  },
+  {
+    "id": "climb",
+    "name": "Climb",
+    "ability": "Strength",
+    "armorCheck": true
+  },
+  {
+    "id": "concentration",
+    "name": "Concentration",
+    "ability": "Constitution",
+    "synergy": [
+      "Autohypnosis"
+    ]
+  },
+  {
+    "id": "control-shape",
+    "name": "Control Shape",
+    "ability": "Wisdom"
+  },
+  {
+    "id": "craft",
+    "name": "Craft",
+    "ability": "Intelligence",
+    "synergy": [
+      "Appraise"
+    ]
+  },
+  {
+    "id": "decipher-script",
+    "name": "Decipher Script",
+    "ability": "Intelligence",
+    "trainedOnly": true,
+    "synergy": [
+      "Use Magic Device"
+    ]
+  },
+  {
+    "id": "diplomacy",
+    "name": "Diplomacy",
+    "ability": "Charisma"
+  },
+  {
+    "id": "disable-device",
+    "name": "Disable Device",
+    "ability": "Intelligence",
+    "trainedOnly": true
+  },
+  {
+    "id": "disguise",
+    "name": "Disguise",
+    "ability": "Charisma"
+  },
+  {
+    "id": "escape-artist",
+    "name": "Escape Artist",
+    "ability": "Dexterity",
+    "armorCheck": true,
+    "synergy": [
+      "Use Rope"
+    ]
+  },
+  {
+    "id": "forgery",
+    "name": "Forgery",
+    "ability": "Intelligence"
+  },
+  {
+    "id": "gather-information",
+    "name": "Gather Information",
+    "ability": "Charisma"
+  },
+  {
+    "id": "handle-animal",
+    "name": "Handle Animal",
+    "ability": "Charisma",
+    "trainedOnly": true,
+    "synergy": [
+      "Ride"
+    ]
+  },
+  {
+    "id": "heal",
+    "name": "Heal",
+    "ability": "Wisdom"
+  },
+  {
+    "id": "hide",
+    "name": "Hide",
+    "ability": "Dexterity",
+    "armorCheck": true
+  },
+  {
+    "id": "intimidate",
+    "name": "Intimidate",
+    "ability": "Charisma"
+  },
+  {
+    "id": "jump",
+    "name": "Jump",
+    "ability": "Strength",
+    "armorCheck": true,
+    "synergy": [
+      "Tumble"
+    ]
+  },
+  {
+    "id": "knowledge-arcana",
+    "name": "Knowledge (Arcana)",
+    "ability": "Intelligence",
+    "trainedOnly": true
+  },
+  {
+    "id": "knowledge-architecture-and-engineering",
+    "name": "Knowledge (Architecture and engineering)",
+    "ability": "Intelligence",
+    "trainedOnly": true
+  },
+  {
+    "id": "knowledge-dungeoneering",
+    "name": "Knowledge (Dungeoneering)",
+    "ability": "Intelligence",
+    "trainedOnly": true
+  },
+  {
+    "id": "knowledge-geography",
+    "name": "Knowledge (Geography)",
+    "ability": "Intelligence",
+    "trainedOnly": true
+  },
+  {
+    "id": "knowledge-history",
+    "name": "Knowledge (History)",
+    "ability": "Intelligence",
+    "trainedOnly": true
+  },
+  {
+    "id": "knowledge-local",
+    "name": "Knowledge (Local)",
+    "ability": "Intelligence",
+    "trainedOnly": true
+  },
+  {
+    "id": "knowledge-nature",
+    "name": "Knowledge (Nature)",
+    "ability": "Intelligence",
+    "trainedOnly": true
+  },
+  {
+    "id": "knowledge-nobility-and-royalty",
+    "name": "Knowledge (Nobility and royalty)",
+    "ability": "Intelligence",
+    "trainedOnly": true
+  },
+  {
+    "id": "knowledge-religion",
+    "name": "Knowledge (Religion)",
+    "ability": "Intelligence",
+    "trainedOnly": true
+  },
+  {
+    "id": "knowledge-the-planes",
+    "name": "Knowledge (the Planes)",
+    "ability": "Intelligence",
+    "trainedOnly": true
+  },
+  {
+    "id": "listen",
+    "name": "Listen",
+    "ability": "Wisdom"
+  },
+  {
+    "id": "move-silently",
+    "name": "Move Silently",
+    "ability": "Dexterity",
+    "armorCheck": true
+  },
+  {
+    "id": "open-lock",
+    "name": "Open Lock",
+    "ability": "Dexterity",
+    "trainedOnly": true
+  },
+  {
+    "id": "perform",
+    "name": "Perform",
+    "ability": "Charisma"
+  },
+  {
+    "id": "profession",
+    "name": "Profession",
+    "ability": "Wisdom",
+    "trainedOnly": true
+  },
+  {
+    "id": "psicraft",
+    "name": "Psicraft",
+    "ability": "Intelligence",
+    "trainedOnly": true,
+    "synergy": [
+      "Use Psionic Device"
+    ]
+  },
+  {
+    "id": "ride",
+    "name": "Ride",
+    "ability": "Dexterity"
+  },
+  {
+    "id": "search",
+    "name": "Search",
+    "ability": "Intelligence",
+    "synergy": [
+      "Survival"
+    ]
+  },
+  {
+    "id": "sense-motive",
+    "name": "Sense Motive",
+    "ability": "Wisdom",
+    "synergy": [
+      "Diplomacy"
+    ]
+  },
+  {
+    "id": "sleight-of-hand",
+    "name": "Sleight of Hand",
+    "ability": "Dexterity",
+    "trainedOnly": true,
+    "armorCheck": true
+  },
+  {
+    "id": "speak-language",
+    "name": "Speak Language",
+    "trainedOnly": true
+  },
+  {
+    "id": "spellcraft",
+    "name": "Spellcraft",
+    "ability": "Intelligence",
+    "trainedOnly": true,
+    "synergy": [
+      "Use Magic Device"
+    ]
+  },
+  {
+    "id": "spot",
+    "name": "Spot",
+    "ability": "Wisdom"
+  },
+  {
+    "id": "survival",
+    "name": "Survival",
+    "ability": "Wisdom"
+  },
+  {
+    "id": "swim",
+    "name": "Swim",
+    "ability": "Strength",
+    "armorCheck": true
+  },
+  {
+    "id": "tumble",
+    "name": "Tumble",
+    "ability": "Dexterity",
+    "trainedOnly": true,
+    "armorCheck": true,
+    "synergy": [
+      "Balance",
+      "Jump"
+    ]
+  },
+  {
+    "id": "use-magic-device",
+    "name": "Use Magic Device",
+    "ability": "Charisma",
+    "trainedOnly": true,
+    "synergy": [
+      "Spellcraft"
+    ]
+  },
+  {
+    "id": "use-psionic-device",
+    "name": "Use Psionic Device",
+    "ability": "Charisma",
+    "trainedOnly": true,
+    "synergy": [
+      "Psicraft"
+    ]
+  },
+  {
+    "id": "use-rope",
+    "name": "Use Rope",
+    "ability": "Dexterity",
+    "synergy": [
+      "Climb",
+      "Escape Artist"
+    ]
+  }
+]

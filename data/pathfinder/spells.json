@@ -1,0 +1,11 @@
+[
+  { "id": "acid-splash", "name": "Salpicadura de Ácido", "level": 0, "school": "Conjuration", "classes": ["wizard"], "range": "Cercano", "duration": "Instantáneo", "description": "Orbe de ácido 1d3." },
+  { "id": "detect-magic", "name": "Detectar Magia", "level": 0, "school": "Divination", "classes": ["wizard","cleric"], "range": "60 ft cono", "duration": "Concentración", "description": "Detecta auras mágicas." },
+  { "id": "magic-missile", "name": "Proyectil Mágico", "level": 1, "school": "Evocation", "classes": ["wizard"], "range": "Medio", "duration": "Instantáneo", "description": "1d4+1 por proyectil (hasta 5)." },
+  { "id": "mage-armor", "name": "Armadura de Mago", "level": 1, "school": "Conjuration", "classes": ["wizard"], "range": "Toque", "duration": "1 h/nivel", "description": "+4 armadura (fuerza)." },
+  { "id": "cure-light-wounds", "name": "Curar Heridas Leves", "level": 1, "school": "Conjuration", "classes": ["cleric"], "range": "Toque", "duration": "Instantáneo", "description": "1d8+nivel (máx +5)." },
+  { "id": "invisibility", "name": "Invisibilidad", "level": 2, "school": "Illusion", "classes": ["wizard"], "range": "Personal o toque", "duration": "1 min/nivel", "description": "Invisible hasta atacar." },
+  { "id": "scorching-ray", "name": "Rayo Abrasador", "level": 2, "school": "Evocation", "classes": ["wizard"], "range": "Cercano", "duration": "Instantáneo", "description": "Rayos 4d6 fuego." },
+  { "id": "fireball", "name": "Bola de Fuego", "level": 3, "school": "Evocation", "classes": ["wizard"], "range": "Largo", "duration": "Instantáneo", "description": "1d6/nivel (máx 10d6) en 20 ft." },
+  { "id": "haste", "name": "Premura", "level": 3, "school": "Transmutation", "classes": ["wizard"], "range": "Cercano", "duration": "1 asalto/nivel", "description": "+1 ataque extra, +1 ataque y CA, +30 ft mov." }
+]

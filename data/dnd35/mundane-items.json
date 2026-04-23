@@ -1,0 +1,11 @@
+[
+  {
+    "id": "backpack",
+    "name": "Backpack",
+    "slot": "inventory",
+    "category": "other",
+    "cost": "2 gp",
+    "weight": 2,
+    "notes": "A backpack is a leather pack carried on the back, typically with straps to secure it."
+  }
+]

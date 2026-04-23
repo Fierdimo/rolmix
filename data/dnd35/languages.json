@@ -1,0 +1,102 @@
+[
+  {
+    "id": "abyssal",
+    "name": "Abyssal",
+    "alphabet": "Infernal"
+  },
+  {
+    "id": "aquan",
+    "name": "Aquan",
+    "alphabet": "Elven"
+  },
+  {
+    "id": "auran",
+    "name": "Auran",
+    "alphabet": "Draconic"
+  },
+  {
+    "id": "celestial",
+    "name": "Celestial",
+    "alphabet": "Celestial"
+  },
+  {
+    "id": "common",
+    "name": "Common",
+    "alphabet": "Common"
+  },
+  {
+    "id": "draconic",
+    "name": "Draconic",
+    "alphabet": "Draconic"
+  },
+  {
+    "id": "druidic",
+    "name": "Druidic",
+    "alphabet": "Druidic"
+  },
+  {
+    "id": "dwarven",
+    "name": "Dwarven",
+    "alphabet": "Dwarven"
+  },
+  {
+    "id": "elven",
+    "name": "Elven",
+    "alphabet": "Elven"
+  },
+  {
+    "id": "giant",
+    "name": "Giant",
+    "alphabet": "Dwarven"
+  },
+  {
+    "id": "gnoll",
+    "name": "Gnoll",
+    "alphabet": "Common"
+  },
+  {
+    "id": "gnome",
+    "name": "Gnome",
+    "alphabet": "Dwarven"
+  },
+  {
+    "id": "goblin",
+    "name": "Goblin",
+    "alphabet": "Dwarven"
+  },
+  {
+    "id": "halfling",
+    "name": "Halfling",
+    "alphabet": "Common"
+  },
+  {
+    "id": "ignan",
+    "name": "Ignan",
+    "alphabet": "Draconic"
+  },
+  {
+    "id": "infernal",
+    "name": "Infernal",
+    "alphabet": "Infernal"
+  },
+  {
+    "id": "orc",
+    "name": "Orc",
+    "alphabet": "Dwarven"
+  },
+  {
+    "id": "sylvan",
+    "name": "Sylvan",
+    "alphabet": "Elven"
+  },
+  {
+    "id": "terran",
+    "name": "Terran",
+    "alphabet": "Dwarven"
+  },
+  {
+    "id": "undercommon",
+    "name": "Undercommon",
+    "alphabet": "Elven"
+  }
+]

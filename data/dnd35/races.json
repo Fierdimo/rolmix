@@ -1,0 +1,191 @@
+[
+  {
+    "id": "dwarf",
+    "name": "Dwarf",
+    "size": "Medium",
+    "speed": 20,
+    "favoredClass": "Fighter",
+    "languages": [
+      "Dwarven",
+      "Common"
+    ],
+    "bonusLanguages": [
+      "Gaint",
+      "Gnome",
+      "Goblin",
+      "Orc",
+      "Terran",
+      "Undercommon"
+    ],
+    "abilityMods": {
+      "Constitution": 2,
+      "Charisma": -2
+    },
+    "abilities": [
+      "Darkvision 60ft",
+      "Stability",
+      "Weapon Familiarity (Dwarven Urgroshes)",
+      "Stonecunning"
+    ]
+  },
+  {
+    "id": "elf",
+    "name": "Elf",
+    "size": "Medium",
+    "speed": 30,
+    "favoredClass": "Wizard",
+    "languages": [
+      "Elven",
+      "Common"
+    ],
+    "bonusLanguages": [
+      "Draconic",
+      "Gnoll",
+      "Gnome",
+      "Goblin",
+      "Orc",
+      "Sylvan"
+    ],
+    "abilityMods": {
+      "Dexterity": 2,
+      "Constitution": -2
+    },
+    "skillBonuses": {
+      "Listen": 2,
+      "Search": 2,
+      "Spot": 2
+    },
+    "abilities": [
+      "Weapon Proficiency (Longsword)",
+      "Weapon Proficiency (Rapier)",
+      "Weapon Proficiency (Longbow)",
+      "Weapon Proficiency (Shortbow)",
+      "Lowlight vision"
+    ]
+  },
+  {
+    "id": "gnome",
+    "name": "Gnome",
+    "size": "Small",
+    "speed": 20,
+    "favoredClass": "Bard",
+    "languages": [
+      "Gnome",
+      "Common"
+    ],
+    "bonusLanguages": [
+      "Draconic",
+      "Dwarven",
+      "Elven",
+      "Giant",
+      "Goblin",
+      "Orc"
+    ],
+    "abilityMods": {
+      "Constitution": 2,
+      "Strength": -2
+    },
+    "skillBonuses": {
+      "Listen": 2,
+      "Craft(Alchemy)": 2
+    },
+    "abilities": [
+      "Lowlight vision",
+      "Weapon Familiarity (Gnome hooked hammer)"
+    ]
+  },
+  {
+    "id": "half-elf",
+    "name": "Half-Elf",
+    "size": "Medium",
+    "speed": 30,
+    "favoredClass": "Any",
+    "languages": [
+      "Elven",
+      "Common"
+    ],
+    "bonusLanguages": [
+      "Any"
+    ],
+    "skillBonuses": {
+      "Listen": 1,
+      "Search": 1,
+      "Spot": 1,
+      "Diplomacy": 2,
+      "Gather Information": 2
+    },
+    "abilities": [
+      "Lowlight vision",
+      "Immunity to sleep",
+      "Elven blood"
+    ]
+  },
+  {
+    "id": "half-orc",
+    "name": "Half-Orc",
+    "size": "Medium",
+    "speed": 30,
+    "favoredClass": "Barbarian",
+    "languages": [
+      "Orc",
+      "Common"
+    ],
+    "bonusLanguages": [
+      "Draconic",
+      "Giant",
+      "Gnoll",
+      "Goblin",
+      "Abyssal"
+    ],
+    "abilityMods": {
+      "Strength": 2,
+      "Intelligence": -2,
+      "Charisma": -2
+    },
+    "abilities": [
+      "Darkvision 60ft",
+      "Orc blood"
+    ]
+  },
+  {
+    "id": "halfling",
+    "name": "Halfling",
+    "size": "Small",
+    "speed": 20,
+    "favoredClass": "Rogue",
+    "languages": [
+      "Halfling",
+      "Common"
+    ],
+    "bonusLanguages": [
+      "Dwarven",
+      "Elven",
+      "Gnome",
+      "Goblin",
+      "Orc"
+    ],
+    "abilityMods": {
+      "Dexterity": 2,
+      "Strength": -2
+    },
+    "skillBonuses": {
+      "Climb": 2,
+      "Jump": 2,
+      "Move Silently": 2,
+      "Listen": 2
+    }
+  },
+  {
+    "id": "human",
+    "name": "Human",
+    "size": "Medium",
+    "speed": 30,
+    "favoredClass": "Any",
+    "languages": [
+      "Common"
+    ],
+    "bonusLanguages": [
+      "Any"
+    ]
+  }
+]

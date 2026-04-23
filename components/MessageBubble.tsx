@@ -1,0 +1,139 @@
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import { Message, MessageType } from '../lib/types';
+import { DiceMetadata } from '../lib/types';
+
+interface Props {
+  message: Message;
+  isOwn: boolean;
+}
+
+const TYPE_STYLES: Record<MessageType, { label: string; color: string; bg: string }> = {
+  message:   { label: '',        color: '#e2e8f0', bg: 'rgba(255,255,255,0.07)' },
+  action:    { label: '* ',      color: '#fbbf24', bg: 'rgba(251,191,36,0.08)'  },
+  narration: { label: '📖 ',    color: '#a78bfa', bg: 'rgba(167,139,250,0.10)' },
+  dice:      { label: '🎲 ',    color: '#34d399', bg: 'rgba(52,211,153,0.10)'  },
+  whisper:   { label: '🤫 ',    color: '#94a3b8', bg: 'rgba(148,163,184,0.08)' },
+};
+
+export default function MessageBubble({ message, isOwn }: Props) {
+  const cfg = TYPE_STYLES[message.type] ?? TYPE_STYLES.message;
+
+  function renderContent() {
+    if (message.type === 'dice') {
+      const meta = message.metadata as DiceMetadata | null;
+      if (meta) {
+        return (
+          <View>
+            <Text style={[styles.content, { color: cfg.color }]}>
+              {message.content}
+            </Text>
+            {meta.character_name || meta.action_label ? (
+              <Text style={styles.diceTag}>
+                {meta.directed ? '🎯 Tirada dirigida · ' : ''}
+                {meta.action_label ?? ''}{meta.character_name ? ` · ${meta.character_name}` : ''}
+              </Text>
+            ) : null}
+            <View style={styles.diceResult}>
+              <Text style={styles.diceResultText}>
+                {meta.die}: {meta.result}
+                {meta.modifier !== undefined && meta.modifier !== 0
+                  ? ` ${meta.modifier > 0 ? '+' : ''}${meta.modifier}` : ''}
+                {' '}= <Text style={styles.diceTotal}>{meta.total}</Text>
+              </Text>
+            </View>
+          </View>
+        );
+      }
+    }
+    return (
+      <Text style={[styles.content, { color: cfg.color }]}>
+        {cfg.label}{message.content}
+      </Text>
+    );
+  }
+
+  // Narration and dice are always full-width, centered
+  const isFullWidth = message.type === 'narration' || message.type === 'dice';
+
+  if (isFullWidth) {
+    return (
+      <View style={[styles.fullWidthWrapper, { backgroundColor: cfg.bg }]}>
+        {renderContent()}
+        <Text style={styles.fullWidthMeta}>
+          — {message.profiles?.username ?? 'Anon'}
+        </Text>
+      </View>
+    );
+  }
+
+  return (
+    <View style={[styles.row, isOwn ? styles.rowOwn : styles.rowOther]}>
+      {!isOwn && (
+        <View style={[styles.avatar, { backgroundColor: message.profiles?.avatar_color ?? '#7c3aed' }]}>
+          <Text style={styles.avatarText}>
+            {(message.profiles?.username ?? '?')[0].toUpperCase()}
+          </Text>
+        </View>
+      )}
+      <View style={[styles.bubble, { backgroundColor: isOwn ? '#4c1d95' : cfg.bg }, isOwn && styles.bubbleOwn]}>
+        {!isOwn && (
+          <Text style={[styles.username, { color: message.profiles?.avatar_color ?? '#a78bfa' }]}>
+            {message.profiles?.username ?? 'Anon'}
+          </Text>
+        )}
+        {renderContent()}
+        <Text style={styles.time}>
+          {new Date(message.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+        </Text>
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  row: { flexDirection: 'row', marginVertical: 4, paddingHorizontal: 12 },
+  rowOwn: { justifyContent: 'flex-end' },
+  rowOther: { justifyContent: 'flex-start' },
+  avatar: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 8,
+    alignSelf: 'flex-end',
+  },
+  avatarText: { color: '#fff', fontWeight: '700', fontSize: 13 },
+  bubble: {
+    maxWidth: '75%',
+    borderRadius: 16,
+    padding: 10,
+    paddingHorizontal: 14,
+  },
+  bubbleOwn: { borderBottomRightRadius: 4 },
+  username: { fontSize: 11, fontWeight: '700', marginBottom: 3 },
+  content: { fontSize: 15, lineHeight: 21 },
+  time: { fontSize: 10, color: '#64748b', marginTop: 4, textAlign: 'right' },
+  fullWidthWrapper: {
+    marginVertical: 6,
+    marginHorizontal: 12,
+    borderRadius: 12,
+    padding: 12,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(167,139,250,0.15)',
+  },
+  fullWidthMeta: { color: '#64748b', fontSize: 11, marginTop: 4 },
+  diceResult: {
+    marginTop: 6,
+    backgroundColor: 'rgba(52,211,153,0.15)',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    alignSelf: 'center',
+  },
+  diceResultText: { color: '#34d399', fontSize: 14, fontWeight: '600' },
+  diceTotal: { fontSize: 18, fontWeight: '800' },
+  diceTag: { color: '#fbbf24', fontSize: 11, marginTop: 4, fontWeight: '600' },
+});

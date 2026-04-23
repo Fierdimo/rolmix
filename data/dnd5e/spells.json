@@ -1,0 +1,13 @@
+[
+  { "id": "fire-bolt", "name": "Saeta de Fuego", "level": 0, "school": "Evocation", "classes": ["wizard"], "range": "120 ft", "duration": "Instantáneo", "description": "1d10 fuego (sube por nivel)." },
+  { "id": "mage-hand", "name": "Mano de Mago", "level": 0, "school": "Conjuration", "classes": ["wizard"], "range": "30 ft", "duration": "1 min", "description": "Mano espectral que manipula objetos ligeros." },
+  { "id": "sacred-flame", "name": "Llama Sagrada", "level": 0, "school": "Evocation", "classes": ["cleric"], "range": "60 ft", "duration": "Instantáneo", "description": "1d8 radiante; objetivo tira Des." },
+  { "id": "magic-missile", "name": "Proyectil Mágico", "level": 1, "school": "Evocation", "classes": ["wizard"], "range": "120 ft", "duration": "Instantáneo", "description": "Tres dardos de 1d4+1 que impactan automáticamente." },
+  { "id": "shield", "name": "Escudo", "level": 1, "school": "Abjuration", "classes": ["wizard"], "range": "Personal", "duration": "1 asalto", "description": "+5 a CA hasta tu próximo turno." },
+  { "id": "cure-wounds", "name": "Curar Heridas", "level": 1, "school": "Evocation", "classes": ["cleric"], "range": "Toque", "duration": "Instantáneo", "description": "1d8 + Sab puntos de vida." },
+  { "id": "bless", "name": "Bendecir", "level": 1, "school": "Enchantment", "classes": ["cleric"], "range": "30 ft", "duration": "1 min, conc.", "description": "+1d4 a ataque y salvaciones de hasta 3 criaturas." },
+  { "id": "misty-step", "name": "Paso Brumoso", "level": 2, "school": "Conjuration", "classes": ["wizard"], "range": "Personal", "duration": "Instantáneo", "description": "Tele­transporte de hasta 30 ft (acción adicional)." },
+  { "id": "scorching-ray", "name": "Rayo Abrasador", "level": 2, "school": "Evocation", "classes": ["wizard"], "range": "120 ft", "duration": "Instantáneo", "description": "Tres rayos de 2d6 fuego cada uno." },
+  { "id": "fireball", "name": "Bola de Fuego", "level": 3, "school": "Evocation", "classes": ["wizard"], "range": "150 ft", "duration": "Instantáneo", "description": "8d6 fuego en esfera de 20 ft (Des CD)." },
+  { "id": "counterspell", "name": "Contraconjuro", "level": 3, "school": "Abjuration", "classes": ["wizard"], "range": "60 ft", "duration": "Instantáneo", "description": "Anula un conjuro de nivel ≤3 (sube tirando)." }
+]

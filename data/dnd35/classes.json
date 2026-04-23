@@ -1,0 +1,1805 @@
+[
+  {
+    "id": "barbarian",
+    "name": "Barbarian",
+    "hitDice": "d12",
+    "skillPoints": 4,
+    "keyStat": "Constitution",
+    "spellCaster": false,
+    "classSkills": [
+      "Climb",
+      "Craft",
+      "Handle Animal",
+      "Intimidate",
+      "Listen",
+      "Ride",
+      "Survival",
+      "Swim"
+    ],
+    "proficiencies": [
+      "Simple weapons",
+      "Martial weapons",
+      "Light armor",
+      "Medium armor",
+      "Shield"
+    ],
+    "alignment": "Non-lawful",
+    "bab": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20
+    ],
+    "saves": {
+      "fort": [
+        2,
+        3,
+        3,
+        4,
+        4,
+        5,
+        5,
+        6,
+        6,
+        7,
+        7,
+        8,
+        8,
+        9,
+        9,
+        10,
+        10,
+        11,
+        11,
+        12
+      ],
+      "ref": [
+        0,
+        0,
+        1,
+        1,
+        1,
+        2,
+        2,
+        2,
+        3,
+        3,
+        3,
+        4,
+        4,
+        4,
+        5,
+        5,
+        5,
+        6,
+        6,
+        6
+      ],
+      "will": [
+        0,
+        0,
+        1,
+        1,
+        1,
+        2,
+        2,
+        2,
+        3,
+        3,
+        3,
+        4,
+        4,
+        4,
+        5,
+        5,
+        5,
+        6,
+        6,
+        6
+      ]
+    },
+    "abilitiesByLevel": {
+      "1": [
+        "Fast movement",
+        "Illiteracy",
+        "Rage 1/day"
+      ],
+      "2": [
+        "Uncanny dodge"
+      ],
+      "3": [
+        "Trap sense +1"
+      ],
+      "4": [
+        "Rage 2/day"
+      ],
+      "5": [
+        "Improved uncanny dodge"
+      ],
+      "6": [
+        "Trap sense +2"
+      ],
+      "7": [
+        "Damage reduction 1/-"
+      ],
+      "8": [
+        "Rage 3/day"
+      ],
+      "9": [
+        "Trap sense+3"
+      ],
+      "10": [
+        "Damage reduction 2/-"
+      ],
+      "11": [
+        "Greater rage"
+      ],
+      "12": [
+        "Rage 4/day",
+        "Trap sense +4"
+      ],
+      "13": [
+        "Damage reduction 3/-"
+      ],
+      "14": [
+        "Indomitable will"
+      ],
+      "15": [
+        "Trap sense +5"
+      ],
+      "16": [
+        "Damage reduction 4/-",
+        "Rage5/day"
+      ],
+      "17": [
+        "Timeless rage"
+      ],
+      "18": [
+        "Trap sense +6"
+      ],
+      "19": [
+        "Damage reduction 5/-"
+      ],
+      "20": [
+        "Mighty rage",
+        "Rage 6/day"
+      ]
+    }
+  },
+  {
+    "id": "bard",
+    "name": "Bard",
+    "hitDice": "d6",
+    "skillPoints": 6,
+    "keyStat": "Charisma",
+    "spellCaster": true,
+    "classSkills": [
+      "Appraise",
+      "Balance",
+      "Bluff",
+      "Climb",
+      "Concentration",
+      "Craft",
+      "Decipher Script",
+      "Diplomacy",
+      "Disguise",
+      "Escape Artist",
+      "Gather Information",
+      "Hide",
+      "Jump",
+      "Knowledge (All)",
+      "Listen",
+      "Move Silently",
+      "Perform",
+      "Profession",
+      "Sense Motive",
+      "Sleight of Hand",
+      "Speak Language",
+      "Spellcraft",
+      "Swim",
+      "Tumble",
+      "Use Magic Device"
+    ],
+    "proficiencies": [
+      "Simple weapons",
+      "Longsword",
+      "Rapier",
+      "Sap",
+      "Short sword",
+      "Shortbow",
+      "Whip",
+      "Light armor",
+      "Basic shields"
+    ],
+    "alignment": "Non-lawful",
+    "bab": [
+      0,
+      1,
+      2,
+      3,
+      3,
+      4,
+      5,
+      6,
+      6,
+      7,
+      8,
+      9,
+      9,
+      10,
+      11,
+      12,
+      12,
+      13,
+      14,
+      15
+    ],
+    "saves": {
+      "fort": [
+        0,
+        0,
+        1,
+        1,
+        1,
+        2,
+        2,
+        2,
+        3,
+        3,
+        3,
+        4,
+        4,
+        4,
+        5,
+        5,
+        5,
+        6,
+        6,
+        6
+      ],
+      "ref": [
+        2,
+        3,
+        3,
+        4,
+        4,
+        5,
+        5,
+        6,
+        6,
+        7,
+        7,
+        8,
+        8,
+        9,
+        9,
+        10,
+        10,
+        11,
+        11,
+        12
+      ],
+      "will": [
+        2,
+        3,
+        3,
+        4,
+        4,
+        5,
+        5,
+        6,
+        6,
+        7,
+        7,
+        8,
+        8,
+        9,
+        9,
+        10,
+        10,
+        11,
+        11,
+        12
+      ]
+    },
+    "abilitiesByLevel": {
+      "1": [
+        "Bardic music",
+        "Bardic knowledge",
+        "Countersong",
+        "Fascinate",
+        "Inspire courage +1"
+      ],
+      "3": [
+        "Inspire competence"
+      ],
+      "6": [
+        "Suggestion"
+      ],
+      "8": [
+        "Inspire courage +2"
+      ],
+      "9": [
+        "Inspire greatness"
+      ],
+      "12": [
+        "Song of freedom"
+      ],
+      "14": [
+        "Inspire courage +3"
+      ],
+      "15": [
+        "Inspire heroics"
+      ],
+      "18": [
+        "Mass suggestion"
+      ],
+      "20": [
+        "Inspire courage +4"
+      ]
+    }
+  },
+  {
+    "id": "cleric",
+    "name": "Cleric",
+    "hitDice": "d4",
+    "skillPoints": 2,
+    "keyStat": "Wisdom",
+    "spellCaster": true,
+    "classSkills": [
+      "Concentration",
+      "Craft",
+      "Diplomacy",
+      "Heal",
+      "Knowledge (Arcane)",
+      "Knowledge (History)",
+      "Knowledge (Religion)",
+      "Knowledge (the Planes)",
+      "Profession",
+      "Spellcraft"
+    ],
+    "proficiencies": [
+      "Simple weapons",
+      "Light armor",
+      "Medium armor",
+      "Heavy armor",
+      "Basic shields"
+    ],
+    "alignment": "Any",
+    "bab": [
+      0,
+      1,
+      2,
+      3,
+      3,
+      4,
+      5,
+      6,
+      6,
+      7,
+      8,
+      9,
+      9,
+      10,
+      11,
+      12,
+      12,
+      13,
+      14,
+      15
+    ],
+    "saves": {
+      "fort": [
+        2,
+        3,
+        3,
+        4,
+        4,
+        5,
+        5,
+        6,
+        6,
+        7,
+        7,
+        8,
+        8,
+        9,
+        9,
+        10,
+        10,
+        11,
+        11,
+        12
+      ],
+      "ref": [
+        0,
+        0,
+        1,
+        1,
+        1,
+        2,
+        2,
+        2,
+        3,
+        3,
+        3,
+        4,
+        4,
+        4,
+        5,
+        5,
+        5,
+        6,
+        6,
+        6
+      ],
+      "will": [
+        2,
+        3,
+        3,
+        4,
+        4,
+        5,
+        5,
+        6,
+        6,
+        7,
+        7,
+        8,
+        8,
+        9,
+        9,
+        10,
+        10,
+        11,
+        11,
+        12
+      ]
+    },
+    "abilitiesByLevel": {
+      "1": [
+        "Turn or rebuke undead"
+      ]
+    }
+  },
+  {
+    "id": "druid",
+    "name": "Druid",
+    "hitDice": "d8",
+    "skillPoints": 4,
+    "keyStat": "Wisdom",
+    "spellCaster": true,
+    "classSkills": [
+      "Concentration",
+      "Craft",
+      "Diplomacy",
+      "Handle Animal",
+      "Heal",
+      "Knowledge (Nature)",
+      "Listen",
+      "Profession",
+      "Ride",
+      "Spellcraft",
+      "Spot",
+      "Survival",
+      "Swim"
+    ],
+    "proficiencies": [
+      "Club",
+      "Dagger",
+      "Dart",
+      "Quarterstaff",
+      "Scimitar",
+      "Sickle",
+      "Shortspear",
+      "Sling",
+      "Spear"
+    ],
+    "alignment": "Neutral",
+    "bab": [
+      0,
+      1,
+      2,
+      3,
+      3,
+      4,
+      5,
+      6,
+      6,
+      7,
+      8,
+      9,
+      9,
+      10,
+      11,
+      12,
+      12,
+      14,
+      14,
+      15
+    ],
+    "saves": {
+      "fort": [
+        2,
+        3,
+        3,
+        4,
+        4,
+        5,
+        5,
+        6,
+        6,
+        7,
+        7,
+        8,
+        8,
+        9,
+        9,
+        10,
+        10,
+        11,
+        11,
+        12
+      ],
+      "ref": [
+        0,
+        0,
+        1,
+        1,
+        1,
+        2,
+        2,
+        2,
+        3,
+        3,
+        3,
+        4,
+        4,
+        4,
+        5,
+        5,
+        5,
+        6,
+        6,
+        6
+      ],
+      "will": [
+        2,
+        3,
+        3,
+        4,
+        4,
+        5,
+        5,
+        6,
+        6,
+        7,
+        7,
+        8,
+        8,
+        9,
+        9,
+        10,
+        10,
+        11,
+        11,
+        12
+      ]
+    },
+    "abilitiesByLevel": {
+      "1": [
+        "Animal companion",
+        "Nature sense",
+        "Wild empathy"
+      ],
+      "2": [
+        "Woodland stride"
+      ],
+      "3": [
+        "Trackless step"
+      ],
+      "4": [
+        "Resist nature's lure"
+      ],
+      "5": [
+        "Wild shape (1/day)"
+      ],
+      "6": [
+        "Wild shape (2/day)"
+      ],
+      "7": [
+        "Wild shape (3/day)"
+      ],
+      "8": [
+        "Wild shape (large)"
+      ],
+      "9": [
+        "Venom immunity"
+      ],
+      "10": [
+        "Wild shape (4/day)"
+      ],
+      "11": [
+        "Wild shape (tiny)"
+      ],
+      "12": [
+        "Wild shape (plant)"
+      ],
+      "13": [
+        "A thousand faces"
+      ],
+      "14": [
+        "Wild shape (5/day)"
+      ],
+      "15": [
+        "Timeless body",
+        "Wild shape (huge)"
+      ],
+      "16": [
+        "Wild shape (elemental 1/day)"
+      ],
+      "18": [
+        "Wild shape (6/day)",
+        "Wild shape (elemental 2/day)"
+      ],
+      "20": [
+        "Wild shape (elemental 3/day)",
+        "Wild shape (huge elemental)"
+      ]
+    }
+  },
+  {
+    "id": "fighter",
+    "name": "Fighter",
+    "hitDice": "d10",
+    "skillPoints": 2,
+    "keyStat": "Strength",
+    "spellCaster": false,
+    "classSkills": [
+      "Climb",
+      "Craft",
+      "Handle Animal",
+      "Intimidate",
+      "Jump",
+      "Ride",
+      "Swim"
+    ],
+    "proficiencies": [
+      "Simple weapons",
+      "Martial weapons",
+      "Light armor",
+      "Medium armor",
+      "Heavy armor",
+      "Shields"
+    ],
+    "alignment": "Any",
+    "bab": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20
+    ],
+    "saves": {
+      "fort": [
+        2,
+        3,
+        3,
+        4,
+        4,
+        5,
+        5,
+        6,
+        6,
+        7,
+        7,
+        8,
+        8,
+        9,
+        9,
+        10,
+        10,
+        11,
+        11,
+        12
+      ],
+      "ref": [
+        0,
+        0,
+        1,
+        1,
+        1,
+        2,
+        2,
+        2,
+        3,
+        3,
+        3,
+        4,
+        4,
+        4,
+        5,
+        5,
+        5,
+        6,
+        6,
+        6
+      ],
+      "will": [
+        0,
+        0,
+        1,
+        1,
+        1,
+        2,
+        2,
+        2,
+        3,
+        3,
+        3,
+        4,
+        4,
+        4,
+        5,
+        5,
+        5,
+        6,
+        6,
+        6
+      ]
+    },
+    "abilitiesByLevel": {
+      "1": [
+        "Bonus fighter feat"
+      ],
+      "2": [
+        "Bonus fighter feat"
+      ],
+      "4": [
+        "Bonus fighter feat"
+      ],
+      "6": [
+        "Bonus fighter feat"
+      ],
+      "8": [
+        "Bonus fighter feat"
+      ],
+      "10": [
+        "Bonus fighter feat"
+      ],
+      "12": [
+        "Bonus fighter feat"
+      ],
+      "14": [
+        "Bonus fighter feat"
+      ],
+      "16": [
+        "Bonus fighter feat"
+      ],
+      "18": [
+        "Bonus fighter feat"
+      ],
+      "20": [
+        "Bonus fighter feat"
+      ]
+    }
+  },
+  {
+    "id": "monk",
+    "name": "Monk",
+    "hitDice": "d8",
+    "skillPoints": 4,
+    "keyStat": "Dexterity",
+    "spellCaster": false,
+    "classSkills": [
+      "Balance",
+      "Climb",
+      "Concentration",
+      "Craft",
+      "Diplomacy",
+      "Escape Artist",
+      "Hide",
+      "Jump",
+      "Knowledge (Arcana)",
+      "Knowledge (Religion)",
+      "Listen",
+      "Move Silently",
+      "Spot",
+      "Swim",
+      "Tumble"
+    ],
+    "proficiencies": [
+      "Club",
+      "Light crossbow",
+      "Heavy crossbow",
+      "Dagger",
+      "Handaxe",
+      "Javelin",
+      "Kama",
+      "Nunchaku",
+      "Quarterstaff",
+      "Sai",
+      "Shuriken",
+      "Siangham",
+      "Sling"
+    ],
+    "alignment": "Lawful",
+    "bab": [
+      0,
+      1,
+      2,
+      3,
+      3,
+      4,
+      5,
+      6,
+      6,
+      7,
+      8,
+      9,
+      9,
+      10,
+      11,
+      12,
+      12,
+      13,
+      14,
+      15
+    ],
+    "saves": {
+      "fort": [
+        2,
+        3,
+        3,
+        4,
+        4,
+        5,
+        5,
+        6,
+        6,
+        7,
+        7,
+        8,
+        8,
+        9,
+        9,
+        10,
+        10,
+        11,
+        11,
+        12
+      ],
+      "ref": [
+        2,
+        3,
+        3,
+        4,
+        4,
+        5,
+        5,
+        6,
+        6,
+        7,
+        7,
+        8,
+        8,
+        9,
+        9,
+        10,
+        10,
+        11,
+        11,
+        12
+      ],
+      "will": [
+        2,
+        3,
+        3,
+        4,
+        4,
+        5,
+        5,
+        6,
+        6,
+        7,
+        7,
+        8,
+        8,
+        9,
+        9,
+        10,
+        10,
+        11,
+        11,
+        12
+      ]
+    },
+    "abilitiesByLevel": {
+      "1": [
+        "Bonus monk feat",
+        "Flurry of blows",
+        "Unarmed strike"
+      ],
+      "2": [
+        "Bonus monk feat",
+        "Evasion",
+        "Fast movement"
+      ],
+      "3": [
+        "Still mind"
+      ],
+      "4": [
+        "Ki strike(magic)",
+        "Slow fall 20ft"
+      ],
+      "5": [
+        "Purity of body"
+      ],
+      "6": [
+        "Bonus monk feat",
+        "Slow fall 30ft"
+      ],
+      "7": [
+        "Wholeness of body"
+      ],
+      "8": [
+        "Slow fall 40ft"
+      ],
+      "9": [
+        "Improved evasion"
+      ],
+      "10": [
+        "Ki strike (lawful)",
+        "Slow fall 50ft"
+      ],
+      "11": [
+        "Diamond body",
+        "Greater flurry"
+      ],
+      "12": [
+        "Abundant step",
+        "Slow fall 60ft"
+      ],
+      "13": [
+        "Diamond soul"
+      ],
+      "14": [
+        "Slow fall 70ft"
+      ],
+      "15": [
+        "Quivering palm"
+      ],
+      "16": [
+        "Ki strike (adamantine)",
+        "Slow fall 80ft"
+      ],
+      "17": [
+        "Timeless body",
+        "Tongue of the sun and moon"
+      ],
+      "18": [
+        "Slow fall 90ft"
+      ],
+      "19": [
+        "Empty body"
+      ],
+      "20": [
+        "Perfect self",
+        "Slow fall any distance"
+      ]
+    }
+  },
+  {
+    "id": "paladin",
+    "name": "Paladin",
+    "hitDice": "d10",
+    "skillPoints": 2,
+    "keyStat": "Charisma",
+    "spellCaster": false,
+    "classSkills": [
+      "Concentration",
+      "Craft",
+      "Diplomacy",
+      "Handle Animal",
+      "Heal",
+      "Knowledge (Nobility and royalty)",
+      "Knowledge (Religion)",
+      "Profession",
+      "Ride",
+      "Survival"
+    ],
+    "proficiencies": [
+      "Simple weapons",
+      "Martial weapons",
+      "Light armor",
+      "Medium armor",
+      "Heavy armor",
+      "Basic shields"
+    ],
+    "alignment": "lawful good",
+    "bab": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20
+    ],
+    "saves": {
+      "fort": [
+        2,
+        3,
+        3,
+        4,
+        4,
+        5,
+        5,
+        6,
+        6,
+        7,
+        7,
+        8,
+        8,
+        9,
+        9,
+        10,
+        10,
+        11,
+        11,
+        12
+      ],
+      "ref": [
+        0,
+        0,
+        1,
+        1,
+        1,
+        2,
+        2,
+        2,
+        3,
+        3,
+        3,
+        4,
+        4,
+        4,
+        5,
+        5,
+        5,
+        6,
+        6,
+        6
+      ],
+      "will": [
+        0,
+        0,
+        1,
+        1,
+        1,
+        2,
+        2,
+        2,
+        3,
+        3,
+        3,
+        4,
+        4,
+        4,
+        5,
+        5,
+        5,
+        6,
+        6,
+        6
+      ]
+    },
+    "abilitiesByLevel": {
+      "1": [
+        "Aura of good",
+        "Detect evil",
+        "Smite evil 1/day"
+      ],
+      "2": [
+        "Divine grace",
+        "Lay on hands"
+      ],
+      "3": [
+        "Aura of courage",
+        "Divine health"
+      ],
+      "4": [
+        "Turn undead"
+      ],
+      "5": [
+        "Smite evil 2/day",
+        "Special mount"
+      ],
+      "6": [
+        "Remove disease 1/week"
+      ],
+      "9": [
+        "Remove disease 2/week"
+      ],
+      "10": [
+        "Smite evil 3/day"
+      ],
+      "12": [
+        "Remove disease 3/week"
+      ],
+      "15": [
+        "Remove disease 4/week",
+        "Smite evil 4/day"
+      ],
+      "18": [
+        "Remove disease 5/week"
+      ],
+      "20": [
+        "Smite evil 5/day"
+      ]
+    }
+  },
+  {
+    "id": "ranger",
+    "name": "Ranger",
+    "hitDice": "d8",
+    "skillPoints": 2,
+    "keyStat": "Dexterity",
+    "spellCaster": true,
+    "classSkills": [
+      "Climb",
+      "Concentration",
+      "Craft",
+      "Handle Animal",
+      "Heal",
+      "Hide",
+      "Jump",
+      "Knowledge (Nature)",
+      "Listen",
+      "Move Silently",
+      "Profession",
+      "Ride",
+      "Search",
+      "Spot",
+      "Survival",
+      "Swim",
+      "Use Rope"
+    ],
+    "proficiencies": [
+      "Simple weapons",
+      "Martial weapons",
+      "Light armor",
+      "Medium armor",
+      "Basic shields"
+    ],
+    "alignment": "Good",
+    "bab": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20
+    ],
+    "saves": {
+      "fort": [
+        2,
+        3,
+        3,
+        4,
+        4,
+        5,
+        5,
+        6,
+        6,
+        7,
+        7,
+        8,
+        8,
+        9,
+        9,
+        10,
+        10,
+        11,
+        11,
+        12
+      ],
+      "ref": [
+        2,
+        3,
+        3,
+        4,
+        4,
+        5,
+        5,
+        6,
+        6,
+        7,
+        7,
+        8,
+        8,
+        9,
+        9,
+        10,
+        10,
+        11,
+        11,
+        12
+      ],
+      "will": [
+        0,
+        0,
+        1,
+        1,
+        1,
+        2,
+        2,
+        2,
+        3,
+        3,
+        3,
+        4,
+        4,
+        4,
+        5,
+        5,
+        5,
+        6,
+        6,
+        6
+      ]
+    },
+    "abilitiesByLevel": {
+      "1": [
+        "Favored enemy (1st)",
+        "Track",
+        "Wild empathy"
+      ],
+      "2": [
+        "Combat style"
+      ],
+      "3": [
+        "Endurance"
+      ],
+      "4": [
+        "Animal companion"
+      ],
+      "5": [
+        "Favored enemy (2nd)"
+      ],
+      "6": [
+        "Improved combat style"
+      ],
+      "7": [
+        "Woodland stride"
+      ],
+      "8": [
+        "Swift tracker"
+      ],
+      "9": [
+        "Evasion"
+      ],
+      "10": [
+        "Favored enemy (3rd)"
+      ],
+      "11": [
+        "Mastery combat style"
+      ],
+      "13": [
+        "Camouflage"
+      ],
+      "15": [
+        "Favored enemy (4th)"
+      ],
+      "17": [
+        "Hide in plain sight"
+      ],
+      "20": [
+        "Favored enemy (5th)"
+      ]
+    }
+  },
+  {
+    "id": "rogue",
+    "name": "Rogue",
+    "hitDice": "d6",
+    "skillPoints": 6,
+    "keyStat": "Dexterity",
+    "spellCaster": false,
+    "classSkills": [
+      "Appraise",
+      "Balance",
+      "Bluff",
+      "Climb",
+      "Craft",
+      "Decipher Script",
+      "Diplomacy",
+      "Disable Device",
+      "Disguise",
+      "Escape Artist",
+      "Forgery",
+      "Gather Information",
+      "Hide",
+      "Intimidate",
+      "Jump",
+      "Knowledge (Local)",
+      "Listen",
+      "Move Silently",
+      "Open Lock",
+      "Perform",
+      "Profession",
+      "Search",
+      "Sense Motive",
+      "Sleight of Hand",
+      "Spot",
+      "Swim",
+      "Tumble",
+      "Use Magic Device",
+      "Use Rope"
+    ],
+    "proficiencies": [
+      "Simple weapons",
+      "Hand crossbow",
+      "Short sword",
+      "Light armor"
+    ],
+    "alignment": "Chaotic",
+    "bab": [
+      0,
+      1,
+      2,
+      3,
+      3,
+      4,
+      5,
+      6,
+      6,
+      7,
+      8,
+      9,
+      9,
+      10,
+      11,
+      12,
+      12,
+      13,
+      14,
+      15
+    ],
+    "saves": {
+      "fort": [
+        0,
+        0,
+        1,
+        1,
+        1,
+        2,
+        2,
+        2,
+        3,
+        3,
+        3,
+        4,
+        4,
+        4,
+        5,
+        5,
+        5,
+        6,
+        6,
+        6
+      ],
+      "ref": [
+        2,
+        3,
+        3,
+        4,
+        4,
+        5,
+        5,
+        6,
+        6,
+        7,
+        7,
+        8,
+        8,
+        9,
+        9,
+        10,
+        10,
+        11,
+        11,
+        12
+      ],
+      "will": [
+        0,
+        0,
+        1,
+        1,
+        1,
+        2,
+        2,
+        2,
+        3,
+        3,
+        3,
+        4,
+        4,
+        4,
+        5,
+        5,
+        5,
+        6,
+        6,
+        6
+      ]
+    },
+    "abilitiesByLevel": {
+      "1": [
+        "Sneak attack 1d6",
+        "Trapfinding"
+      ],
+      "2": [
+        "Evasion"
+      ],
+      "3": [
+        "Sneak attack 2d6",
+        "Trap sense +1"
+      ],
+      "4": [
+        "Uncanny dodge"
+      ],
+      "5": [
+        "Sneak attack 3d6"
+      ],
+      "6": [
+        "Trap sense +2"
+      ],
+      "7": [
+        "Sneak attack 4d6"
+      ],
+      "8": [
+        "Improved uncanny dodge"
+      ],
+      "9": [
+        "Sneak attack 5d6",
+        "Trap sense +3"
+      ],
+      "10": [
+        "Special ability"
+      ],
+      "11": [
+        "Sneak attack 6d6"
+      ],
+      "12": [
+        "Trap sense +4"
+      ],
+      "13": [
+        "Sneak attack 7d6",
+        "Special ability"
+      ],
+      "15": [
+        "Sneak attack 8d6",
+        "Trap sense +5"
+      ],
+      "16": [
+        "Special ability"
+      ],
+      "17": [
+        "Sneak attack 9d6"
+      ],
+      "18": [
+        "Trap sense +6"
+      ],
+      "19": [
+        "Sneak attack 10d6",
+        "Special ability"
+      ]
+    }
+  },
+  {
+    "id": "sorcerer",
+    "name": "Sorcerer",
+    "hitDice": "d4",
+    "skillPoints": 2,
+    "keyStat": "Charisma",
+    "spellCaster": true,
+    "classSkills": [
+      "Bluff",
+      "Concentration",
+      "Craft",
+      "Knowledge (arcana)",
+      "Profession",
+      "Spellcraft"
+    ],
+    "proficiencies": [
+      "Simple weapons"
+    ],
+    "alignment": "Any",
+    "bab": [
+      0,
+      1,
+      1,
+      2,
+      2,
+      3,
+      3,
+      4,
+      4,
+      5,
+      5,
+      6,
+      6,
+      7,
+      7,
+      8,
+      8,
+      9,
+      9,
+      10
+    ],
+    "saves": {
+      "fort": [
+        0,
+        0,
+        1,
+        1,
+        1,
+        2,
+        2,
+        2,
+        3,
+        3,
+        3,
+        4,
+        4,
+        4,
+        5,
+        5,
+        5,
+        6,
+        6,
+        6
+      ],
+      "ref": [
+        0,
+        0,
+        1,
+        1,
+        1,
+        2,
+        2,
+        2,
+        3,
+        3,
+        3,
+        4,
+        4,
+        4,
+        5,
+        5,
+        5,
+        6,
+        6,
+        6
+      ],
+      "will": [
+        2,
+        3,
+        3,
+        4,
+        4,
+        5,
+        5,
+        6,
+        6,
+        7,
+        7,
+        8,
+        8,
+        9,
+        9,
+        10,
+        10,
+        11,
+        11,
+        12
+      ]
+    },
+    "abilitiesByLevel": {
+      "1": [
+        "Summon familiar"
+      ]
+    }
+  },
+  {
+    "id": "wizard",
+    "name": "Wizard",
+    "hitDice": "d4",
+    "skillPoints": 2,
+    "keyStat": "Intelligence",
+    "spellCaster": true,
+    "classSkills": [
+      "Concentration",
+      "Craft",
+      "Decipher Script",
+      "Knowledge (All)",
+      "Profession",
+      "Spellcraft"
+    ],
+    "proficiencies": [
+      "Club",
+      "Dagger",
+      "Heavy crossbow",
+      "Light crossbow",
+      "Quarterstaff"
+    ],
+    "alignment": "Lawful",
+    "bab": [
+      0,
+      1,
+      1,
+      2,
+      2,
+      3,
+      3,
+      4,
+      4,
+      5,
+      5,
+      6,
+      6,
+      7,
+      7,
+      8,
+      8,
+      9,
+      9,
+      10
+    ],
+    "saves": {
+      "fort": [
+        0,
+        0,
+        1,
+        1,
+        1,
+        2,
+        2,
+        2,
+        3,
+        3,
+        3,
+        4,
+        4,
+        4,
+        5,
+        5,
+        5,
+        6,
+        6,
+        6
+      ],
+      "ref": [
+        0,
+        0,
+        1,
+        1,
+        1,
+        2,
+        2,
+        2,
+        3,
+        3,
+        3,
+        4,
+        4,
+        4,
+        5,
+        5,
+        5,
+        6,
+        6,
+        6
+      ],
+      "will": [
+        2,
+        3,
+        3,
+        4,
+        4,
+        5,
+        5,
+        6,
+        6,
+        7,
+        7,
+        8,
+        8,
+        9,
+        9,
+        10,
+        10,
+        11,
+        11,
+        12
+      ]
+    },
+    "abilitiesByLevel": {
+      "1": [
+        "Summon familiar",
+        "Scribe scroll"
+      ],
+      "5": [
+        "Bonus wizard feat"
+      ],
+      "10": [
+        "Bonus wizard feat"
+      ],
+      "15": [
+        "Bonus wizard feat"
+      ],
+      "20": [
+        "Bonus wizard feat"
+      ]
+    }
+  }
+]

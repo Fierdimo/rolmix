@@ -1,0 +1,12 @@
+[
+  { "id": "longsword", "name": "Espada Larga", "slot": "weapon_main", "category": "weapon", "notes": "1d8 cortante 19-20/×2", "weight": 4, "cost": "15 po" },
+  { "id": "rapier", "name": "Estoque", "slot": "weapon_main", "category": "weapon", "notes": "1d6 perforante 18-20/×2 (sutileza)", "weight": 2, "cost": "20 po" },
+  { "id": "composite-longbow", "name": "Arco Largo Compuesto", "slot": "weapon_main", "category": "weapon", "notes": "1d8 perforante ×3, suma Fue al daño", "weight": 3, "cost": "100 po" },
+  { "id": "studded-leather", "name": "Cuero Tachonado", "slot": "armor", "category": "armor", "bonuses": [{ "target": "ac", "value": 3 }], "notes": "Ligera, máx Des +5", "weight": 20, "cost": "25 po" },
+  { "id": "breastplate", "name": "Coraza", "slot": "armor", "category": "armor", "bonuses": [{ "target": "ac", "value": 6 }], "notes": "Media, máx Des +3", "weight": 30, "cost": "200 po" },
+  { "id": "full-plate", "name": "Armadura Completa", "slot": "armor", "category": "armor", "bonuses": [{ "target": "ac", "value": 9 }], "notes": "Pesada, máx Des +1", "weight": 50, "cost": "1500 po" },
+  { "id": "heavy-shield", "name": "Escudo Pesado", "slot": "shield", "category": "shield", "bonuses": [{ "target": "ac", "value": 2 }], "notes": "Penalización -2", "weight": 15, "cost": "20 po" },
+  { "id": "cloak-resistance-1", "name": "Capa de Resistencia +1", "slot": "cloak", "category": "wondrous", "bonuses": [{ "target": "fort", "value": 1 }, { "target": "ref", "value": 1 }, { "target": "will", "value": 1 }], "cost": "1000 po" },
+  { "id": "ring-protection-1", "name": "Anillo de Protección +1", "slot": "ring1", "category": "wondrous", "bonuses": [{ "target": "ac", "value": 1 }], "notes": "Bonificador de deflexión", "cost": "2000 po" },
+  { "id": "belt-giant-strength", "name": "Cinturón de Fuerza de Gigante +2", "slot": "belt", "category": "wondrous", "bonuses": [{ "target": "mod_str", "value": 1 }, { "target": "attack_melee", "value": 1 }, { "target": "cmb", "value": 1 }], "notes": "+2 a Fuerza (mejora)", "cost": "4000 po" }
+]
