@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView,
-  StatusBar, ActivityIndicator, Alert, Modal, Switch,
+  StatusBar, ActivityIndicator, Alert, Modal, Switch, FlatList, ListRenderItem,
 } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp } from '@react-navigation/native';
@@ -19,7 +19,7 @@ type Props = {
   route: RouteProp<RootStackParamList, 'CharacterEditor'>;
 };
 
-type Tab = 'stats' | 'classes' | 'equipment' | 'inventory' | 'spells' | 'feats' | 'skills' | 'rolls';
+type Tab = 'stats' | 'adventure' | 'classes' | 'equipment' | 'inventory' | 'spells' | 'feats' | 'skills' | 'rolls';
 
 function uid() { return Math.random().toString(36).slice(2, 10); }
 
@@ -137,7 +137,7 @@ export default function CharacterEditorScreen({ navigation, route }: Props) {
 
       {/* Tabs */}
       <View style={styles.tabs}>
-        {(['stats', 'classes', 'equipment', 'inventory', ...(system.hasSpells ? ['spells'] as Tab[] : []), 'feats', 'skills', 'rolls'] as Tab[]).map((t) => (
+        {(['stats', 'adventure', 'classes', 'equipment', 'inventory', ...(system.hasSpells ? ['spells'] as Tab[] : []), 'feats', 'skills', 'rolls'] as Tab[]).map((t) => (
           <TouchableOpacity key={t} style={[styles.tab, tab === t && styles.tabActive]} onPress={() => setTab(t)}>
             <Text style={[styles.tabText, tab === t && styles.tabTextActive]}>{TAB_LABEL[t]}</Text>
           </TouchableOpacity>
@@ -155,6 +155,17 @@ export default function CharacterEditorScreen({ navigation, route }: Props) {
             finalStats={finalStats}
             finalActions={finalActions}
             classFeatures={classFeatures}
+          />
+        )}
+        {tab === 'adventure' && (
+          <AdventureTab
+            data={data}
+            setData={(d) => { setData(d); setDirty(true); }}
+            hp={finalStats.hp_max ?? 0}
+            bab={finalStats.bab ?? 0}
+            strMod={finalStats.mod_str ?? 0}
+            dexMod={finalStats.mod_dex ?? 0}
+            finalActions={finalActions}
           />
         )}
         {tab === 'classes' && (
@@ -185,6 +196,7 @@ export default function CharacterEditorScreen({ navigation, route }: Props) {
 
 const TAB_LABEL: Record<Tab, string> = {
   stats: 'Hoja',
+  adventure: 'Sesión',
   classes: 'Clases',
   equipment: 'Equipo',
   inventory: 'Mochila',
@@ -259,11 +271,29 @@ function StatsTab({
           ))}
         </View>
       ) : null}
+
+      {/* ── Notas del personaje ──────────────────────────────── */}
+      <View style={styles.statsCard}>
+        <Text style={styles.sectionTitle}>Notas del personaje</Text>
+        <TextInput
+          style={[styles.fieldInput, { minHeight: 100 }]}
+          value={String(data.notes ?? '')}
+          onChangeText={(t) => setField('notes', t)}
+          placeholder="Trasfondo, personalidad, vínculos, apariencia…"
+          placeholderTextColor="#475569"
+          multiline
+          textAlignVertical="top"
+        />
+      </View>
     </View>
   );
 }
 
 // ─── Cabecera de identidad: nombre, raza (selector), nivel total ──
+// Tabla XP D&D 3.5 (nivel → XP necesaria para alcanzarlo)
+const DND35_XP_TABLE = [0, 0, 1000, 3000, 6000, 10000, 15000, 21000, 28000, 36000, 45000,
+  55000, 66000, 78000, 91000, 105000, 120000, 136000, 153000, 171000, 190000];
+
 function IdentityHeader({
   system, data, name, onName, setField,
 }: {
@@ -275,8 +305,13 @@ function IdentityHeader({
 }) {
   const [racePickerOpen, setRacePickerOpen] = useState(false);
   const [raceQuery, setRaceQuery] = useState('');
+  const [xpModal, setXpModal] = useState<'add' | 'set' | null>(null);
+  const [xpInput, setXpInput] = useState('');
+  const [langInput, setLangInput] = useState('');
   const catalog = getCatalog(system.id);
   const races = (catalog?.races ?? []) as Array<{ id: string; name: string; size?: string; favoredClass?: string }>;
+  const catalogClassesForLabel = catalog?.classes ?? [];
+
   const filteredRaces = useMemo(() => {
     const q = raceQuery.trim().toLowerCase();
     if (!q) return races;
@@ -290,7 +325,12 @@ function IdentityHeader({
     ? ((data as { classes: Array<{ classId: string; level: number }> }).classes)
     : [];
   const totalLevel = classes.reduce((acc, c) => acc + (c.level | 0), 0);
-  const classLabel = (id: string) => system.classes?.find((c: any) => c.id === id)?.name ?? id;
+  const classLabel = (id: string) => {
+    const sys = system.classes?.find((c: any) => c.id === id);
+    if (sys) return sys.name;
+    const cat = catalogClassesForLabel.find((c) => c.id === id);
+    return cat?.name ?? id;
+  };
 
   return (
     <View style={styles.identityCard}>
@@ -335,6 +375,119 @@ function IdentityHeader({
         <Text style={styles.help}>Añade clases en la pestaña Clases para calcular el nivel.</Text>
       )}
 
+      {/* ── XP tracker ─────────────────────────────────────── */}
+      {(() => {
+        const xp = typeof data.xp === 'number' ? data.xp : 0;
+        const nextLvl = Math.min(20, totalLevel + 1);
+        const xpNext = DND35_XP_TABLE[nextLvl] ?? 0;
+        const xpCur  = DND35_XP_TABLE[totalLevel] ?? 0;
+        const xpPct  = xpNext > xpCur ? Math.min(1, Math.max(0, (xp - xpCur) / (xpNext - xpCur))) : 1;
+        const formatter = (n: number) => n >= 1000 ? `${(n / 1000).toFixed(0)}k` : `${n}`;
+        return (
+          <View style={styles.xpRow}>
+            <Text style={styles.xpLabel}>PX</Text>
+            <View style={{ flex: 1, marginHorizontal: 8 }}>
+              <View style={styles.xpBarTrack}>
+                <View style={[styles.xpBarFill, { width: `${Math.round(xpPct * 100)}%` as any }]} />
+              </View>
+              <Text style={styles.xpNums}>
+                {formatter(xp)} / {formatter(xpNext)}
+                {totalLevel >= 20 ? ' · Nivel máximo' : ` (Nv ${nextLvl})`}
+              </Text>
+            </View>
+            <TouchableOpacity
+              style={styles.xpEditBtn}
+              onPress={() => { setXpInput(''); setXpModal('add'); }}
+              onLongPress={() => { setXpInput(String(xp)); setXpModal('set'); }}
+              delayLongPress={400}
+            >
+              <Text style={styles.xpEditText}>+PX</Text>
+            </TouchableOpacity>
+          </View>
+        );
+      })()}
+
+      {/* ── Alineamiento ─────────────────────────────────────── */}
+      {(() => {
+        const ALIGNS = [
+          ['legal-bueno',    'LB'], ['neutral-bueno',   'NB'], ['caótico-bueno',    'CB'],
+          ['legal-neutral',  'LN'], ['neutral',         'N'],  ['caótico-neutral',  'CN'],
+          ['legal-malvado',  'LM'], ['neutral-malvado', 'NM'], ['caótico-malvado',  'CM'],
+        ] as const;
+        const curAlign = String(data.alignment ?? '');
+        return (
+          <View style={styles.alignSection}>
+            <Text style={styles.identityFieldLabel}>Alineamiento</Text>
+            <View style={styles.alignGrid}>
+              {ALIGNS.map(([id, label]) => {
+                const active = curAlign === id;
+                return (
+                  <TouchableOpacity
+                    key={id}
+                    style={[styles.alignCell, active && styles.alignCellActive]}
+                    onPress={() => setField('alignment', active ? '' : id)}
+                  >
+                    <Text style={[styles.alignCellText, active && styles.alignCellTextActive]}>{label}</Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+            {curAlign ? (
+              <Text style={styles.alignLabel}>{curAlign.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}</Text>
+            ) : null}
+          </View>
+        );
+      })()}
+
+      {/* ── Idiomas ──────────────────────────────────────────── */}
+      {(() => {
+        const langs: string[] = Array.isArray((data as any).languages) ? (data as any).languages : [];
+        return (
+          <View style={styles.langsSection}>
+            <Text style={styles.identityFieldLabel}>Idiomas</Text>
+            <View style={styles.langsRow}>
+              {langs.map((l, i) => (
+                <TouchableOpacity
+                  key={i}
+                  style={styles.langChip}
+                  onLongPress={() => setField('languages', langs.filter((_, j) => j !== i))}
+                >
+                  <Text style={styles.langChipText}>{l}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+            <View style={styles.langInputRow}>
+              <TextInput
+                style={[styles.fieldInput, { flex: 1, marginTop: 0 }]}
+                value={langInput}
+                onChangeText={setLangInput}
+                placeholder="Añadir idioma…"
+                placeholderTextColor="#475569"
+                onSubmitEditing={() => {
+                  const t = langInput.trim();
+                  if (t && !langs.includes(t)) setField('languages', [...langs, t]);
+                  setLangInput('');
+                }}
+                returnKeyType="done"
+              />
+              <TouchableOpacity
+                style={styles.langAddBtn}
+                onPress={() => {
+                  const t = langInput.trim();
+                  if (t && !langs.includes(t)) setField('languages', [...langs, t]);
+                  setLangInput('');
+                }}
+              >
+                <Text style={styles.langAddBtnText}>+</Text>
+              </TouchableOpacity>
+            </View>
+            {langs.length > 0 ? (
+              <Text style={styles.help}>Mantén pulsado un idioma para eliminarlo.</Text>
+            ) : null}
+          </View>
+        );
+      })()}
+
       <Modal visible={racePickerOpen} transparent animationType="slide" onRequestClose={() => setRacePickerOpen(false)}>
         <View style={styles.modalOverlay}>
           <View style={[styles.modalCard, { maxHeight: '80%' }]}>
@@ -347,10 +500,7 @@ function IdentityHeader({
               placeholderTextColor="#64748b"
               autoCorrect={false}
             />
-            <ScrollView style={{ maxHeight: 460 }} keyboardShouldPersistTaps="handled">
-              {filteredRaces.length === 0 ? (
-                <Text style={styles.muted}>Sin resultados.</Text>
-              ) : null}
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 2 }}>
               {filteredRaces.map((r) => {
                 const active = currentRace.toLowerCase() === r.name.toLowerCase();
                 return (
@@ -385,6 +535,60 @@ function IdentityHeader({
                 onPress={() => setRacePickerOpen(false)}
               >
                 <Text style={{ color: '#94a3b8', fontWeight: '600' }}>Cerrar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Modal edición / suma de PX */}
+      <Modal visible={!!xpModal} transparent animationType="fade" onRequestClose={() => setXpModal(null)}>
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalCard, { paddingBottom: 20 }]}>
+            <Text style={styles.modalTitle}>
+              {xpModal === 'add' ? 'Añadir PX' : 'Establecer PX'}
+            </Text>
+            <TextInput
+              style={[styles.input, { fontSize: 22, textAlign: 'center' }]}
+              keyboardType="numeric"
+              value={xpInput}
+              onChangeText={setXpInput}
+              autoFocus
+              selectTextOnFocus
+              placeholder={xpModal === 'add' ? 'Cantidad a sumar' : 'PX totales'}
+              placeholderTextColor="#64748b"
+              onSubmitEditing={() => {
+                const n = Number(xpInput);
+                if (!Number.isNaN(n)) {
+                  const cur = typeof data.xp === 'number' ? data.xp : 0;
+                  setField('xp', Math.max(0, xpModal === 'add' ? cur + n : n));
+                }
+                setXpModal(null);
+              }}
+            />
+            <Text style={styles.help}>
+              {xpModal === 'add'
+                ? 'Introduce los PX ganados para sumarlos al total.'
+                : 'Mantén pulsado +PX para editar el total directamente.'}
+            </Text>
+            <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
+              <TouchableOpacity style={[styles.modalAction, { flex: 1 }]} onPress={() => setXpModal(null)}>
+                <Text style={{ color: '#94a3b8', fontWeight: '600' }}>Cancelar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalAction, { flex: 1, backgroundColor: 'rgba(124,58,237,0.4)' }]}
+                onPress={() => {
+                  const n = Number(xpInput);
+                  if (!Number.isNaN(n)) {
+                    const cur = typeof data.xp === 'number' ? data.xp : 0;
+                    setField('xp', Math.max(0, xpModal === 'add' ? cur + n : n));
+                  }
+                  setXpModal(null);
+                }}
+              >
+                <Text style={{ color: '#fff', fontWeight: '700' }}>
+                  {xpModal === 'add' ? 'Sumar' : 'Guardar'}
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -600,7 +804,7 @@ function SummaryCard({
 
   return (
     <View style={styles.statsCard}>
-      {/* Cabecera con CA y PG destacados como dos "fichas" grandes. */}
+      {/* CA y PG héroe + HP actual */}
       <View style={styles.heroRow}>
         <TouchableOpacity
           activeOpacity={0.85}
@@ -612,16 +816,19 @@ function SummaryCard({
           <Text style={styles.heroValue}>{raw(ac)}</Text>
           <Text style={styles.heroSub}>Defensa</Text>
         </TouchableOpacity>
+
+        {/* PG máximos (valor permanente) */}
         <TouchableOpacity
           activeOpacity={0.85}
           onLongPress={() => openEdit('hp_max', 'PG máximos', 0, 9999)}
           delayLongPress={350}
           style={[styles.heroCard, styles.heroHp]}
         >
-          <Text style={styles.heroLabel}>PG</Text>
+          <Text style={styles.heroLabel}>PG máx.</Text>
           <Text style={styles.heroValue}>{raw(hp)}</Text>
-          <Text style={styles.heroSub}>Máximos</Text>
+          <Text style={styles.heroSub}>Constitución</Text>
         </TouchableOpacity>
+
         <View style={styles.heroSideCol}>
           <View style={styles.heroSmall}>
             <Text style={styles.heroSmallLabel}>Iniciativa</Text>
@@ -697,10 +904,14 @@ function SummaryCard({
                       <Text style={styles.weaponNotes} numberOfLines={2}>{p.notes}</Text>
                     ) : null}
                   </View>
-                  <View style={styles.weaponStat}>
+                  <TouchableOpacity style={styles.weaponStat} onPress={() => {
+                    const roll = Math.floor(Math.random() * 20) + 1;
+                    const label = p.isRanged ? 'A distancia' : 'Cuerpo a cuerpo';
+                    Alert.alert(w.name, `${label}\n🎲 d20: ${roll} + ${p.totalAtk}\n= ${roll + p.totalAtk}`);
+                  }}>
                     <Text style={styles.weaponStatLabel}>{p.isRanged ? 'Ataque (D)' : 'Ataque (C)'}</Text>
                     <Text style={styles.weaponAtk}>{p.totalAtk >= 0 ? `+${p.totalAtk}` : `${p.totalAtk}`}</Text>
-                  </View>
+                  </TouchableOpacity>
                   <View style={styles.weaponStat}>
                     <Text style={styles.weaponStatLabel}>Daño</Text>
                     <Text style={styles.weaponDmg}>{p.dmgStr}</Text>
@@ -760,6 +971,327 @@ function SummaryCard({
                 style={[styles.modalAction, { flex: 1, backgroundColor: 'rgba(124,58,237,0.4)' }]}
                 onPress={commitEdit}
               >
+                <Text style={{ color: '#fff', fontWeight: '700' }}>Guardar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+    </View>
+  );
+}
+
+// ─── Adventure / Session tab ────────────────────────────────────────────────
+// Contiene el estado temporal del personaje durante la sesión:
+// PG actuales, PG temporales, velocidad, tiradas de muerte, condiciones.
+// Este estado es independiente de la hoja permanente y se puede resetear
+// entre sesiones sin afectar al personaje base.
+
+const CONDITIONS_LIST: Array<{ id: string; label: string; color: string }> = [
+  { id: 'blind',       label: 'Cegado',      color: '#6b7280' },
+  { id: 'deaf',        label: 'Sordo',        color: '#6b7280' },
+  { id: 'stunned',     label: 'Aturdido',     color: '#ef4444' },
+  { id: 'paralyzed',   label: 'Paralizado',   color: '#ef4444' },
+  { id: 'unconscious', label: 'Inconsciente', color: '#991b1b' },
+  { id: 'prone',       label: 'Tumbado',      color: '#f59e0b' },
+  { id: 'entangled',   label: 'Aprisionado',  color: '#f59e0b' },
+  { id: 'frightened',  label: 'Asustado',     color: '#f97316' },
+  { id: 'shaken',      label: 'Tembloroso',   color: '#f97316' },
+  { id: 'fatigued',    label: 'Fatigado',     color: '#a78bfa' },
+  { id: 'exhausted',   label: 'Agotado',      color: '#7c3aed' },
+  { id: 'sickened',    label: 'Enfermo',      color: '#84cc16' },
+];
+
+function AdventureTab({
+  data, setData, hp, bab, strMod, dexMod, finalActions,
+}: {
+  data: Record<string, unknown>;
+  setData: (d: Record<string, unknown>) => void;
+  hp: number;
+  bab: number;
+  strMod: number;
+  dexMod: number;
+  finalActions: RollableAction[];
+}) {
+  // All session state lives under data.sessionState so it's cleanly separable
+  // from the permanent sheet data.
+  const ss = ((data as any).sessionState ?? {}) as Record<string, unknown>;
+  const setSS = (patch: Record<string, unknown>) =>
+    setData({ ...data, sessionState: { ...ss, ...patch } });
+
+  const hpCur: number = typeof ss.hp_cur === 'number' ? ss.hp_cur : hp;
+  const hpTemp: number = typeof ss.hp_temp === 'number' ? Math.max(0, ss.hp_temp) : 0;
+  const speed: number = typeof ss.speed === 'number' ? ss.speed :
+    typeof (data as any).speed === 'number' ? (data as any).speed : 30;
+  const ds = (ss.deathSaves as any) ?? { s: 0, f: 0 };
+  const conditions: string[] = Array.isArray(ss.conditions) ? (ss.conditions as string[]) : [];
+  // Spell slots used — mirror of SpellsTab but session-owned
+  const slots: Record<number, { max: number; used: number }> =
+    (data.spellSlots as any) ?? {};
+
+  const hpPct = hp > 0 ? Math.min(1, Math.max(0, hpCur / hp)) : 0;
+  const hpColor = hpPct > 0.5 ? '#34d399' : hpPct > 0.25 ? '#fbbf24' : '#f87171';
+
+  const [editKey, setEditKey] = useState<{ key: string; label: string; min: number; max: number } | null>(null);
+  const [editVal, setEditVal] = useState('');
+  function openEdit(key: string, label: string, min: number, max: number, cur: number) {
+    setEditVal(String(cur)); setEditKey({ key, label, min, max });
+  }
+  function commitEdit() {
+    if (!editKey) return;
+    const n = Number(editVal);
+    if (Number.isNaN(n)) { setEditKey(null); return; }
+    const v = Math.min(editKey.max, Math.max(editKey.min, n));
+    if (editKey.key === 'speed') setSS({ speed: v });
+    else if (editKey.key === 'hp_cur') setSS({ hp_cur: v });
+    else if (editKey.key === 'hp_temp') setSS({ hp_temp: v });
+    setEditKey(null);
+  }
+
+  function useSlot(level: number) {
+    const cur = slots[level] ?? { max: 0, used: 0 };
+    if (cur.used >= cur.max) return;
+    setData({ ...data, spellSlots: { ...slots, [level]: { ...cur, used: cur.used + 1 } } });
+  }
+  function restoreSlot(level: number) {
+    const cur = slots[level] ?? { max: 0, used: 0 };
+    if (cur.used <= 0) return;
+    setData({ ...data, spellSlots: { ...slots, [level]: { ...cur, used: cur.used - 1 } } });
+  }
+  function longRestSlots() {
+    const reset = Object.fromEntries(
+      Object.entries(slots).map(([k, v]) => [k, { ...(v as any), used: 0 }])
+    );
+    setData({ ...data, spellSlots: reset });
+  }
+  const usedLevels = [1,2,3,4,5,6,7,8,9].filter((l) => (slots[l]?.max ?? 0) > 0);
+
+  function resetSession() {
+    Alert.alert(
+      'Resetear sesión',
+      'Restaura PG al máximo, borra condiciones, tiradas de muerte y recupera todos los espacios de conjuro. El personaje base no cambia.',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        { text: 'Resetear', style: 'destructive', onPress: () => {
+          const resetSlots = Object.fromEntries(
+            Object.entries(slots).map(([k, v]) => [k, { ...(v as any), used: 0 }])
+          );
+          setData({
+            ...data,
+            spellSlots: resetSlots,
+            sessionState: { hp_cur: hp, hp_temp: 0, speed, deathSaves: { s: 0, f: 0 }, conditions: [] },
+          });
+        }},
+      ]
+    );
+  }
+
+  const actionMod = (id: string) => {
+    const a = finalActions.find((x) => x.id === id);
+    return a ? a.modifier : 0;
+  };
+  function rollDice(sides: number, mod: number, label: string) {
+    const roll = Math.floor(Math.random() * sides) + 1;
+    Alert.alert(label, `🎲 d${sides}: ${roll}${mod !== 0 ? ` ${mod >= 0 ? '+' : ''}${mod}` : ''}\n= ${roll + mod}`);
+  }
+
+  return (
+    <View>
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
+        <Text style={[styles.sectionTitle, { flex: 1, marginBottom: 0 }]}>Estado de sesión</Text>
+        <TouchableOpacity
+          style={[styles.addBtn, { marginTop: 0, paddingHorizontal: 12, paddingVertical: 6 }]}
+          onPress={resetSession}
+        >
+          <Text style={[styles.addBtnText, { fontSize: 11 }]}>↺ Nueva sesión</Text>
+        </TouchableOpacity>
+      </View>
+      <Text style={styles.help}>
+        Estado temporal: se resetea entre sesiones. El personaje base (Hoja) no cambia.
+      </Text>
+
+      {/* ── PG actuales ──────────────────────────────────────── */}
+      <View style={styles.statsCard}>
+        <View style={styles.heroRow}>
+          {/* HP card */}
+          <View style={[styles.heroCard, styles.heroHp, { justifyContent: 'space-between' }]}>
+            <TouchableOpacity onLongPress={() => openEdit('hp_cur', 'PG actuales', 0, hp + 200, hpCur)} delayLongPress={350}>
+              <Text style={styles.heroLabel}>PG</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 2 }}>
+                <Text style={[styles.heroValue, { color: hpColor }]}>{hpCur}</Text>
+                {hpTemp > 0 ? <Text style={{ color: '#fbbf24', fontSize: 13, fontWeight: '700' }}>+{hpTemp}</Text> : null}
+                <Text style={{ color: '#64748b', fontSize: 13 }}>/{hp}</Text>
+              </View>
+            </TouchableOpacity>
+            <View style={styles.hpBarTrack}>
+              <View style={[styles.hpBarFill, { width: `${Math.round(hpPct * 100)}%` as any, backgroundColor: hpColor }]} />
+              {hpTemp > 0 && hp > 0 ? (
+                <View style={[styles.hpBarFill, {
+                  position: 'absolute', left: `${Math.round(hpPct * 100)}%` as any,
+                  width: `${Math.min(100 - Math.round(hpPct * 100), Math.round((hpTemp / hp) * 100))}%` as any,
+                  backgroundColor: '#fbbf24', opacity: 0.7,
+                }]} />
+              ) : null}
+            </View>
+            <View style={styles.hpBtnRow}>
+              <TouchableOpacity style={styles.hpBtn} onPress={() => setSS({ hp_cur: Math.max(0, hpCur - 1) })}>
+                <Text style={styles.hpBtnText}>−1</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.hpBtn} onPress={() => setSS({ hp_cur: Math.min(hp, hpCur + 1) })}>
+                <Text style={[styles.hpBtnText, { color: '#34d399' }]}>+1</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.hpBtn, { opacity: 0.7 }]} onPress={() => setSS({ hp_cur: hp })}>
+                <Text style={[styles.hpBtnText, { color: '#a78bfa', fontSize: 9 }]}>Full</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.hpBtn}
+                onPress={() => openEdit('hp_temp', 'PG temporales', 0, 999, hpTemp)}
+                onLongPress={() => setSS({ hp_temp: 0 })}>
+                <Text style={[styles.hpBtnText, { color: hpTemp > 0 ? '#fbbf24' : '#475569', fontSize: 9 }]}>
+                  {hpTemp > 0 ? `Tmp:${hpTemp}` : '+Tmp'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Side stats */}
+          <View style={styles.heroSideCol}>
+            <TouchableOpacity style={styles.heroSmall}
+              onLongPress={() => openEdit('speed', 'Velocidad (pies)', 0, 120, speed)} delayLongPress={350}>
+              <Text style={styles.heroSmallLabel}>Vel.</Text>
+              <Text style={styles.heroSmallValue}>{speed}p</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.heroSmall} onPress={() => rollDice(20, actionMod('initiative'), 'Iniciativa')}>
+              <Text style={styles.heroSmallLabel}>Init.</Text>
+              <Text style={styles.heroSmallValue}>{actionMod('initiative') >= 0 ? '+' : ''}{actionMod('initiative')}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* ── Tiradas de muerte (cuando PG ≤ 0) ──────────────── */}
+        {hpCur <= 0 ? (() => {
+          const toggleDS = (kind: 's' | 'f') => {
+            const cur = (ds[kind] ?? 0) as number;
+            setSS({ deathSaves: { ...ds, [kind]: cur >= 3 ? 0 : cur + 1 } });
+          };
+          return (
+            <View style={styles.deathSavesBox}>
+              <Text style={styles.deathSavesTitle}>⚠ Tiradas de Muerte</Text>
+              <View style={styles.deathSavesRow}>
+                <Text style={styles.deathSavesLabel}>Éxitos</Text>
+                <View style={styles.deathPips}>
+                  {[0, 1, 2].map((i) => (
+                    <TouchableOpacity key={i}
+                      style={[styles.deathPip, styles.deathPipSuccess, i < ds.s ? styles.deathPipOn : undefined]}
+                      onPress={() => toggleDS('s')} />
+                  ))}
+                </View>
+                <Text style={styles.deathSavesLabel}>Fallos</Text>
+                <View style={styles.deathPips}>
+                  {[0, 1, 2].map((i) => (
+                    <TouchableOpacity key={i}
+                      style={[styles.deathPip, styles.deathPipFail, i < ds.f ? styles.deathPipFailOn : undefined]}
+                      onPress={() => toggleDS('f')} />
+                  ))}
+                </View>
+                <TouchableOpacity style={styles.deathResetBtn} onPress={() => setSS({ deathSaves: { s: 0, f: 0 } })}>
+                  <Text style={styles.deathResetText}>↺</Text>
+                </TouchableOpacity>
+              </View>
+              {ds.s >= 3 ? <Text style={{ color: '#34d399', fontSize: 11, marginTop: 4 }}>¡Estabilizado!</Text> : null}
+              {ds.f >= 3 ? <Text style={{ color: '#f87171', fontSize: 11, marginTop: 4 }}>Muerto.</Text> : null}
+            </View>
+          );
+        })() : null}
+      </View>
+
+      {/* ── Espacios de conjuro (usados en sesión) ───────────── */}
+      {usedLevels.length > 0 ? (
+        <View style={styles.slotSection}>
+          <View style={styles.slotHeader}>
+            <Text style={styles.subgroupHero}>Espacios de conjuro</Text>
+            <TouchableOpacity onPress={longRestSlots} style={styles.longRestBtn}>
+              <Text style={styles.longRestText}>Descanso largo</Text>
+            </TouchableOpacity>
+          </View>
+          {usedLevels.map((lvl) => {
+            const s = slots[lvl];
+            return (
+              <View key={lvl} style={styles.slotRow}>
+                <Text style={styles.slotLevelLabel}>Nv {lvl}</Text>
+                <View style={styles.slotPips}>
+                  {Array.from({ length: s.max }).map((_, i) => (
+                    <TouchableOpacity key={i}
+                      style={[styles.slotPip, i < s.used && styles.slotPipUsed]}
+                      onPress={() => i < s.used ? restoreSlot(lvl) : useSlot(lvl)}
+                    />
+                  ))}
+                </View>
+                <Text style={[styles.slotMaxVal, { marginLeft: 6 }]}>{s.max - s.used}/{s.max}</Text>
+              </View>
+            );
+          })}
+        </View>
+      ) : null}
+
+      {/* ── Tiradas rápidas ──────────────────────────────────── */}
+      <View style={styles.statsCard}>
+        <Text style={styles.subgroupHero}>Tiradas rápidas</Text>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+          {([
+            ['Fortaleza', 'fort'],
+            ['Reflejos', 'ref'],
+            ['Voluntad', 'will'],
+            ['Cuerpo a cuerpo', 'attack_melee'],
+            ['A distancia', 'attack_ranged'],
+          ] as [string, string][]).map(([label, id]) => {
+            const mod = actionMod(id);
+            return (
+              <TouchableOpacity key={id} style={styles.actionChip}
+                onPress={() => rollDice(20, mod, label)}>
+                <Text style={styles.actionLabel}>{label}</Text>
+                <Text style={styles.actionMod}>d20 {mod >= 0 ? '+' : ''}{mod}</Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      </View>
+
+      {/* ── Condiciones activas ───────────────────────────────── */}
+      <View style={styles.statsCard}>
+        <Text style={styles.subgroupHero}>Condiciones</Text>
+        <View style={styles.conditionsGrid}>
+          {CONDITIONS_LIST.map((c) => {
+            const on = conditions.includes(c.id);
+            return (
+              <TouchableOpacity key={c.id}
+                style={[styles.conditionChip, on && { backgroundColor: `${c.color}33`, borderColor: c.color }]}
+                onPress={() => {
+                  const next = on ? conditions.filter((x) => x !== c.id) : [...conditions, c.id];
+                  setSS({ conditions: next });
+                }}
+              >
+                <Text style={[styles.conditionText, on && { color: c.color, fontWeight: '700' }]}>{c.label}</Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      </View>
+
+      {/* Editor rápido */}
+      <Modal visible={!!editKey} transparent animationType="fade" onRequestClose={() => setEditKey(null)}>
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalCard, { paddingBottom: 20 }]}>
+            <Text style={styles.modalTitle}>{editKey?.label ?? ''}</Text>
+            <TextInput
+              style={[styles.input, { fontSize: 22, textAlign: 'center' }]}
+              keyboardType="numeric" value={editVal} onChangeText={setEditVal}
+              autoFocus selectTextOnFocus onSubmitEditing={commitEdit}
+            />
+            <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
+              <TouchableOpacity style={[styles.modalAction, { flex: 1 }]} onPress={() => setEditKey(null)}>
+                <Text style={{ color: '#94a3b8', fontWeight: '600' }}>Cancelar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.modalAction, { flex: 1, backgroundColor: 'rgba(124,58,237,0.4)' }]} onPress={commitEdit}>
                 <Text style={{ color: '#fff', fontWeight: '700' }}>Guardar</Text>
               </TouchableOpacity>
             </View>
@@ -1002,6 +1534,47 @@ function EquipmentTab({ system, data, setData }: any) {
 }
 function InventoryTab({ data, setData }: any) {
   const items: InventoryItem[] = Array.isArray(data.inventory) ? data.inventory : [];
+  const [coinEdit, setCoinEdit] = useState<{ key: string; label: string } | null>(null);
+  const [coinInput, setCoinInput] = useState('');
+
+  // D&D 3.5 encumbrance thresholds indexed by STR score (1-29+)
+  // [light, medium, heavy] in pounds
+  const ENC_TABLE: Record<number, [number, number, number]> = {
+    1:[3,6,10],2:[6,13,20],3:[10,20,30],4:[13,26,40],5:[16,33,50],
+    6:[20,40,60],7:[23,46,70],8:[26,53,80],9:[30,60,90],10:[33,66,100],
+    11:[38,76,115],12:[43,86,130],13:[50,100,150],14:[58,116,175],15:[66,133,200],
+    16:[76,153,230],17:[86,173,260],18:[100,200,300],19:[116,233,350],20:[133,266,400],
+    21:[153,306,460],22:[173,346,520],23:[200,400,600],24:[233,466,700],25:[266,533,800],
+    26:[306,613,920],27:[346,693,1040],28:[400,800,1200],29:[466,933,1400],
+  };
+  const strScore = Math.max(1, Math.min(29, Number((data as any).str) || 10));
+  const [lightLb, medLb, heavyLb] = ENC_TABLE[strScore] ?? [33, 66, 100];
+  // Coin weight: 50 coins = 1 lb (D&D 3.5)
+  const coinWeight = (
+    (Number((data as any).coin_pp) || 0) +
+    (Number((data as any).coin_po) || 0) +
+    (Number((data as any).coin_pe) || 0) +
+    (Number((data as any).coin_pc) || 0)
+  ) / 50;
+  // Item weight from notes like "5 lb" or just numeric qty×0 (no known weight)
+  const itemWeight = items.reduce((sum, it) => {
+    const match = String(it.name + ' ' + (it as any).notes ?? '').match(/(\d+(?:\.\d+)?)\s*lb/i);
+    const w = match ? parseFloat(match[1]) : 0;
+    return sum + w * (it.qty || 1);
+  }, 0);
+  const totalWeight = Math.round((coinWeight + itemWeight) * 10) / 10;
+  const encLevel = totalWeight <= lightLb ? 'Ligera' : totalWeight <= medLb ? 'Media' : totalWeight <= heavyLb ? 'Pesada' : 'Sobrecargado';
+  const encColor = totalWeight <= lightLb ? '#34d399' : totalWeight <= medLb ? '#fbbf24' : totalWeight <= heavyLb ? '#f97316' : '#f87171';
+  const encPct = Math.min(1, totalWeight / heavyLb);
+
+  const COINS = [
+    { key: 'coin_pp', label: 'PP', color: '#a78bfa' },
+    { key: 'coin_po', label: 'PO', color: '#fbbf24' },
+    { key: 'coin_pe', label: 'PE', color: '#94a3b8' },
+    { key: 'coin_pc', label: 'PC', color: '#d97706' },
+  ];
+  const getCoin = (k: string) => Math.max(0, Number((data as Record<string, unknown>)[k]) || 0);
+
   function update(next: InventoryItem[]) { setData({ ...data, inventory: next }); }
   function add() { update([...items, { id: uid(), name: 'Nuevo item', qty: 1 }]); }
   function patch(id: string, p: Partial<InventoryItem>) {
@@ -1012,6 +1585,92 @@ function InventoryTab({ data, setData }: any) {
   return (
     <View>
       <Text style={styles.sectionTitle}>Mochila</Text>
+
+      {/* ── Monedas ──────────────────────────────────────────── */}
+      <View style={styles.coinsRow}>
+        {COINS.map((c) => {
+          const val = getCoin(c.key);
+          return (
+            <TouchableOpacity
+              key={c.key}
+              style={styles.coinCard}
+              onPress={() => { setCoinInput(String(val)); setCoinEdit(c); }}
+            >
+              <Text style={[styles.coinLabel, { color: c.color }]}>{c.label}</Text>
+              <Text style={styles.coinValue}>{val}</Text>
+              <View style={styles.coinBtns}>
+                <TouchableOpacity
+                  style={styles.coinBtn}
+                  onPress={() => setData({ ...data, [c.key]: Math.max(0, val - 1) })}
+                >
+                  <Text style={styles.coinBtnText}>−</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.coinBtn}
+                  onPress={() => setData({ ...data, [c.key]: val + 1 })}
+                >
+                  <Text style={[styles.coinBtnText, { color: '#34d399' }]}>+</Text>
+                </TouchableOpacity>
+              </View>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+      <Text style={styles.help}>Toca una moneda para editar el total. PP=10PO, PO=10PE=100PC.</Text>
+
+      {/* ── Encumbrance ──────────────────────────────────────── */}
+      <View style={styles.encBox}>
+        <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 6 }}>
+          <Text style={[styles.encLevel, { color: encColor }]}>{encLevel}</Text>
+          <Text style={styles.encWeight}>{totalWeight} lb</Text>
+        </View>
+        <View style={styles.encBarTrack}>
+          <View style={[styles.encBarFill, { width: `${Math.round(encPct * 100)}%` as any, backgroundColor: encColor }]} />
+        </View>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 4 }}>
+          <Text style={styles.encThreshold}>Lig. ≤{lightLb}</Text>
+          <Text style={styles.encThreshold}>Med. ≤{medLb}</Text>
+          <Text style={styles.encThreshold}>Pes. ≤{heavyLb} lb (FUE {strScore})</Text>
+        </View>
+      </View>
+
+      {/* Modal edición de monedas */}
+      <Modal visible={!!coinEdit} transparent animationType="fade" onRequestClose={() => setCoinEdit(null)}>
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalCard, { paddingBottom: 20 }]}>
+            <Text style={styles.modalTitle}>{coinEdit?.label ?? ''}</Text>
+            <TextInput
+              style={[styles.input, { fontSize: 22, textAlign: 'center' }]}
+              keyboardType="numeric"
+              value={coinInput}
+              onChangeText={setCoinInput}
+              autoFocus selectTextOnFocus
+              onSubmitEditing={() => {
+                const n = Number(coinInput);
+                if (!Number.isNaN(n) && coinEdit) setData({ ...data, [coinEdit.key]: Math.max(0, n) });
+                setCoinEdit(null);
+              }}
+            />
+            <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
+              <TouchableOpacity style={[styles.modalAction, { flex: 1 }]} onPress={() => setCoinEdit(null)}>
+                <Text style={{ color: '#94a3b8', fontWeight: '600' }}>Cancelar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalAction, { flex: 1, backgroundColor: 'rgba(124,58,237,0.4)' }]}
+                onPress={() => {
+                  const n = Number(coinInput);
+                  if (!Number.isNaN(n) && coinEdit) setData({ ...data, [coinEdit.key]: Math.max(0, n) });
+                  setCoinEdit(null);
+                }}
+              >
+                <Text style={{ color: '#fff', fontWeight: '700' }}>Guardar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      <Text style={[styles.subgroup, { marginTop: 8 }]}>Objetos</Text>
       <Text style={styles.help}>Objetos sin efectos mecánicos (raciones, antorchas, recuerdos…).</Text>
 
       {items.length === 0 ? <Text style={styles.muted}>Sin objetos en la mochila.</Text> : null}
@@ -1037,10 +1696,58 @@ function InventoryTab({ data, setData }: any) {
 function SpellsTab({ system, data, setData }: any) {
   const items: SpellEntry[] = Array.isArray(data.spells) ? data.spells : [];
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [spellClassFilter, setSpellClassFilter] = useState<string | null>(null);
+  const [detailSpell, setDetailSpell] = useState<SpellEntry | null>(null);
   const catalog = getCatalog(system.id);
   const catalogSpells = catalog?.spells ?? [];
+
+  // Clases del personaje (para filtro de conjuros)
+  const charClassNames = useMemo(() => {
+    if (!Array.isArray((data as any).classes)) return [];
+    return ((data as any).classes as Array<{ classId: string }>)
+      .map((c) => {
+        const def = catalog?.classes?.find((cl) => cl.id === c.classId);
+        return def?.name ?? c.classId;
+      })
+      .filter((v, i, arr) => arr.indexOf(v) === i);
+  }, [(data as any).classes, catalog]);
+
+  const visibleSpells = useMemo(() => {
+    if (!spellClassFilter) return catalogSpells;
+    return catalogSpells.filter((s) =>
+      s.classes?.some((sc) => sc.toLowerCase() === spellClassFilter.toLowerCase()),
+    );
+  }, [catalogSpells, spellClassFilter]);
+
   function update(next: SpellEntry[]) { setData({ ...data, spells: next }); }
   function add() { update([...items, { id: uid(), name: 'Conjuro', level: 0, prepared: false }]); }
+
+  // ── Espacios de conjuro ──
+  // slots = { 1: {max:4, used:1}, 2: {max:3, used:0}, ... }
+  const slots: Record<number, { max: number; used: number }> =
+    (data.spellSlots as Record<number, { max: number; used: number }>) ?? {};
+  function setSlotMax(level: number, max: number) {
+    const cur = slots[level] ?? { max: 0, used: 0 };
+    setData({ ...data, spellSlots: { ...slots, [level]: { ...cur, max: Math.max(0, max) } } });
+  }
+  function useSlot(level: number) {
+    const cur = slots[level] ?? { max: 0, used: 0 };
+    if (cur.used >= cur.max) return;
+    setData({ ...data, spellSlots: { ...slots, [level]: { ...cur, used: cur.used + 1 } } });
+  }
+  function restoreSlot(level: number) {
+    const cur = slots[level] ?? { max: 0, used: 0 };
+    if (cur.used <= 0) return;
+    setData({ ...data, spellSlots: { ...slots, [level]: { ...cur, used: cur.used - 1 } } });
+  }
+  function longRestSlots() {
+    const reset = Object.fromEntries(
+      Object.entries(slots).map(([k, v]) => [k, { ...(v as any), used: 0 }])
+    );
+    setData({ ...data, spellSlots: reset });
+  }
+  const usedLevels = [1,2,3,4,5,6,7,8,9].filter((l) => (slots[l]?.max ?? 0) > 0);
+
   function addFromCatalog(c: CatalogSpell) {
     setPickerOpen(false);
     update([...items, { id: uid(), name: c.name, level: c.level, prepared: false, notes: c.description }]);
@@ -1060,7 +1767,49 @@ function SpellsTab({ system, data, setData }: any) {
   return (
     <View>
       <Text style={styles.sectionTitle}>Conjuros</Text>
-      <Text style={styles.help}>Marca los conjuros preparados para destacarlos.</Text>
+
+      {/* ── Tracker de espacios de conjuro ────────────────────── */}
+      <View style={styles.slotSection}>
+        <View style={styles.slotHeader}>
+          <Text style={styles.subgroupHero}>Espacios de conjuro</Text>
+          {usedLevels.length > 0 ? (
+            <TouchableOpacity onPress={longRestSlots} style={styles.longRestBtn}>
+              <Text style={styles.longRestText}>Descanso largo</Text>
+            </TouchableOpacity>
+          ) : null}
+        </View>
+        {[1,2,3,4,5,6,7,8,9].map((lvl) => {
+          const s = slots[lvl] ?? { max: 0, used: 0 };
+          return (
+            <View key={lvl} style={styles.slotRow}>
+              <Text style={styles.slotLevelLabel}>Nv {lvl}</Text>
+              {/* pips */}
+              <View style={styles.slotPips}>
+                {Array.from({ length: Math.max(s.max, 0) }).map((_, i) => (
+                  <TouchableOpacity
+                    key={i}
+                    style={[styles.slotPip, i < s.used && styles.slotPipUsed]}
+                    onPress={() => i < s.used ? restoreSlot(lvl) : useSlot(lvl)}
+                  />
+                ))}
+              </View>
+              {/* editor max */}
+              <View style={styles.slotMaxEdit}>
+                <TouchableOpacity onPress={() => setSlotMax(lvl, s.max - 1)} style={styles.slotMaxBtn}>
+                  <Text style={styles.slotMaxBtnText}>−</Text>
+                </TouchableOpacity>
+                <Text style={styles.slotMaxVal}>{s.max}</Text>
+                <TouchableOpacity onPress={() => setSlotMax(lvl, s.max + 1)} style={styles.slotMaxBtn}>
+                  <Text style={styles.slotMaxBtnText}>+</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          );
+        })}
+        <Text style={styles.help}>Toca un pip para gastar/recuperar. Cambia el máximo con −/+.</Text>
+      </View>
+
+      <Text style={[styles.help, { marginTop: 8 }]}>Marca los conjuros preparados para destacarlos.</Text>
 
       {items.length === 0 ? <Text style={styles.muted}>Sin conjuros aún.</Text> : null}
       {Object.keys(grouped).map(Number).sort((a, b) => a - b).map((lvl) => (
@@ -1068,8 +1817,11 @@ function SpellsTab({ system, data, setData }: any) {
           <Text style={styles.subgroup}>{lvl === 0 ? 'Trucos / Cantrips' : `Nivel ${lvl}`}</Text>
           {grouped[lvl].map((sp) => (
             <View key={sp.id} style={styles.spellRow}>
-              <TextInput style={[styles.itemNameInput, { flex: 1 }]} value={sp.name}
-                onChangeText={(t) => patch(sp.id, { name: t })} />
+              <TouchableOpacity style={{ flex: 1 }} onPress={() => setDetailSpell(sp)}>
+                <Text style={[styles.itemNameInput, { color: sp.prepared ? '#e2d9ff' : '#94a3b8' }]} numberOfLines={1}>
+                  {sp.name}
+                </Text>
+              </TouchableOpacity>
               <TextInput style={styles.qtyInput} keyboardType="numeric" value={String(sp.level)}
                 onChangeText={(t) => { const n = Number(t); if (!Number.isNaN(n)) patch(sp.id, { level: n }); }} />
               <Switch value={!!sp.prepared} onValueChange={(v) => patch(sp.id, { prepared: v })}
@@ -1085,17 +1837,36 @@ function SpellsTab({ system, data, setData }: any) {
         <Text style={styles.addBtnText}>+ Añadir conjuro</Text>
       </TouchableOpacity>
       {catalogSpells.length > 0 ? (
-        <TouchableOpacity style={[styles.addBtn, styles.addBtnSecondary]} onPress={() => setPickerOpen(true)}>
-          <Text style={styles.addBtnText}>📚 Añadir desde catálogo ({catalogSpells.length})</Text>
-        </TouchableOpacity>
+        <View>
+          {charClassNames.length > 0 ? (
+            <View style={styles.filterChipRow}>
+              <TouchableOpacity
+                style={[styles.filterChip, !spellClassFilter && styles.filterChipActive]}
+                onPress={() => setSpellClassFilter(null)}>
+                <Text style={[styles.filterChipText, !spellClassFilter && styles.filterChipTextActive]}>Todos</Text>
+              </TouchableOpacity>
+              {charClassNames.map((cn) => (
+                <TouchableOpacity
+                  key={cn}
+                  style={[styles.filterChip, spellClassFilter === cn && styles.filterChipActive]}
+                  onPress={() => setSpellClassFilter(spellClassFilter === cn ? null : cn)}>
+                  <Text style={[styles.filterChipText, spellClassFilter === cn && styles.filterChipTextActive]}>{cn}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          ) : null}
+          <TouchableOpacity style={[styles.addBtn, styles.addBtnSecondary]} onPress={() => setPickerOpen(true)}>
+            <Text style={styles.addBtnText}>📚 Catálogo ({visibleSpells.length}{spellClassFilter ? ` · ${spellClassFilter}` : ''})</Text>
+          </TouchableOpacity>
+        </View>
       ) : null}
       <CatalogPicker
         visible={pickerOpen}
         title="Conjuros del catálogo"
         source={catalog?.source}
-        items={catalogSpells.map((c) => ({
+        items={visibleSpells.map((c) => ({
           id: c.id,
-          title: `${c.name}`,
+          title: c.name,
           subtitle: `Nv ${c.level}` +
             (c.school ? ` · ${c.school}` : '') +
             (c.classes && c.classes.length ? ` · ${c.classes.join('/')}` : '') +
@@ -1105,17 +1876,67 @@ function SpellsTab({ system, data, setData }: any) {
         onPick={(it) => addFromCatalog(it.raw as CatalogSpell)}
         onClose={() => setPickerOpen(false)}
       />
+
+      {/* ── Detalle de conjuro ──────────────────────────────── */}
+      <Modal visible={!!detailSpell} transparent animationType="slide" onRequestClose={() => setDetailSpell(null)}>
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalCard, { maxHeight: '80%' }]}>
+            {detailSpell ? (() => {
+              // Busca datos enriquecidos en el catálogo
+              const cat = catalogSpells.find((s) => s.name.toLowerCase() === detailSpell.name.toLowerCase());
+              return (
+                <>
+                  <Text style={styles.modalTitle}>{detailSpell.name}</Text>
+                  <View style={styles.detailMeta}>
+                    <Text style={styles.detailMetaItem}>Nivel {detailSpell.level}</Text>
+                    {cat?.school ? <Text style={styles.detailMetaItem}>{cat.school}</Text> : null}
+                    {cat?.components ? <Text style={styles.detailMetaItem}>{cat.components}</Text> : null}
+                    {cat?.casting_time ? <Text style={styles.detailMetaItem}>⏱ {cat.casting_time}</Text> : null}
+                    {cat?.range ? <Text style={styles.detailMetaItem}>↔ {cat.range}</Text> : null}
+                    {cat?.duration ? <Text style={styles.detailMetaItem}>⌛ {cat.duration}</Text> : null}
+                    {cat?.saving_throw ? <Text style={styles.detailMetaItem}>🛡 {cat.saving_throw}</Text> : null}
+                    {cat?.classes?.length ? <Text style={styles.detailMetaItem}>{cat.classes.join(', ')}</Text> : null}
+                  </View>
+                  <ScrollView style={{ marginTop: 8, maxHeight: 260 }}>
+                    <Text style={styles.detailDesc}>{cat?.description ?? detailSpell.notes ?? 'Sin descripción.'}</Text>
+                  </ScrollView>
+                  <View style={{ flexDirection: 'row', gap: 8, marginTop: 12 }}>
+                    <TouchableOpacity style={[styles.modalAction, { flex: 1 }]} onPress={() => setDetailSpell(null)}>
+                      <Text style={{ color: '#94a3b8', fontWeight: '600' }}>Cerrar</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[styles.modalAction, { flex: 1, backgroundColor: 'rgba(239,68,68,0.25)' }]}
+                      onPress={() => { remove(detailSpell.id); setDetailSpell(null); }}
+                    >
+                      <Text style={{ color: '#f87171', fontWeight: '600' }}>Eliminar</Text>
+                    </TouchableOpacity>
+                  </View>
+                </>
+              );
+            })() : null}
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
+
+const FEAT_TYPE_CHIPS = ['General', 'Fighter', 'Metamagic', 'Epic', 'Item Creation', 'Psionic', 'Divine'];
 
 // ─── Feats tab ────────────────────────────────────────────────
 function FeatsTab({ system, data, setData }: any) {
   const items: FeatItem[] = Array.isArray(data.feats) ? data.feats : [];
   const targets = system.bonusTargets ?? [];
+  const [featTypeFilter, setFeatTypeFilter] = useState<string | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [detailFeat, setDetailFeat] = useState<FeatItem | null>(null);
   const catalog = getCatalog(system.id);
   const catalogFeats: CatalogFeat[] = catalog?.feats ?? [];
+
+  const visibleFeats = useMemo(() => {
+    if (!featTypeFilter) return catalogFeats;
+    return catalogFeats.filter((f) => f.type === featTypeFilter);
+  }, [catalogFeats, featTypeFilter]);
 
   function update(next: FeatItem[]) { setData({ ...data, feats: next }); }
   function add() { update([...items, { id: uid(), name: 'Nueva dote', bonuses: [] }]); }
@@ -1155,14 +1976,10 @@ function FeatsTab({ system, data, setData }: any) {
       {items.map((it) => (
         <View key={it.id} style={styles.equipCard}>
           <View style={styles.equipHeader}>
-            <View style={{ flex: 1 }}>
-              <TextInput
-                style={styles.itemNameInput}
-                value={it.name}
-                onChangeText={(t) => patch(it.id, { name: t })}
-                placeholder="Nombre de la dote" placeholderTextColor="#475569"
-              />
-            </View>
+            <TouchableOpacity style={{ flex: 1 }} onPress={() => setDetailFeat(it)}>
+              <Text style={styles.itemNameInput} numberOfLines={1}>{it.name || 'Dote sin nombre'}</Text>
+              {it.notes ? <Text style={styles.weaponNotes} numberOfLines={1}>{it.notes}</Text> : null}
+            </TouchableOpacity>
             <TouchableOpacity onPress={() => remove(it.id)} style={styles.delBtn}>
               <Text style={styles.delBtnText}>×</Text>
             </TouchableOpacity>
@@ -1198,16 +2015,33 @@ function FeatsTab({ system, data, setData }: any) {
         <Text style={styles.addBtnText}>+ Añadir dote</Text>
       </TouchableOpacity>
       {catalogFeats.length > 0 ? (
-        <TouchableOpacity style={[styles.addBtn, styles.addBtnSecondary]} onPress={() => setPickerOpen(true)}>
-          <Text style={styles.addBtnText}>📚 Añadir desde catálogo ({catalogFeats.length})</Text>
-        </TouchableOpacity>
+        <View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterChipRow}>
+            <TouchableOpacity
+              style={[styles.filterChip, !featTypeFilter && styles.filterChipActive]}
+              onPress={() => setFeatTypeFilter(null)}>
+              <Text style={[styles.filterChipText, !featTypeFilter && styles.filterChipTextActive]}>Todos</Text>
+            </TouchableOpacity>
+            {FEAT_TYPE_CHIPS.map((t) => (
+              <TouchableOpacity
+                key={t}
+                style={[styles.filterChip, featTypeFilter === t && styles.filterChipActive]}
+                onPress={() => setFeatTypeFilter(featTypeFilter === t ? null : t)}>
+                <Text style={[styles.filterChipText, featTypeFilter === t && styles.filterChipTextActive]}>{t}</Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+          <TouchableOpacity style={[styles.addBtn, styles.addBtnSecondary]} onPress={() => setPickerOpen(true)}>
+            <Text style={styles.addBtnText}>📚 Catálogo ({visibleFeats.length}{featTypeFilter ? ` · ${featTypeFilter}` : ''})</Text>
+          </TouchableOpacity>
+        </View>
       ) : null}
 
       <CatalogPicker
         visible={pickerOpen}
         title="Dotes del catálogo"
         source={catalog?.source}
-        items={catalogFeats.map((c) => ({
+        items={visibleFeats.map((c) => ({
           id: c.id,
           title: c.name,
           subtitle: (c.type ? c.type : '') +
@@ -1220,6 +2054,47 @@ function FeatsTab({ system, data, setData }: any) {
         onPick={(it) => addFromCatalog(it.raw as CatalogFeat)}
         onClose={() => setPickerOpen(false)}
       />
+
+      {/* ── Detalle de dote ─────────────────────────────────── */}
+      <Modal visible={!!detailFeat} transparent animationType="slide" onRequestClose={() => setDetailFeat(null)}>
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalCard, { maxHeight: '80%' }]}>
+            {detailFeat ? (() => {
+              const cat = catalogFeats.find((f) => f.name.toLowerCase() === detailFeat.name.toLowerCase());
+              const prereq = cat?.prereq ?? cat?.prereqs ?? null;
+              const bonuses = detailFeat.bonuses ?? cat?.bonuses ?? [];
+              return (
+                <>
+                  <Text style={styles.modalTitle}>{detailFeat.name}</Text>
+                  <View style={styles.detailMeta}>
+                    {cat?.type ? <Text style={styles.detailMetaItem}>Tipo: {cat.type}</Text> : null}
+                    {prereq ? <Text style={styles.detailMetaItem}>Prerreq: {String(prereq)}</Text> : null}
+                    {bonuses.length > 0 ? (
+                      <Text style={styles.detailMetaItem}>
+                        Bonos: {bonuses.map((b: any) => `${b.target} ${b.value >= 0 ? '+' : ''}${b.value}`).join(', ')}
+                      </Text>
+                    ) : null}
+                  </View>
+                  <ScrollView style={{ marginTop: 8, maxHeight: 260 }}>
+                    <Text style={styles.detailDesc}>{cat?.description ?? detailFeat.notes ?? 'Sin descripción.'}</Text>
+                  </ScrollView>
+                  <View style={{ flexDirection: 'row', gap: 8, marginTop: 12 }}>
+                    <TouchableOpacity style={[styles.modalAction, { flex: 1 }]} onPress={() => setDetailFeat(null)}>
+                      <Text style={{ color: '#94a3b8', fontWeight: '600' }}>Cerrar</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[styles.modalAction, { flex: 1, backgroundColor: 'rgba(239,68,68,0.25)' }]}
+                      onPress={() => { remove(detailFeat.id); setDetailFeat(null); }}
+                    >
+                      <Text style={{ color: '#f87171', fontWeight: '600' }}>Eliminar</Text>
+                    </TouchableOpacity>
+                  </View>
+                </>
+              );
+            })() : null}
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -1230,6 +2105,7 @@ function FeatsTab({ system, data, setData }: any) {
 function SkillsTab({ system, data, setData }: any) {
   const items: SkillEntry[] = Array.isArray(data.skills) ? data.skills : [];
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [detailSkill, setDetailSkill] = useState<SkillEntry | null>(null);
   const catalog = getCatalog(system.id);
   const catalogSkills: CatalogSkill[] = catalog?.skills ?? [];
 
@@ -1306,6 +2182,9 @@ function SkillsTab({ system, data, setData }: any) {
                 <Text style={styles.skillTotalLabel}>Total</Text>
                 <Text style={styles.skillTotalValue}>{total >= 0 ? `+${total}` : total}</Text>
               </View>
+              <TouchableOpacity onPress={() => setDetailSkill(it)} style={styles.infoBtn}>
+                <Text style={styles.infoBtnText}>ⓘ</Text>
+              </TouchableOpacity>
               <TouchableOpacity onPress={() => remove(it.id)} style={styles.delBtn}>
                 <Text style={styles.delBtnText}>×</Text>
               </TouchableOpacity>
@@ -1395,6 +2274,52 @@ function SkillsTab({ system, data, setData }: any) {
         onPick={(it) => addFromCatalog(it.raw as CatalogSkill)}
         onClose={() => setPickerOpen(false)}
       />
+
+      {/* ── Detalle de habilidad ────────────────────────────── */}
+      <Modal visible={!!detailSkill} transparent animationType="slide" onRequestClose={() => setDetailSkill(null)}>
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalCard, { maxHeight: '80%' }]}>
+            {detailSkill ? (() => {
+              const cat = catalogSkills.find((s) => s.name.toLowerCase() === detailSkill.name.toLowerCase());
+              const mod = abilMod(detailSkill.ability);
+              const total = (detailSkill.ranks || 0) + mod + (detailSkill.miscMod || 0);
+              return (
+                <>
+                  <Text style={styles.modalTitle}>{detailSkill.name}</Text>
+                  <View style={styles.detailMeta}>
+                    <Text style={styles.detailMetaItem}>{detailSkill.ability ?? '—'}</Text>
+                    <Text style={styles.detailMetaItem}>Total {total >= 0 ? `+${total}` : total}</Text>
+                    {detailSkill.classSkill ? <Text style={styles.detailMetaItem}>De clase</Text> : null}
+                    {cat?.trainedOnly ? <Text style={styles.detailMetaItem}>Sólo entrenada</Text> : null}
+                    {cat?.armorCheck ? <Text style={styles.detailMetaItem}>Pen. armadura</Text> : null}
+                  </View>
+                  {cat?.synergy && cat.synergy.length > 0 ? (
+                    <Text style={[styles.help, { marginTop: 6 }]}>
+                      Sinergia: {cat.synergy.join(', ')}
+                    </Text>
+                  ) : null}
+                  <ScrollView style={{ marginTop: 8, maxHeight: 260 }}>
+                    <Text style={styles.detailDesc}>
+                      {cat?.description ?? detailSkill.notes ?? 'Sin descripción en el catálogo.'}
+                    </Text>
+                  </ScrollView>
+                  <View style={{ flexDirection: 'row', gap: 8, marginTop: 12 }}>
+                    <TouchableOpacity style={[styles.modalAction, { flex: 1 }]} onPress={() => setDetailSkill(null)}>
+                      <Text style={{ color: '#94a3b8', fontWeight: '600' }}>Cerrar</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[styles.modalAction, { flex: 1, backgroundColor: 'rgba(239,68,68,0.25)' }]}
+                      onPress={() => { remove(detailSkill.id); setDetailSkill(null); }}
+                    >
+                      <Text style={{ color: '#f87171', fontWeight: '600' }}>Eliminar</Text>
+                    </TouchableOpacity>
+                  </View>
+                </>
+              );
+            })() : null}
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -1585,6 +2510,9 @@ const BONUS_TYPE_OPTIONS: Array<{ id: string; label: string; stacks?: boolean; h
 
 // ─── Catalog picker (modal genérico) ──────────────────────────
 type CatalogPickItem = { id: string; title: string; subtitle?: string; raw: unknown };
+const CATALOG_PAGE = 200; // ítems visibles máximos sin búsqueda
+const CATALOG_MAX  = 300; // ítems visibles máximos con búsqueda
+
 function CatalogPicker({
   visible, title, source, items, onPick, onClose,
 }: {
@@ -1596,14 +2524,35 @@ function CatalogPicker({
   onClose: () => void;
 }) {
   const [query, setQuery] = useState('');
-  const filtered = useMemo(() => {
+
+  // Resetear búsqueda al abrir
+  useEffect(() => { if (visible) setQuery(''); }, [visible]);
+
+  const { shown, total } = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return items;
-    return items.filter((it) =>
+    if (!q) {
+      return { shown: items.slice(0, CATALOG_PAGE), total: items.length };
+    }
+    const matched = items.filter((it) =>
       it.title.toLowerCase().includes(q) ||
       (it.subtitle ?? '').toLowerCase().includes(q)
     );
+    return { shown: matched.slice(0, CATALOG_MAX), total: matched.length };
   }, [items, query]);
+
+  const renderItem: ListRenderItem<CatalogPickItem> = useCallback(
+    ({ item }) => (
+      <TouchableOpacity style={styles.charPickRow} onPress={() => onPick(item)}>
+        <Text style={styles.charPickName}>{item.title}</Text>
+        {item.subtitle ? <Text style={styles.charPickSys}>{item.subtitle}</Text> : null}
+      </TouchableOpacity>
+    ),
+    [onPick],
+  );
+
+  const hint = total > shown.length
+    ? `Mostrando ${shown.length} de ${total} — escribe para filtrar`
+    : total === 0 ? 'Sin resultados.' : null;
 
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
@@ -1615,21 +2564,22 @@ function CatalogPicker({
             style={styles.input}
             value={query}
             onChangeText={setQuery}
-            placeholder="Buscar…"
+            placeholder={`Buscar entre ${items.length}…`}
             placeholderTextColor="#64748b"
             autoCorrect={false}
           />
-          <ScrollView style={{ maxHeight: 420 }} keyboardShouldPersistTaps="handled">
-            {filtered.length === 0 ? (
-              <Text style={styles.muted}>Sin resultados.</Text>
-            ) : null}
-            {filtered.map((it) => (
-              <TouchableOpacity key={it.id} style={styles.charPickRow} onPress={() => onPick(it)}>
-                <Text style={styles.charPickName}>{it.title}</Text>
-                {it.subtitle ? <Text style={styles.charPickSys}>{it.subtitle}</Text> : null}
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
+          {hint ? <Text style={[styles.muted, { marginBottom: 4 }]}>{hint}</Text> : null}
+          <FlatList
+            data={shown}
+            keyExtractor={(it) => it.id}
+            renderItem={renderItem}
+            style={{ maxHeight: 400 }}
+            keyboardShouldPersistTaps="handled"
+            initialNumToRender={20}
+            maxToRenderPerBatch={30}
+            windowSize={5}
+            removeClippedSubviews
+          />
           <TouchableOpacity style={styles.modalAction} onPress={onClose}>
             <Text style={{ color: '#94a3b8', fontWeight: '600' }}>Cerrar</Text>
           </TouchableOpacity>
@@ -1731,6 +2681,40 @@ const styles = StyleSheet.create({
   selectChipActive: { backgroundColor: 'rgba(124,58,237,0.4)', borderColor: '#7c3aed' },
   selectChipText: { color: '#94a3b8', fontSize: 12 },
   selectChipTextActive: { color: '#fff', fontWeight: '700' },
+  filterChipRow: { flexDirection: 'row', marginVertical: 6 },
+  filterChip: {
+    paddingHorizontal: 10, paddingVertical: 5, borderRadius: 999, marginRight: 6,
+    backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1, borderColor: 'rgba(167,139,250,0.2)',
+  },
+  filterChipActive: { backgroundColor: 'rgba(124,58,237,0.35)', borderColor: '#7c3aed' },
+  filterChipText: { color: '#94a3b8', fontSize: 11 },
+  filterChipTextActive: { color: '#e2d9ff', fontWeight: '700', fontSize: 11 },
+  // Spell slot tracker
+  slotSection: {
+    backgroundColor: 'rgba(30,20,70,0.5)', borderRadius: 12,
+    padding: 12, marginBottom: 12, borderWidth: 1, borderColor: 'rgba(167,139,250,0.18)',
+  },
+  slotHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
+  longRestBtn: {
+    paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8,
+    backgroundColor: 'rgba(52,211,153,0.12)', borderWidth: 1, borderColor: 'rgba(52,211,153,0.3)',
+  },
+  longRestText: { color: '#34d399', fontSize: 10, fontWeight: '700' },
+  slotRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 6 },
+  slotLevelLabel: { color: '#a78bfa', fontSize: 11, fontWeight: '700', width: 36 },
+  slotPips: { flexDirection: 'row', flexWrap: 'wrap', flex: 1, gap: 4 },
+  slotPip: {
+    width: 16, height: 16, borderRadius: 8,
+    backgroundColor: 'rgba(167,139,250,0.7)', borderWidth: 1, borderColor: '#a78bfa',
+  },
+  slotPipUsed: { backgroundColor: 'rgba(255,255,255,0.08)', borderColor: 'rgba(167,139,250,0.3)' },
+  slotMaxEdit: { flexDirection: 'row', alignItems: 'center', gap: 4, marginLeft: 8 },
+  slotMaxBtn: {
+    width: 22, height: 22, borderRadius: 6, backgroundColor: 'rgba(255,255,255,0.07)',
+    borderWidth: 1, borderColor: 'rgba(167,139,250,0.25)', alignItems: 'center', justifyContent: 'center',
+  },
+  slotMaxBtnText: { color: '#a78bfa', fontSize: 14, fontWeight: '700', lineHeight: 16 },
+  slotMaxVal: { color: '#e2d9ff', fontSize: 12, fontWeight: '700', minWidth: 18, textAlign: 'center' },
   help: { color: '#64748b', fontSize: 11, marginTop: 4, marginBottom: 4 },
   muted: { color: '#64748b', fontSize: 12, marginVertical: 8 },
   statsCard: {
@@ -1803,6 +2787,112 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6, borderRadius: 999,
   },
 
+  // XP tracker
+  xpRow: {
+    flexDirection: 'row', alignItems: 'center', marginTop: 12,
+    backgroundColor: 'rgba(15,12,41,0.4)', borderRadius: 10,
+    paddingHorizontal: 10, paddingVertical: 8,
+    borderWidth: 1, borderColor: 'rgba(167,139,250,0.15)',
+  },
+  xpLabel: { color: '#a78bfa', fontSize: 11, fontWeight: '800', width: 24 },
+  xpBarTrack: { height: 6, backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 3, overflow: 'hidden', marginBottom: 2 },
+  xpBarFill: { height: 6, backgroundColor: '#a78bfa', borderRadius: 3 },
+  xpNums: { color: '#64748b', fontSize: 10 },
+  xpEditBtn: {
+    paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8,
+    backgroundColor: 'rgba(124,58,237,0.2)', borderWidth: 1, borderColor: 'rgba(124,58,237,0.4)',
+  },
+  xpEditText: { color: '#c4b5fd', fontSize: 11, fontWeight: '700' },
+
+  // Condiciones
+  conditionsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 4 },
+  conditionChip: {
+    paddingHorizontal: 10, paddingVertical: 5, borderRadius: 999,
+    backgroundColor: 'rgba(255,255,255,0.04)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)',
+  },
+  conditionText: { color: '#475569', fontSize: 11 },
+
+  // Alineamiento
+  alignSection: { marginTop: 10 },
+  alignGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 4 },
+  alignCell: {
+    width: '31%', paddingVertical: 8, borderRadius: 8, alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.04)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
+  },
+  alignCellActive: { backgroundColor: 'rgba(124,58,237,0.3)', borderColor: '#7c3aed' },
+  alignCellText: { color: '#475569', fontSize: 11, fontWeight: '700', textAlign: 'center' },
+  alignCellTextActive: { color: '#e2d9ff' },
+  alignLabel: { color: '#a78bfa', fontSize: 11, marginTop: 4 },
+
+  // Idiomas
+  langsSection: { marginTop: 10 },
+  langsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 4, marginBottom: 6 },
+  langChip: {
+    paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999,
+    backgroundColor: 'rgba(148,163,184,0.12)', borderWidth: 1, borderColor: 'rgba(148,163,184,0.25)',
+  },
+  langChipText: { color: '#94a3b8', fontSize: 12 },
+  langInputRow: { flexDirection: 'row', gap: 8, alignItems: 'center' },
+  langAddBtn: {
+    width: 36, height: 36, borderRadius: 10, backgroundColor: 'rgba(124,58,237,0.25)',
+    alignItems: 'center', justifyContent: 'center',
+  },
+  langAddBtnText: { color: '#a78bfa', fontWeight: '800', fontSize: 20 },
+
+  // Encumbrance
+  encBox: {
+    backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 12, padding: 12, marginTop: 8, marginBottom: 4,
+    borderWidth: 1, borderColor: 'rgba(167,139,250,0.15)',
+  },
+  encLevel: { fontSize: 16, fontWeight: '800' },
+  encWeight: { color: '#94a3b8', fontSize: 13 },
+  encBarTrack: {
+    height: 6, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 3,
+    marginTop: 8, overflow: 'hidden',
+  },
+  encBarFill: { height: 6, borderRadius: 3 },
+  encThreshold: { color: '#64748b', fontSize: 10 },
+
+  // Tiradas de muerte
+  deathSavesBox: {
+    backgroundColor: 'rgba(239,68,68,0.1)', borderRadius: 12, padding: 12, marginBottom: 12,
+    borderWidth: 1, borderColor: 'rgba(239,68,68,0.35)',
+  },
+  deathSavesTitle: { color: '#f87171', fontWeight: '800', fontSize: 13, marginBottom: 8 },
+  deathSavesRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  deathSavesLabel: { color: '#94a3b8', fontSize: 11, fontWeight: '700', minWidth: 44 },
+  deathPips: { flexDirection: 'row', gap: 6 },
+  deathPip: { width: 20, height: 20, borderRadius: 10, borderWidth: 2 },
+  deathPipSuccess: { borderColor: '#34d399', backgroundColor: 'rgba(52,211,153,0.1)' },
+  deathPipOn: { backgroundColor: '#34d399' },
+  deathPipFail: { borderColor: '#f87171', backgroundColor: 'rgba(248,113,113,0.1)' },
+  deathPipFailOn: { backgroundColor: '#f87171' },
+  deathResetBtn: { marginLeft: 'auto' as any, padding: 4 },
+  deathResetText: { color: '#64748b', fontSize: 16 },
+
+  // Monedas
+  coinsRow: { flexDirection: 'row', gap: 8, marginBottom: 6 },
+  coinCard: {
+    flex: 1, backgroundColor: 'rgba(15,12,41,0.5)', borderRadius: 12,
+    padding: 10, alignItems: 'center', borderWidth: 1, borderColor: 'rgba(167,139,250,0.15)',
+  },
+  coinLabel: { fontSize: 10, fontWeight: '800', letterSpacing: 1 },
+  coinValue: { color: '#f1f5f9', fontSize: 20, fontWeight: '800', marginVertical: 2 },
+  coinBtns: { flexDirection: 'row', gap: 4 },
+  coinBtn: {
+    paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6,
+    backgroundColor: 'rgba(255,255,255,0.06)', borderWidth: 1, borderColor: 'rgba(167,139,250,0.2)',
+  },
+  coinBtnText: { color: '#f87171', fontWeight: '700', fontSize: 12 },
+
+  // Detalle conjuro/dote
+  detailMeta: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 6 },
+  detailMetaItem: {
+    color: '#a78bfa', fontSize: 11, paddingHorizontal: 8, paddingVertical: 3,
+    backgroundColor: 'rgba(124,58,237,0.15)', borderRadius: 999,
+  },
+  detailDesc: { color: '#cbd5e1', fontSize: 13, lineHeight: 20 },
+
   // Armas equipadas
   weaponList: { gap: 8, marginBottom: 6 },
   weaponRow: {
@@ -1851,6 +2941,17 @@ const styles = StyleSheet.create({
   },
   heroSmallLabel: { color: '#94a3b8', fontSize: 9, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase' },
   heroSmallValue: { color: '#34d399', fontSize: 18, fontWeight: '800', marginTop: 2 },
+  hpBarTrack: {
+    height: 4, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 2,
+    marginTop: 4, marginBottom: 4, overflow: 'hidden', width: '100%',
+  },
+  hpBarFill: { height: 4, borderRadius: 2 },
+  hpBtnRow: { flexDirection: 'row', gap: 4, justifyContent: 'center' },
+  hpBtn: {
+    paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6,
+    backgroundColor: 'rgba(255,255,255,0.07)', borderWidth: 1, borderColor: 'rgba(167,139,250,0.2)',
+  },
+  hpBtnText: { color: '#f87171', fontWeight: '700', fontSize: 11 },
 
   // Atributos en grid 3x2 estilo "stat block"
   abilGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
@@ -1909,6 +3010,11 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(239,68,68,0.18)',
   },
   delBtnText: { color: '#fca5a5', fontWeight: '800', fontSize: 18, lineHeight: 18 },
+  infoBtn: {
+    width: 26, height: 26, borderRadius: 13, alignItems: 'center', justifyContent: 'center',
+    backgroundColor: 'rgba(124,58,237,0.18)', marginRight: 2,
+  },
+  infoBtnText: { color: '#a78bfa', fontWeight: '700', fontSize: 14 },
 
   addBtn: {
     marginTop: 6, alignItems: 'center', paddingVertical: 12, borderRadius: 10,

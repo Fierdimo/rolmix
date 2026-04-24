@@ -1801,5 +1801,6069 @@
         "Bonus wizard feat"
       ]
     }
+  },
+  {
+    "id": "ninja",
+    "name": "Ninja",
+    "type": "base",
+    "hitDice": "d6",
+    "alignment": "Any"
+  },
+  {
+    "id": "scout",
+    "name": "Scout",
+    "type": "base",
+    "hitDice": "d8",
+    "alignment": "Any"
+  },
+  {
+    "id": "spellthief",
+    "name": "Spellthief",
+    "type": "base",
+    "hitDice": "d6"
+  },
+  {
+    "id": "warlock",
+    "name": "Warlock",
+    "type": "base",
+    "hitDice": "d6"
+  },
+  {
+    "id": "warmage",
+    "name": "Warmage",
+    "type": "base",
+    "hitDice": "d6"
+  },
+  {
+    "id": "wu-jen",
+    "name": "Wu Jen",
+    "type": "base",
+    "hitDice": "d4"
+  },
+  {
+    "id": "favored-soul",
+    "name": "Favored Soul",
+    "type": "base",
+    "hitDice": "d8"
+  },
+  {
+    "id": "shugenja",
+    "name": "Shugenja",
+    "type": "base",
+    "hitDice": "d6"
+  },
+  {
+    "id": "spirit-shaman",
+    "name": "Spirit Shaman",
+    "type": "base",
+    "hitDice": "d8"
+  },
+  {
+    "id": "ardent",
+    "name": "Ardent",
+    "type": "base",
+    "hitDice": "d6"
+  },
+  {
+    "id": "divine-mind",
+    "name": "Divine Mind",
+    "type": "base",
+    "hitDice": "d10"
+  },
+  {
+    "id": "lurk",
+    "name": "Lurk",
+    "type": "base",
+    "hitDice": "d6"
+  },
+  {
+    "id": "duergar-racial-class",
+    "name": "Duergar Racial Class",
+    "type": "base",
+    "hitDice": "d0"
+  },
+  {
+    "id": "githyanki-racial-class",
+    "name": "Githyanki Racial Class",
+    "type": "base",
+    "hitDice": "d0"
+  },
+  {
+    "id": "githzerai-racial-class",
+    "name": "Githzerai Racial Class",
+    "type": "base",
+    "hitDice": "d0"
+  },
+  {
+    "id": "half-giant-racial-class",
+    "name": "Half-giant Racial Class",
+    "type": "base",
+    "hitDice": "d0"
+  },
+  {
+    "id": "thri-kreen-racial-class",
+    "name": "Thri-kreen Racial Class",
+    "type": "base",
+    "hitDice": "d0"
+  },
+  {
+    "id": "erudite-variant-psion",
+    "name": "Erudite (variant Psion)",
+    "type": "base",
+    "hitDice": "d0"
+  },
+  {
+    "id": "hexblade",
+    "name": "Hexblade",
+    "type": "base",
+    "hitDice": "d10",
+    "alignment": "Any nongood."
+  },
+  {
+    "id": "paladin-variant",
+    "name": "Paladin Variant",
+    "type": "base",
+    "hitDice": "d0"
+  },
+  {
+    "id": "ranger-variant",
+    "name": "Ranger Variant",
+    "type": "base",
+    "hitDice": "d0"
+  },
+  {
+    "id": "samurai",
+    "name": "Samurai",
+    "type": "base",
+    "hitDice": "d10",
+    "alignment": "Any lawful."
+  },
+  {
+    "id": "swashbuckler",
+    "name": "Swashbuckler",
+    "type": "base",
+    "hitDice": "d10",
+    "alignment": "Any"
+  },
+  {
+    "id": "commoner",
+    "name": "Commoner",
+    "type": "base",
+    "hitDice": "d0"
+  },
+  {
+    "id": "expert",
+    "name": "Expert",
+    "type": "base",
+    "hitDice": "d0"
+  },
+  {
+    "id": "mystic",
+    "name": "Mystic",
+    "type": "base",
+    "hitDice": "d8",
+    "alignment": "Because mystics follow an inner truth rather than a doctrine imposed on them from the outside, mystics rarely possess a lawful alignment."
+  },
+  {
+    "id": "noble",
+    "name": "Noble",
+    "type": "base",
+    "hitDice": "d8",
+    "alignment": "Any"
+  },
+  {
+    "id": "warrior",
+    "name": "Warrior",
+    "type": "base",
+    "hitDice": "d0"
+  },
+  {
+    "id": "dragonfire-adept",
+    "name": "Dragonfire Adept",
+    "type": "base",
+    "hitDice": "d8"
+  },
+  {
+    "id": "aristocrat",
+    "name": "Aristocrat",
+    "type": "base",
+    "hitDice": "d8"
+  },
+  {
+    "id": "commoner-2",
+    "name": "Commoner",
+    "type": "base",
+    "hitDice": "d4"
+  },
+  {
+    "id": "expert-2",
+    "name": "Expert",
+    "type": "base",
+    "hitDice": "d6"
+  },
+  {
+    "id": "warrior-2",
+    "name": "Warrior",
+    "type": "base",
+    "hitDice": "d8"
+  },
+  {
+    "id": "factotum",
+    "name": "Factotum",
+    "type": "base",
+    "hitDice": "d8"
+  },
+  {
+    "id": "artificer",
+    "name": "Artificer",
+    "type": "base",
+    "hitDice": "d6",
+    "alignment": "Any"
+  },
+  {
+    "id": "epic-barbarian",
+    "name": "Epic Barbarian",
+    "type": "base",
+    "hitDice": "d0"
+  },
+  {
+    "id": "epic-bard",
+    "name": "Epic Bard",
+    "type": "base",
+    "hitDice": "d0"
+  },
+  {
+    "id": "epic-cleric",
+    "name": "Epic Cleric",
+    "type": "base",
+    "hitDice": "d0"
+  },
+  {
+    "id": "epic-druid",
+    "name": "Epic Druid",
+    "type": "base",
+    "hitDice": "d0"
+  },
+  {
+    "id": "epic-fighter",
+    "name": "Epic Fighter",
+    "type": "base",
+    "hitDice": "d0"
+  },
+  {
+    "id": "epic-monk",
+    "name": "Epic Monk",
+    "type": "base",
+    "hitDice": "d0"
+  },
+  {
+    "id": "epic-paladin",
+    "name": "Epic Paladin",
+    "type": "base",
+    "hitDice": "d0"
+  },
+  {
+    "id": "epic-psion",
+    "name": "Epic Psion",
+    "type": "base",
+    "hitDice": "d0"
+  },
+  {
+    "id": "epic-psychic-warrior",
+    "name": "Epic Psychic Warrior",
+    "type": "base",
+    "hitDice": "d0"
+  },
+  {
+    "id": "epic-ranger",
+    "name": "Epic Ranger",
+    "type": "base",
+    "hitDice": "d0"
+  },
+  {
+    "id": "epic-rogue",
+    "name": "Epic Rogue",
+    "type": "base",
+    "hitDice": "d0"
+  },
+  {
+    "id": "epic-sorcerer",
+    "name": "Epic Sorcerer",
+    "type": "base",
+    "hitDice": "d0"
+  },
+  {
+    "id": "epic-wizard",
+    "name": "Epic Wizard",
+    "type": "base",
+    "hitDice": "d0"
+  },
+  {
+    "id": "eidolon",
+    "name": "Eidolon",
+    "type": "base",
+    "hitDice": "d0"
+  },
+  {
+    "id": "eidoloncer",
+    "name": "Eidoloncer",
+    "type": "base",
+    "hitDice": "d0"
+  },
+  {
+    "id": "archivist",
+    "name": "Archivist",
+    "type": "base",
+    "hitDice": "d6"
+  },
+  {
+    "id": "dread-necromancer",
+    "name": "Dread Necromancer",
+    "type": "base",
+    "hitDice": "d6"
+  },
+  {
+    "id": "favored-soul-2",
+    "name": "Favored Soul",
+    "type": "base",
+    "hitDice": "d0"
+  },
+  {
+    "id": "healer",
+    "name": "Healer",
+    "type": "base",
+    "hitDice": "d8",
+    "alignment": "Any Good"
+  },
+  {
+    "id": "marshal",
+    "name": "Marshal",
+    "type": "base",
+    "hitDice": "d8",
+    "alignment": "Any"
+  },
+  {
+    "id": "warmage-2",
+    "name": "Warmage",
+    "type": "base",
+    "hitDice": "d0"
+  },
+  {
+    "id": "psionic-artificer",
+    "name": "Psionic Artificer",
+    "type": "base",
+    "hitDice": "d0"
+  },
+  {
+    "id": "incarnate",
+    "name": "Incarnate",
+    "type": "base",
+    "hitDice": "d6",
+    "alignment": "Neutral good, neutral evil, lawful neutral, or chaotic neutral"
+  },
+  {
+    "id": "soulborn",
+    "name": "Soulborn",
+    "type": "base",
+    "hitDice": "d10",
+    "alignment": "Lawful good, chaotic good, lawful evil, or chaotic evil"
+  },
+  {
+    "id": "totemist",
+    "name": "Totemist",
+    "type": "base",
+    "hitDice": "d8"
+  },
+  {
+    "id": "samurai-2",
+    "name": "Samurai",
+    "type": "base",
+    "hitDice": "d10",
+    "alignment": "Any lawful"
+  },
+  {
+    "id": "shaman",
+    "name": "Shaman",
+    "type": "base",
+    "hitDice": "d0"
+  },
+  {
+    "id": "shugenja-2",
+    "name": "Shugenja",
+    "type": "base",
+    "hitDice": "d0"
+  },
+  {
+    "id": "sohei",
+    "name": "Sohei",
+    "type": "base",
+    "hitDice": "d0"
+  },
+  {
+    "id": "wu-jen-2",
+    "name": "Wu Jen",
+    "type": "base",
+    "hitDice": "d0"
+  },
+  {
+    "id": "beguiler",
+    "name": "Beguiler",
+    "type": "base",
+    "hitDice": "d6"
+  },
+  {
+    "id": "dragon-shaman",
+    "name": "Dragon Shaman",
+    "type": "base",
+    "hitDice": "d10"
+  },
+  {
+    "id": "duskblade",
+    "name": "Duskblade",
+    "type": "base",
+    "hitDice": "d8"
+  },
+  {
+    "id": "knight",
+    "name": "Knight",
+    "type": "base",
+    "hitDice": "d12",
+    "alignment": "Lawful"
+  },
+  {
+    "id": "urban-adept",
+    "name": "Urban Adept",
+    "type": "base",
+    "hitDice": "d0"
+  },
+  {
+    "id": "binder",
+    "name": "Binder",
+    "type": "base",
+    "hitDice": "d8"
+  },
+  {
+    "id": "shadowcaster",
+    "name": "Shadowcaster",
+    "type": "base",
+    "hitDice": "d6",
+    "alignment": "Any"
+  },
+  {
+    "id": "truenamer",
+    "name": "Truenamer",
+    "type": "base",
+    "hitDice": "d6"
+  },
+  {
+    "id": "crusader",
+    "name": "Crusader",
+    "type": "base",
+    "hitDice": "d10"
+  },
+  {
+    "id": "swordsage",
+    "name": "Swordsage",
+    "type": "base",
+    "hitDice": "d8"
+  },
+  {
+    "id": "warblade",
+    "name": "Warblade",
+    "type": "base",
+    "hitDice": "d12"
+  },
+  {
+    "id": "bardic-sage",
+    "name": "Bardic Sage",
+    "type": "base",
+    "hitDice": "d6",
+    "alignment": "Neutral good, neutral or neutral evil. "
+  },
+  {
+    "id": "battle-sorcerer",
+    "name": "Battle Sorcerer",
+    "type": "base",
+    "hitDice": "d8"
+  },
+  {
+    "id": "cloistered-cleric",
+    "name": "Cloistered Cleric",
+    "type": "base",
+    "hitDice": "d6"
+  },
+  {
+    "id": "divine-bard",
+    "name": "Divine Bard",
+    "type": "base",
+    "hitDice": "d6"
+  },
+  {
+    "id": "domain-wizard",
+    "name": "Domain Wizard",
+    "type": "base",
+    "hitDice": "d4"
+  },
+  {
+    "id": "druidic-avenger",
+    "name": "Druidic Avenger",
+    "type": "base",
+    "hitDice": "d0"
+  },
+  {
+    "id": "expert-3",
+    "name": "Expert",
+    "type": "base",
+    "hitDice": "d6"
+  },
+  {
+    "id": "paladin-of-freedom",
+    "name": "Paladin of Freedom",
+    "type": "base",
+    "hitDice": "d0"
+  },
+  {
+    "id": "paladin-of-slaughter",
+    "name": "Paladin of Slaughter",
+    "type": "base",
+    "hitDice": "d10"
+  },
+  {
+    "id": "paladin-of-tyranny",
+    "name": "Paladin of Tyranny",
+    "type": "base",
+    "hitDice": "d10"
+  },
+  {
+    "id": "planar-ranger",
+    "name": "Planar Ranger",
+    "type": "base",
+    "hitDice": "d0"
+  },
+  {
+    "id": "savage-bard",
+    "name": "Savage Bard",
+    "type": "base",
+    "alignment": "Any chaotic"
+  },
+  {
+    "id": "specialized-wizard-variants",
+    "name": "Specialized Wizard Variants",
+    "type": "base",
+    "hitDice": "d0"
+  },
+  {
+    "id": "spellcaster",
+    "name": "Spellcaster",
+    "type": "base",
+    "hitDice": "d4",
+    "alignment": "Any"
+  },
+  {
+    "id": "thug",
+    "name": "Thug",
+    "type": "base",
+    "hitDice": "d10"
+  },
+  {
+    "id": "totem-barbarian",
+    "name": "Totem Barbarian",
+    "type": "base",
+    "hitDice": "d12"
+  },
+  {
+    "id": "urban-ranger",
+    "name": "Urban Ranger",
+    "type": "base",
+    "hitDice": "d8"
+  },
+  {
+    "id": "warrior-3",
+    "name": "Warrior",
+    "type": "base",
+    "hitDice": "d10"
+  },
+  {
+    "id": "wilderness-rogue",
+    "name": "Wilderness Rogue",
+    "type": "base",
+    "hitDice": "d0"
+  },
+  {
+    "id": "psion",
+    "name": "Psion",
+    "type": "base",
+    "hitDice": "d4",
+    "alignment": "Any."
+  },
+  {
+    "id": "psychic-warrior",
+    "name": "Psychic Warrior",
+    "type": "base",
+    "hitDice": "d8",
+    "alignment": "Any."
+  },
+  {
+    "id": "soulknife",
+    "name": "Soulknife",
+    "type": "base",
+    "hitDice": "d10",
+    "alignment": "Any."
+  },
+  {
+    "id": "wilder",
+    "name": "Wilder",
+    "type": "base",
+    "hitDice": "d6",
+    "alignment": "Any."
+  },
+  {
+    "id": "apostle-of-peace",
+    "name": "Apostle of Peace",
+    "type": "prestige",
+    "hitDice": "d4",
+    "alignment": "Any good. "
+  },
+  {
+    "id": "defender-of-sealtiel",
+    "name": "Defender of Sealtiel",
+    "type": "prestige",
+    "hitDice": "d12",
+    "alignment": "Lawful good."
+  },
+  {
+    "id": "emissary-of-barachiel",
+    "name": "Emissary of Barachiel",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Lawful good."
+  },
+  {
+    "id": "exalted-arcanist",
+    "name": "Exalted Arcanist",
+    "type": "prestige",
+    "hitDice": "d4",
+    "alignment": "Any good. "
+  },
+  {
+    "id": "fist-of-raziel",
+    "name": "Fist of Raziel",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Lawful good"
+  },
+  {
+    "id": "initiate-of-pistis-sophia",
+    "name": "Initiate of Pistis Sophia",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Lawful good"
+  },
+  {
+    "id": "lion-of-talisid",
+    "name": "Lion of Talisid",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Neutral good"
+  },
+  {
+    "id": "prophet-of-erathaoi",
+    "name": "Prophet of Erathaoi",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Lawful good"
+  },
+  {
+    "id": "risen-martyr",
+    "name": "Risen Martyr",
+    "type": "prestige",
+    "hitDice": "d12",
+    "alignment": "Any good"
+  },
+  {
+    "id": "sentinel-of-bharrai",
+    "name": "Sentinel of Bharrai",
+    "type": "prestige",
+    "hitDice": "d4",
+    "alignment": "Any good"
+  },
+  {
+    "id": "skylord",
+    "name": "Skylord",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Any good"
+  },
+  {
+    "id": "slayer-of-domiel",
+    "name": "Slayer of Domiel",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Lawful good"
+  },
+  {
+    "id": "stalker-of-kharash",
+    "name": "Stalker of Kharash",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Neutral good"
+  },
+  {
+    "id": "swanmay",
+    "name": "Swanmay",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any good"
+  },
+  {
+    "id": "sword-of-righteousness",
+    "name": "Sword of Righteousness",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any good"
+  },
+  {
+    "id": "troubadour-of-stars",
+    "name": "Troubadour of Stars",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Chaotic Good"
+  },
+  {
+    "id": "vassal-of-bahamut",
+    "name": "Vassal of Bahamut",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Lawful good"
+  },
+  {
+    "id": "wonderworker",
+    "name": "Wonderworker",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any good"
+  },
+  {
+    "id": "anointed-knight",
+    "name": "Anointed Knight",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Any good."
+  },
+  {
+    "id": "beloved-of-valarian",
+    "name": "Beloved of Valarian",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Any good. "
+  },
+  {
+    "id": "celestial-mystic",
+    "name": "Celestial Mystic",
+    "type": "prestige",
+    "hitDice": "d4",
+    "alignment": "Lawful good."
+  },
+  {
+    "id": "champion-of-gwynharwyf",
+    "name": "Champion of Gwynharwyf",
+    "type": "prestige",
+    "hitDice": "d12",
+    "alignment": "Chaotic good."
+  },
+  {
+    "id": "demonologist",
+    "name": "Demonologist",
+    "type": "prestige",
+    "hitDice": "d4",
+    "alignment": "Chaotic evil"
+  },
+  {
+    "id": "diabolist",
+    "name": "Diabolist",
+    "type": "prestige",
+    "hitDice": "d4",
+    "alignment": "Lawful evil"
+  },
+  {
+    "id": "disciple-of-asmodeus",
+    "name": "Disciple of Asmodeus",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Lawful evil or neutral evil"
+  },
+  {
+    "id": "disciple-of-baalzebul",
+    "name": "Disciple of Baalzebul",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any evil"
+  },
+  {
+    "id": "disciple-of-dispater",
+    "name": "Disciple of Dispater",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Any evil"
+  },
+  {
+    "id": "disciple-of-mammon",
+    "name": "Disciple of Mammon",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any evil"
+  },
+  {
+    "id": "disciple-of-mephistopheles",
+    "name": "Disciple of Mephistopheles",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any evil"
+  },
+  {
+    "id": "lifedrinker",
+    "name": "Lifedrinker",
+    "type": "prestige",
+    "hitDice": "d12",
+    "alignment": "Any Evil"
+  },
+  {
+    "id": "mortal-hunter",
+    "name": "Mortal Hunter",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Any evil"
+  },
+  {
+    "id": "soul-eater",
+    "name": "Soul Eater",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any evil"
+  },
+  {
+    "id": "thrall-of-demogorgon",
+    "name": "Thrall of Demogorgon",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Chaotic evil"
+  },
+  {
+    "id": "thrall-of-graz-zt",
+    "name": "Thrall of Graz'zt",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any evil"
+  },
+  {
+    "id": "thrall-of-juiblex",
+    "name": "Thrall of Juiblex",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Any Evil"
+  },
+  {
+    "id": "thrall-of-orcus",
+    "name": "Thrall of Orcus",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any evil"
+  },
+  {
+    "id": "ur-priest",
+    "name": "Ur-priest",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any evil"
+  },
+  {
+    "id": "vermin-lord",
+    "name": "Vermin Lord",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any evil"
+  },
+  {
+    "id": "warrior-of-darkness",
+    "name": "Warrior of Darkness",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Any evil"
+  },
+  {
+    "id": "cancer-mage",
+    "name": "Cancer Mage",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any evil"
+  },
+  {
+    "id": "animal-lord",
+    "name": "Animal Lord",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Neutral good, lawful neutral, neutral, chaotic neutral, or neutral evil"
+  },
+  {
+    "id": "dread-pirate",
+    "name": "Dread Pirate",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any nonlawful."
+  },
+  {
+    "id": "dungeon-delver",
+    "name": "Dungeon Delver",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "exemplar",
+    "name": "Exemplar",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "fochlucan-lyrist",
+    "name": "Fochlucan Lyrist",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Neutral good, neutral, chaotic neutral, or neutral evil."
+  },
+  {
+    "id": "ghost-faced-killer",
+    "name": "Ghost-faced Killer",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any evil."
+  },
+  {
+    "id": "highland-stalker",
+    "name": "Highland Stalker",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "maester",
+    "name": "Maester",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "master-of-many-forms",
+    "name": "Master of Many Forms",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "nightsong-enforcer",
+    "name": "Nightsong Enforcer",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "nightsong-infiltrator",
+    "name": "Nightsong Infiltrator",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "ollam",
+    "name": "Ollam",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Lawful good"
+  },
+  {
+    "id": "shadowbane-inquisitor",
+    "name": "Shadowbane Inquisitor",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Lawful good"
+  },
+  {
+    "id": "shadowbane-stalker",
+    "name": "Shadowbane Stalker",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Lawful good"
+  },
+  {
+    "id": "shadowmind",
+    "name": "Shadowmind",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any"
+  },
+  {
+    "id": "spymaster",
+    "name": "Spymaster",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any"
+  },
+  {
+    "id": "streetfighter",
+    "name": "Streetfighter",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any"
+  },
+  {
+    "id": "tempest",
+    "name": "Tempest",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Any"
+  },
+  {
+    "id": "thief-acrobat",
+    "name": "Thief-acrobat",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any"
+  },
+  {
+    "id": "vigilante",
+    "name": "Vigilante",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any nonevil"
+  },
+  {
+    "id": "virtuoso",
+    "name": "Virtuoso",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any"
+  },
+  {
+    "id": "wild-plains-outrider",
+    "name": "Wild Plains Outrider",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any"
+  },
+  {
+    "id": "beastmaster",
+    "name": "Beastmaster",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "bloodhound",
+    "name": "Bloodhound",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "daggerspell-mage",
+    "name": "Daggerspell Mage",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any nonevil"
+  },
+  {
+    "id": "daggerspell-shaper",
+    "name": "Daggerspell Shaper",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any nonevil."
+  },
+  {
+    "id": "acolyte-of-the-skin",
+    "name": "Acolyte of the Skin",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any nongood"
+  },
+  {
+    "id": "effigy-master",
+    "name": "Effigy Master",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "elemental-savant",
+    "name": "Elemental Savant",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "enlightened-fist",
+    "name": "Enlightened Fist",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "fatespinner",
+    "name": "Fatespinner",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "geometer",
+    "name": "Geometer",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "green-star-adept",
+    "name": "Green Star Adept",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "initiate-of-the-sevenfold-veil",
+    "name": "Initiate of the Sevenfold Veil",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "mage-of-the-arcane-order",
+    "name": "Mage of the Arcane Order",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "master-transmogrifist",
+    "name": "Master Transmogrifist",
+    "type": "prestige",
+    "hitDice": "d4",
+    "alignment": "any nonlawful"
+  },
+  {
+    "id": "mindbender",
+    "name": "Mindbender",
+    "type": "prestige",
+    "hitDice": "d4",
+    "alignment": "Any nongood"
+  },
+  {
+    "id": "seeker-of-the-song",
+    "name": "Seeker of the Song",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "sublime-chord",
+    "name": "Sublime Chord",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "suel-arcanamach",
+    "name": "Suel Arcanamach",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "wayfarer-guide",
+    "name": "Wayfarer Guide",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "wild-mage",
+    "name": "Wild Mage",
+    "type": "prestige",
+    "hitDice": "d4",
+    "alignment": "any chaotic"
+  },
+  {
+    "id": "alienist",
+    "name": "Alienist",
+    "type": "prestige",
+    "hitDice": "d4",
+    "alignment": "any nonlawful"
+  },
+  {
+    "id": "argent-savant",
+    "name": "Argent Savant",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "blood-magus",
+    "name": "Blood Magus",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any but lawful good"
+  },
+  {
+    "id": "fist-of-the-forest",
+    "name": "Fist of the Forest",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "forest-reeve",
+    "name": "Forest Reeve",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "holt-warden",
+    "name": "Holt Warden",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "mythic-exemplar",
+    "name": "Mythic Exemplar",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "ordained-champion",
+    "name": "Ordained Champion",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any lawful, neutral good, or neutral evil"
+  },
+  {
+    "id": "paragnostic-apostle",
+    "name": "Paragnostic Apostle",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "paragnostic-initiate",
+    "name": "Paragnostic Initiate",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "sanctified-one",
+    "name": "Sanctified One",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Must match that of deity chosen."
+  },
+  {
+    "id": "shadowspy",
+    "name": "Shadowspy",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any good"
+  },
+  {
+    "id": "shadowstriker",
+    "name": "Shadowstriker",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Any good"
+  },
+  {
+    "id": "squire-of-legend",
+    "name": "Squire of Legend",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "divine-crusader",
+    "name": "Divine Crusader",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Must match chosen deity"
+  },
+  {
+    "id": "divine-oracle",
+    "name": "Divine Oracle",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any"
+  },
+  {
+    "id": "entropomancer",
+    "name": "Entropomancer",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any nongood"
+  },
+  {
+    "id": "evangelist",
+    "name": "Evangelist",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "As a cleric of the chosen deity"
+  },
+  {
+    "id": "geomancer",
+    "name": "Geomancer",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any"
+  },
+  {
+    "id": "holy-liberator",
+    "name": "Holy Liberator",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Chaotic Good"
+  },
+  {
+    "id": "hospitaler",
+    "name": "Hospitaler",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any nonchaotic"
+  },
+  {
+    "id": "pious-templar",
+    "name": "Pious Templar",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Any"
+  },
+  {
+    "id": "radiant-servant-of-pelor",
+    "name": "Radiant Servant of Pelor",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Neutral good"
+  },
+  {
+    "id": "rainbow-servant",
+    "name": "Rainbow Servant",
+    "type": "prestige",
+    "hitDice": "d4",
+    "alignment": "Any nonevil and nonchaotic"
+  },
+  {
+    "id": "sacred-exorcist",
+    "name": "Sacred Exorcist",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "sacred-fist",
+    "name": "Sacred Fist",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any"
+  },
+  {
+    "id": "seeker-of-the-misty-isle",
+    "name": "Seeker of the Misty Isle",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any"
+  },
+  {
+    "id": "shining-blade-of-heironeous",
+    "name": "Shining Blade of Heironeous",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Lawful good"
+  },
+  {
+    "id": "stormlord",
+    "name": "Stormlord",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "As for a cleric of Talos"
+  },
+  {
+    "id": "temple-raider-of-olidammara",
+    "name": "Temple Raider of Olidammara",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any chaotic"
+  },
+  {
+    "id": "ur-priest-2",
+    "name": "Ur-priest",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any evil"
+  },
+  {
+    "id": "void-disciple",
+    "name": "Void Disciple",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any neutral"
+  },
+  {
+    "id": "warpriest",
+    "name": "Warpriest",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Any"
+  },
+  {
+    "id": "black-flame-zealot",
+    "name": "Black Flame Zealot",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any nongood"
+  },
+  {
+    "id": "blighter",
+    "name": "Blighter",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any nongood"
+  },
+  {
+    "id": "church-inquisitor",
+    "name": "Church Inquisitor",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Lawful good or lawful neutral"
+  },
+  {
+    "id": "consecrated-harrier",
+    "name": "Consecrated Harrier",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Any lawful"
+  },
+  {
+    "id": "contemplative",
+    "name": "Contemplative",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any"
+  },
+  {
+    "id": "ebonmar-infiltrator",
+    "name": "Ebonmar Infiltrator",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "crimson-scourge",
+    "name": "Crimson Scourge",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Any nongood"
+  },
+  {
+    "id": "urban-savant",
+    "name": "Urban Savant",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "abjurant-champion",
+    "name": "Abjurant Champion",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Any"
+  },
+  {
+    "id": "eldritch-disciple",
+    "name": "Eldritch Disciple",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "eldritch-theurge",
+    "name": "Eldritch Theurge",
+    "type": "prestige",
+    "hitDice": "d4",
+    "alignment": "Any"
+  },
+  {
+    "id": "enlightened-spirit",
+    "name": "Enlightened Spirit",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any good"
+  },
+  {
+    "id": "holy-scourge",
+    "name": "Holy Scourge",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any good"
+  },
+  {
+    "id": "lyric-thaumaturge",
+    "name": "Lyric Thaumaturge",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any"
+  },
+  {
+    "id": "master-specialist",
+    "name": "Master Specialist",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "nightmare-spinner",
+    "name": "Nightmare Spinner",
+    "type": "prestige",
+    "hitDice": "d4",
+    "alignment": "Any"
+  },
+  {
+    "id": "ultimate-magus",
+    "name": "Ultimate Magus",
+    "type": "prestige",
+    "hitDice": "d4",
+    "alignment": "Any"
+  },
+  {
+    "id": "unseen-seer",
+    "name": "Unseen Seer",
+    "type": "prestige",
+    "hitDice": "d4",
+    "alignment": "Any"
+  },
+  {
+    "id": "wild-soul",
+    "name": "Wild Soul",
+    "type": "prestige",
+    "hitDice": "d4",
+    "alignment": "Any nonlawful"
+  },
+  {
+    "id": "anarchic-initiate",
+    "name": "Anarchic Initiate",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any chaotic."
+  },
+  {
+    "id": "ebon-saint",
+    "name": "Ebon Saint",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "ectopic-adept",
+    "name": "Ectopic Adept",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "flayerspawn-psychic",
+    "name": "Flayerspawn Psychic",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "illumine-soul",
+    "name": "Illumine Soul",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Any non-evil."
+  },
+  {
+    "id": "soulbow",
+    "name": "Soulbow",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "storm-disciple",
+    "name": "Storm Disciple",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Any chaotic."
+  },
+  {
+    "id": "zerth-cenobite",
+    "name": "Zerth Cenobite",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "black-blood-cultist",
+    "name": "Black Blood Cultist",
+    "type": "prestige",
+    "hitDice": "d12",
+    "alignment": "Chaotic evil, chaotic neutral, or neutral evil"
+  },
+  {
+    "id": "justice-of-weald-and-woe",
+    "name": "Justice of Weald and Woe",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any"
+  },
+  {
+    "id": "night-mask-deathbringer",
+    "name": "Night Mask Deathbringer",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any evil"
+  },
+  {
+    "id": "shade-hunter",
+    "name": "Shade Hunter",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any evil"
+  },
+  {
+    "id": "thayan-gladiator",
+    "name": "Thayan Gladiator",
+    "type": "prestige",
+    "hitDice": "d12",
+    "alignment": "Any evil"
+  },
+  {
+    "id": "vengeance-knight",
+    "name": "Vengeance Knight",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Lawful evil, lawful neutral, or neutral evil"
+  },
+  {
+    "id": "avenging-executioner",
+    "name": "Avenging Executioner",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any nongood"
+  },
+  {
+    "id": "battle-trickster",
+    "name": "Battle Trickster",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Any"
+  },
+  {
+    "id": "cloaked-dancer",
+    "name": "Cloaked Dancer",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any"
+  },
+  {
+    "id": "combat-trapsmith",
+    "name": "Combat Trapsmith",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any"
+  },
+  {
+    "id": "fortune-s-friend",
+    "name": "Fortune's Friend",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any"
+  },
+  {
+    "id": "gray-guard",
+    "name": "Gray Guard",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Lawful good"
+  },
+  {
+    "id": "magical-trickster",
+    "name": "Magical Trickster",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any"
+  },
+  {
+    "id": "malconvoker",
+    "name": "Malconvoker",
+    "type": "prestige",
+    "hitDice": "d4",
+    "alignment": "Any nonevil"
+  },
+  {
+    "id": "master-of-masks",
+    "name": "Master of Masks",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any"
+  },
+  {
+    "id": "mountebank",
+    "name": "Mountebank",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any nonlawful"
+  },
+  {
+    "id": "psibond-agent",
+    "name": "Psibond Agent",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any"
+  },
+  {
+    "id": "spellwarp-sniper",
+    "name": "Spellwarp Sniper",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any"
+  },
+  {
+    "id": "uncanny-trickster",
+    "name": "Uncanny Trickster",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any"
+  },
+  {
+    "id": "gray-hand-enforcer",
+    "name": "Gray Hand Enforcer",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Any nonevil"
+  },
+  {
+    "id": "knight-of-the-blue-moon",
+    "name": "Knight of the Blue Moon",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any good"
+  },
+  {
+    "id": "moonstar-agent",
+    "name": "Moonstar Agent",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any"
+  },
+  {
+    "id": "sun-soul-monk",
+    "name": "Sun Soul Monk",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Lawful good or lawful neutral"
+  },
+  {
+    "id": "bladesinger",
+    "name": "Bladesinger",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any"
+  },
+  {
+    "id": "dark-hunter",
+    "name": "Dark Hunter",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "darkwood-stalker",
+    "name": "Darkwood Stalker",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "dervish",
+    "name": "Dervish",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Any"
+  },
+  {
+    "id": "drunken-master",
+    "name": "Drunken Master",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "exotic-weapon-master",
+    "name": "Exotic Weapon Master",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "eye-of-gruumsh",
+    "name": "Eye of Gruumsh",
+    "type": "prestige",
+    "hitDice": "d12",
+    "alignment": "Chaotic evil, chaotic neutral, or neutral evil."
+  },
+  {
+    "id": "frenzied-berserker",
+    "name": "Frenzied Berserker",
+    "type": "prestige",
+    "hitDice": "d12",
+    "alignment": "Any nonlawful."
+  },
+  {
+    "id": "gnome-giant-slayer",
+    "name": "Gnome Giant-slayer",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "halfling-outrider",
+    "name": "Halfling Outrider",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "hulking-hurler",
+    "name": "Hulking Hurler",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "hunter-of-the-dead",
+    "name": "Hunter of the Dead",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any nonevil"
+  },
+  {
+    "id": "invisible-blade",
+    "name": "Invisible Blade",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "justiciar",
+    "name": "Justiciar",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Any lawful"
+  },
+  {
+    "id": "kensai",
+    "name": "Kensai",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Any lawful"
+  },
+  {
+    "id": "knight-of-the-chalice",
+    "name": "Knight of the Chalice",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Lawful good"
+  },
+  {
+    "id": "knight-protector",
+    "name": "Knight Protector",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Lawful neutral or lawful good."
+  },
+  {
+    "id": "master-of-the-unseen-hand",
+    "name": "Master of the Unseen Hand",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "master-thrower",
+    "name": "Master Thrower",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any"
+  },
+  {
+    "id": "mindspy",
+    "name": "Mindspy",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "nature-s-warrior",
+    "name": "Nature's Warrior",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Any neutral"
+  },
+  {
+    "id": "occult-slayer",
+    "name": "Occult Slayer",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "order-of-the-bow-initiate",
+    "name": "Order of the Bow Initiate",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "purple-dragon-knight",
+    "name": "Purple Dragon Knight",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Lawful good, neutral good, lawful neutral, or neutral"
+  },
+  {
+    "id": "rage-mage",
+    "name": "Rage Mage",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any nonlawful"
+  },
+  {
+    "id": "ravager",
+    "name": "Ravager",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Chaotic evil or neutral evil"
+  },
+  {
+    "id": "reaping-mauler",
+    "name": "Reaping Mauler",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "ronin",
+    "name": "Ronin",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Any nonlawful"
+  },
+  {
+    "id": "spellsword",
+    "name": "Spellsword",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any"
+  },
+  {
+    "id": "stonelord",
+    "name": "Stonelord",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "tattooed-monk",
+    "name": "Tattooed Monk",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any lawful"
+  },
+  {
+    "id": "thayan-knight",
+    "name": "Thayan Knight",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Any nongood"
+  },
+  {
+    "id": "war-chanter",
+    "name": "War Chanter",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any nonlawful"
+  },
+  {
+    "id": "warshaper",
+    "name": "Warshaper",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "bear-warrior",
+    "name": "Bear Warrior",
+    "type": "prestige",
+    "hitDice": "d12",
+    "alignment": "Any"
+  },
+  {
+    "id": "cavalier",
+    "name": "Cavalier",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Any lawful."
+  },
+  {
+    "id": "dragon-rider",
+    "name": "Dragon Rider",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "inquisitor",
+    "name": "Inquisitor",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any nonchaotic"
+  },
+  {
+    "id": "knight-of-the-crown",
+    "name": "Knight of the Crown",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Lawful Good"
+  },
+  {
+    "id": "knight-of-the-lily",
+    "name": "Knight of the Lily",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Lawful Evil"
+  },
+  {
+    "id": "knight-of-the-rose",
+    "name": "Knight of the Rose",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "knight-of-the-skull",
+    "name": "Knight of the Skull",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "knight-of-the-sword",
+    "name": "Knight of the Sword",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "knight-of-the-thorn",
+    "name": "Knight of the Thorn",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "legendary-tactician",
+    "name": "Legendary Tactician",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "righteous-zealot",
+    "name": "Righteous Zealot",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "steel-legionnaire",
+    "name": "Steel Legionnaire",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "wizard-of-high-sorcery",
+    "name": "Wizard of High Sorcery",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "berserk",
+    "name": "Berserk",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "justiciar-of-taiia",
+    "name": "Justiciar of Taiia",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "soldier-of-light",
+    "name": "Soldier of Light",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "church-inquisitor-2",
+    "name": "Church Inquisitor",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Lawful good or lawful neutral"
+  },
+  {
+    "id": "consecrated-harrier-2",
+    "name": "Consecrated Harrier",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Any lawful"
+  },
+  {
+    "id": "contemplative-2",
+    "name": "Contemplative",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "divine-oracle-2",
+    "name": "Divine Oracle",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "holy-liberator-2",
+    "name": "Holy Liberator",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Chaotic good"
+  },
+  {
+    "id": "hospitaler-2",
+    "name": "Hospitaler",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any nonchaotic"
+  },
+  {
+    "id": "hunter-of-the-dead-2",
+    "name": "Hunter of the Dead",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any nonevil"
+  },
+  {
+    "id": "knight-of-the-chalice-2",
+    "name": "Knight of the Chalice",
+    "type": "prestige",
+    "hitDice": "d12",
+    "alignment": "Lawful good"
+  },
+  {
+    "id": "knight-of-the-middle-circle",
+    "name": "Knight of the Middle Circle",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Good. nonchaotic"
+  },
+  {
+    "id": "master-of-shrouds",
+    "name": "Master of Shrouds",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any nongood"
+  },
+  {
+    "id": "sacred-exorcist-2",
+    "name": "Sacred Exorcist",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any good"
+  },
+  {
+    "id": "sacred-fist-2",
+    "name": "Sacred Fist",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "templar",
+    "name": "Templar",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "warpriest-2",
+    "name": "Warpriest",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "diamond-dragon",
+    "name": "Diamond Dragon",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Neutral good, neutral evil, lawful neutral, chaotic neutral, or neutral"
+  },
+  {
+    "id": "dragon-descendant",
+    "name": "Dragon Descendant",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "dragon-lord",
+    "name": "Dragon Lord",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "hand-of-the-winged-masters",
+    "name": "Hand of the Winged Masters",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "pact-bound-adept",
+    "name": "Pact-bound Adept",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "swift-wing",
+    "name": "Swift Wing",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "wyrm-wizard",
+    "name": "Wyrm Wizard",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "arcane-archer",
+    "name": "Arcane Archer",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "arcane-trickster",
+    "name": "Arcane Trickster",
+    "type": "prestige",
+    "hitDice": "d4",
+    "alignment": "any nonlawful"
+  },
+  {
+    "id": "archmage",
+    "name": "Archmage",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "assassin",
+    "name": "Assassin",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any evil"
+  },
+  {
+    "id": "blackguard",
+    "name": "Blackguard",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "any evil"
+  },
+  {
+    "id": "dragon-disciple",
+    "name": "Dragon Disciple",
+    "type": "prestige",
+    "hitDice": "d12"
+  },
+  {
+    "id": "duelist",
+    "name": "Duelist",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "dwarven-defender",
+    "name": "Dwarven Defender",
+    "type": "prestige",
+    "hitDice": "d12",
+    "alignment": "Any lawful"
+  },
+  {
+    "id": "eldritch-knight",
+    "name": "Eldritch Knight",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "hierophant",
+    "name": "Hierophant",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "horizon-walker",
+    "name": "Horizon Walker",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "loremaster",
+    "name": "Loremaster",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "mystic-theurge",
+    "name": "Mystic Theurge",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "red-wizard",
+    "name": "Red Wizard",
+    "type": "prestige",
+    "hitDice": "d4",
+    "alignment": "Any nongood"
+  },
+  {
+    "id": "shadowdancer",
+    "name": "Shadowdancer",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "thaumaturgist",
+    "name": "Thaumaturgist",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "bloodscaled-fury",
+    "name": "Bloodscaled Fury",
+    "type": "prestige",
+    "hitDice": "d12",
+    "alignment": "Any chaotic"
+  },
+  {
+    "id": "disciple-of-ashardalon",
+    "name": "Disciple of Ashardalon",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any evil"
+  },
+  {
+    "id": "dispassionate-watcher-of-chronepsis",
+    "name": "Dispassionate Watcher of Chronepsis",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any neutral"
+  },
+  {
+    "id": "dracolyte",
+    "name": "Dracolyte",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "dragon-ascendant",
+    "name": "Dragon Ascendant",
+    "type": "prestige",
+    "hitDice": "d12"
+  },
+  {
+    "id": "dragonkith",
+    "name": "Dragonkith",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "dragonrider",
+    "name": "Dragonrider",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "dragonslayer",
+    "name": "Dragonslayer",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "dragonsong-lyrist",
+    "name": "Dragonsong Lyrist",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any nonevil"
+  },
+  {
+    "id": "dragonstalker",
+    "name": "Dragonstalker",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "elemental-master",
+    "name": "Elemental Master",
+    "type": "prestige",
+    "hitDice": "d12"
+  },
+  {
+    "id": "hidecarved-dragon",
+    "name": "Hidecarved Dragon",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Any lawful"
+  },
+  {
+    "id": "hoardstealer",
+    "name": "Hoardstealer",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any nonlawful"
+  },
+  {
+    "id": "initiate-of-the-draconic-mysteries",
+    "name": "Initiate of the Draconic Mysteries",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "platinum-knight",
+    "name": "Platinum Knight",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any good"
+  },
+  {
+    "id": "sacred-warder-of-bahamut",
+    "name": "Sacred Warder of Bahamut",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Lawful good or neutral good"
+  },
+  {
+    "id": "talon-of-tiamat",
+    "name": "Talon of Tiamat",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any evil"
+  },
+  {
+    "id": "unholy-ravager-of-tiamat",
+    "name": "Unholy Ravager of Tiamat",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Lawful evil or neutral evil"
+  },
+  {
+    "id": "black-dog",
+    "name": "Black Dog",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "blade-of-orien",
+    "name": "Blade of Orien",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "cyre-scout",
+    "name": "Cyre Scout",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "deneith-warden",
+    "name": "Deneith Warden",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Any lawful"
+  },
+  {
+    "id": "duraak-ash",
+    "name": "Duraak'ash",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "medani-prophet",
+    "name": "Medani Prophet",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "nosomatic-chirurgeon",
+    "name": "Nosomatic Chirurgeon",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any nongood"
+  },
+  {
+    "id": "shadow-hunter",
+    "name": "Shadow Hunter",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "silver-key",
+    "name": "Silver Key",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "storm-sentry",
+    "name": "Storm Sentry",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "unbound-scroll",
+    "name": "Unbound Scroll",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "vadalis-beastkeeper",
+    "name": "Vadalis Beastkeeper",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "wearer-of-purple",
+    "name": "Wearer of Purple",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "arachnomancer",
+    "name": "Arachnomancer",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any evil"
+  },
+  {
+    "id": "cavestalker",
+    "name": "Cavestalker",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any"
+  },
+  {
+    "id": "demonbinder",
+    "name": "Demonbinder",
+    "type": "prestige",
+    "hitDice": "d4",
+    "alignment": "Chaotic evil"
+  },
+  {
+    "id": "dread-fang-of-lolth",
+    "name": "Dread Fang of Lolth",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Lawful evil"
+  },
+  {
+    "id": "eye-of-lolth",
+    "name": "Eye of Lolth",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "insidious-corruptor",
+    "name": "Insidious Corruptor",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any evil"
+  },
+  {
+    "id": "kinslayer",
+    "name": "Kinslayer",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "beast-heart-adept",
+    "name": "Beast Heart Adept",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "trapsmith",
+    "name": "Trapsmith",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "dragonmark-heir",
+    "name": "Dragonmark Heir",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "eldeen-ranger",
+    "name": "Eldeen Ranger",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "exorcist-of-the-silver-flame",
+    "name": "Exorcist of the Silver Flame",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any good"
+  },
+  {
+    "id": "extreme-explorer",
+    "name": "Extreme Explorer",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "heir-of-siberys",
+    "name": "Heir of Siberys",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "master-inquisitive",
+    "name": "Master Inquisitive",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "warforged-juggernaut",
+    "name": "Warforged Juggernaut",
+    "type": "prestige",
+    "hitDice": "d12"
+  },
+  {
+    "id": "weretouched-master",
+    "name": "Weretouched Master",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "demonwrecker",
+    "name": "Demonwrecker",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "jaunter",
+    "name": "Jaunter",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "cataclysm-mage",
+    "name": "Cataclysm Mage",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "thunder-guide",
+    "name": "Thunder Guide",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "windwright-captain",
+    "name": "Windwright Captain",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "agent-retriever",
+    "name": "Agent Retriever",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "cosmic-descryer",
+    "name": "Cosmic Descryer",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "divine-emissary",
+    "name": "Divine Emissary",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "epic-arcane-archer",
+    "name": "Epic Arcane Archer",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "epic-assassin",
+    "name": "Epic Assassin",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "epic-blackguard",
+    "name": "Epic Blackguard",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "epic-dwarven-defender",
+    "name": "Epic Dwarven Defender",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "epic-infiltrator",
+    "name": "Epic Infiltrator",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "epic-loremaster",
+    "name": "Epic Loremaster",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "epic-shadowdancer",
+    "name": "Epic Shadowdancer",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "guardian-paramount",
+    "name": "Guardian Paramount",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "high-proselytizer",
+    "name": "High Proselytizer",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "legendary-dreadnought",
+    "name": "Legendary Dreadnought",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "perfect-wight",
+    "name": "Perfect Wight",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "union-sentinel",
+    "name": "Union Sentinel",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "hellbreaker",
+    "name": "Hellbreaker",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any chaotic"
+  },
+  {
+    "id": "hellfire-warlock",
+    "name": "Hellfire Warlock",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "hellreaver",
+    "name": "Hellreaver",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Any good"
+  },
+  {
+    "id": "soulguard",
+    "name": "Soulguard",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Lawful good or lawful neutral"
+  },
+  {
+    "id": "sovereign-speaker",
+    "name": "Sovereign Speaker",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "escalation-mage",
+    "name": "Escalation Mage",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "argent-fist",
+    "name": "Argent Fist",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Lawful good"
+  },
+  {
+    "id": "thief-of-life",
+    "name": "Thief of Life",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "planar-shepherd",
+    "name": "Planar Shepherd",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "fiend-of-blasphemy",
+    "name": "Fiend of Blasphemy",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "fiend-of-corruption",
+    "name": "Fiend of Corruption",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "fiend-of-possession",
+    "name": "Fiend of Possession",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "knight-phantom",
+    "name": "Knight Phantom",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "dark-lantern",
+    "name": "Dark Lantern",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "cyran-avenger",
+    "name": "Cyran Avenger",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "bone-knight",
+    "name": "Bone Knight",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "silver-pyromancer",
+    "name": "Silver Pyromancer",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Lawful good"
+  },
+  {
+    "id": "arachne",
+    "name": "Arachne",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "auspician",
+    "name": "Auspician",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "doomguide",
+    "name": "Doomguide",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "dreadmaster",
+    "name": "Dreadmaster",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "dweomerkeeper",
+    "name": "Dweomerkeeper",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "elemental-archon",
+    "name": "Elemental Archon",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "forest-master",
+    "name": "Forest Master",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "goldeye",
+    "name": "Goldeye",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "heartwarder",
+    "name": "Heartwarder",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "horned-harbinger",
+    "name": "Horned Harbinger",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "nightcloak",
+    "name": "Nightcloak",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "ocular-adept",
+    "name": "Ocular Adept",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "silverstar",
+    "name": "Silverstar",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "stormlord-2",
+    "name": "Stormlord",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "strifeleader",
+    "name": "Strifeleader",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "sword-dancer",
+    "name": "Sword Dancer",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "techsmith",
+    "name": "Techsmith",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "waveservant",
+    "name": "Waveservant",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "wearer-of-purple-2",
+    "name": "Wearer of Purple",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "windwalker",
+    "name": "Windwalker",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "cloud-anchorite",
+    "name": "Cloud Anchorite",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any nonchaotic"
+  },
+  {
+    "id": "cryokineticist",
+    "name": "Cryokineticist",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any lawful"
+  },
+  {
+    "id": "disciple-of-thrym",
+    "name": "Disciple of Thrym",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Any nongood"
+  },
+  {
+    "id": "frost-mage",
+    "name": "Frost Mage",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "frostrager",
+    "name": "Frostrager",
+    "type": "prestige",
+    "hitDice": "d12"
+  },
+  {
+    "id": "knight-of-the-iron-glacier",
+    "name": "Knight of the Iron Glacier",
+    "type": "prestige",
+    "hitDice": "d0",
+    "alignment": "Lawful good or lawful neutral"
+  },
+  {
+    "id": "primeval",
+    "name": "Primeval",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Any nonlawful"
+  },
+  {
+    "id": "rimefire-witch",
+    "name": "Rimefire Witch",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "stormsinger",
+    "name": "Stormsinger",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "winterhaunt-of-iborighu",
+    "name": "Winterhaunt of Iborighu",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Chaotic neutral, chaotic evil, or neutral evil"
+  },
+  {
+    "id": "arcane-devotee",
+    "name": "Arcane Devotee",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "archmage-2",
+    "name": "Archmage",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "divine-champion",
+    "name": "Divine Champion",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "divine-disciple",
+    "name": "Divine Disciple",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "divine-seeker",
+    "name": "Divine Seeker",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "guild-thief",
+    "name": "Guild Thief",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "harper-scout",
+    "name": "Harper Scout",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "hathran",
+    "name": "Hathran",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "hierophant-2",
+    "name": "Hierophant",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "purple-dragon-knight-2",
+    "name": "Purple Dragon Knight",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "red-wizard-2",
+    "name": "Red Wizard",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "runecaster",
+    "name": "Runecaster",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "shadow-adept",
+    "name": "Shadow Adept",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "arboreal-guardian",
+    "name": "Arboreal Guardian",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "bone-collector",
+    "name": "Bone Collector",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "deathwarden-chanter",
+    "name": "Deathwarden Chanter",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "ghost-slayer",
+    "name": "Ghost Slayer",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "combat-medic",
+    "name": "Combat Medic",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any nonevil"
+  },
+  {
+    "id": "dread-commando",
+    "name": "Dread Commando",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "legendary-leader",
+    "name": "Legendary Leader",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "war-weaver",
+    "name": "War Weaver",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "corrupt-avenger",
+    "name": "Corrupt Avenger",
+    "type": "prestige",
+    "hitDice": "d12"
+  },
+  {
+    "id": "death-delver",
+    "name": "Death Delver",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "dread-witch",
+    "name": "Dread Witch",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "fiend-blooded",
+    "name": "Fiend-blooded",
+    "type": "prestige",
+    "hitDice": "d4",
+    "alignment": "Any nongood"
+  },
+  {
+    "id": "purifier-of-the-hallowed-doctrine",
+    "name": "Purifier of the Hallowed Doctrine",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any good or true neutral"
+  },
+  {
+    "id": "tainted-scholar",
+    "name": "Tainted Scholar",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "darkmask",
+    "name": "Darkmask",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "spur-lord",
+    "name": "Spur Lord",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "thayan-knight-2",
+    "name": "Thayan Knight",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "zhentarim-skymage",
+    "name": "Zhentarim Skymage",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "cultist-of-the-shattered-peak",
+    "name": "Cultist of the Shattered Peak",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "glorious-servitor",
+    "name": "Glorious Servitor",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any"
+  },
+  {
+    "id": "magelord",
+    "name": "Magelord",
+    "type": "prestige",
+    "hitDice": "d4",
+    "alignment": "Any"
+  },
+  {
+    "id": "olin-gisir",
+    "name": "Olin Gisir",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "sunmaster",
+    "name": "Sunmaster",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any lawful"
+  },
+  {
+    "id": "death-s-chosen",
+    "name": "Death's Chosen",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Any nongood"
+  },
+  {
+    "id": "dirgesinger",
+    "name": "Dirgesinger",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any nongood"
+  },
+  {
+    "id": "ephemeral-exemplar",
+    "name": "Ephemeral Exemplar",
+    "type": "prestige",
+    "hitDice": "d12"
+  },
+  {
+    "id": "lurking-terror",
+    "name": "Lurking Terror",
+    "type": "prestige",
+    "hitDice": "d12"
+  },
+  {
+    "id": "master-of-radiance",
+    "name": "Master of Radiance",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any nonevil"
+  },
+  {
+    "id": "master-of-shrouds-2",
+    "name": "Master of Shrouds",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any Nongood"
+  },
+  {
+    "id": "master-vampire",
+    "name": "Master Vampire",
+    "type": "prestige",
+    "hitDice": "d12"
+  },
+  {
+    "id": "pale-master",
+    "name": "Pale Master",
+    "type": "prestige",
+    "hitDice": "d4",
+    "alignment": "Any nongood"
+  },
+  {
+    "id": "sacred-purifier",
+    "name": "Sacred Purifier",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any good"
+  },
+  {
+    "id": "tomb-warden",
+    "name": "Tomb Warden",
+    "type": "prestige",
+    "hitDice": "d12",
+    "alignment": "Any nonchaotic"
+  },
+  {
+    "id": "true-necromancer",
+    "name": "True Necromancer",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any nongood"
+  },
+  {
+    "id": "abolisher",
+    "name": "Abolisher",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any nonchaotic"
+  },
+  {
+    "id": "beholder-mage",
+    "name": "Beholder Mage",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "darkrunner",
+    "name": "Darkrunner",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any"
+  },
+  {
+    "id": "fleshwarper",
+    "name": "Fleshwarper",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any nonlawful"
+  },
+  {
+    "id": "keeper-of-the-cerulean-sign",
+    "name": "Keeper of the Cerulean Sign",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "sanctified-mind",
+    "name": "Sanctified Mind",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any nonevil"
+  },
+  {
+    "id": "savant-aboleth",
+    "name": "Savant Aboleth",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "topaz-guardian",
+    "name": "Topaz Guardian",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any good"
+  },
+  {
+    "id": "gnome-artificer",
+    "name": "Gnome Artificer",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "guild-wizard-of-waterdeep",
+    "name": "Guild Wizard of Waterdeep",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "harper-mage",
+    "name": "Harper Mage",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "harper-priest",
+    "name": "Harper Priest",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "incantatrix",
+    "name": "Incantatrix",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "mage-killer",
+    "name": "Mage-killer",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "master-alchemist",
+    "name": "Master Alchemist",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "mystic-wanderer",
+    "name": "Mystic Wanderer",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "spelldancer",
+    "name": "Spelldancer",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "spellfire-channeler",
+    "name": "Spellfire Channeler",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "war-wizard-of-cormyr",
+    "name": "War Wizard of Cormyr",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "bonded-summoner",
+    "name": "Bonded Summoner",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "dragon-samurai",
+    "name": "Dragon Samurai",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": " "
+  },
+  {
+    "id": "havoc-mage",
+    "name": "Havoc Mage",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any"
+  },
+  {
+    "id": "skullclan-hunter",
+    "name": "Skullclan Hunter",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any Good"
+  },
+  {
+    "id": "tactical-soldier",
+    "name": "Tactical Soldier",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Any"
+  },
+  {
+    "id": "war-hulk",
+    "name": "War Hulk",
+    "type": "prestige",
+    "hitDice": "d12",
+    "alignment": "Any"
+  },
+  {
+    "id": "warchief",
+    "name": "Warchief",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "alchemist-savant",
+    "name": "Alchemist Savant",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "deadgrim",
+    "name": "Deadgrim",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any non-evil"
+  },
+  {
+    "id": "dragon-prophet",
+    "name": "Dragon Prophet",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "elemental-scion-of-zilargo",
+    "name": "Elemental Scion of Zilargo",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "impure-prince",
+    "name": "Impure Prince",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "quori-mindhunter",
+    "name": "Quori Mindhunter",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any non-evil"
+  },
+  {
+    "id": "renegade-mastermaker",
+    "name": "Renegade Mastermaker",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "vigilant-sentinel-of-aerenal",
+    "name": "Vigilant Sentinel of Aerenal",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "incandescent-champion",
+    "name": "Incandescent Champion",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Any good"
+  },
+  {
+    "id": "incarnum-blade",
+    "name": "Incarnum Blade",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Any except neutral"
+  },
+  {
+    "id": "ironsoul-forgemaster",
+    "name": "Ironsoul Forgemaster",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any nonevil"
+  },
+  {
+    "id": "necrocarnate",
+    "name": "Necrocarnate",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any evil"
+  },
+  {
+    "id": "sapphire-hierarch",
+    "name": "Sapphire Hierarch",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Lawful"
+  },
+  {
+    "id": "soulcaster",
+    "name": "Soulcaster",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "spinemeld-warrior",
+    "name": "Spinemeld Warrior",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Any lawful"
+  },
+  {
+    "id": "totem-rager",
+    "name": "Totem Rager",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "umbral-disciple",
+    "name": "Umbral Disciple",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "witchborn-binder",
+    "name": "Witchborn Binder",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "beholder-mage-2",
+    "name": "Beholder Mage",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "divine-agent",
+    "name": "Divine Agent",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "gatecrasher",
+    "name": "Gatecrasher",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any nonlawful"
+  },
+  {
+    "id": "planar-champion",
+    "name": "Planar Champion",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "planeshifter",
+    "name": "Planeshifter",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "animal-lord-2",
+    "name": "Animal Lord",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Neutral good, lawful netural, neutral, chaotic neutral, or neutral evil"
+  },
+  {
+    "id": "bane-of-infidels",
+    "name": "Bane of Infidels",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any nongood"
+  },
+  {
+    "id": "blighter-2",
+    "name": "Blighter",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any nongood"
+  },
+  {
+    "id": "bloodhound-2",
+    "name": "Bloodhound",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "deepwood-sniper",
+    "name": "Deepwood Sniper",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "exotic-weapon-master-2",
+    "name": "Exotic Weapon Master",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "eye-of-gruumsh-2",
+    "name": "Eye of Gruumsh",
+    "type": "prestige",
+    "hitDice": "d12",
+    "alignment": "chaotic evil, chaotic neutral, neutral evil"
+  },
+  {
+    "id": "foe-hunter",
+    "name": "Foe Hunter",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "forsaker",
+    "name": "Forsaker",
+    "type": "prestige",
+    "hitDice": "d12"
+  },
+  {
+    "id": "frenzied-berserker-2",
+    "name": "Frenzied Berserker",
+    "type": "prestige",
+    "hitDice": "d12",
+    "alignment": "Any nonlawful"
+  },
+  {
+    "id": "geomancer-2",
+    "name": "Geomancer",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "hexer",
+    "name": "Hexer",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any nongood"
+  },
+  {
+    "id": "king-queen-of-the-wild",
+    "name": "King/queen of the Wild",
+    "type": "prestige",
+    "hitDice": "d12"
+  },
+  {
+    "id": "oozemaster",
+    "name": "Oozemaster",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "shifter",
+    "name": "Shifter",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "tamer-of-beasts",
+    "name": "Tamer of Beasts",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "tempest-2",
+    "name": "Tempest",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "verdant-lord",
+    "name": "Verdant Lord",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any nonevil"
+  },
+  {
+    "id": "watch-detective",
+    "name": "Watch Detective",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any nonevil"
+  },
+  {
+    "id": "windrider",
+    "name": "Windrider",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "akodo-champion",
+    "name": "Akodo Champion",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Lawful Good"
+  },
+  {
+    "id": "battle-maiden",
+    "name": "Battle Maiden",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Any Lawful"
+  },
+  {
+    "id": "bayushi-deceiver",
+    "name": "Bayushi Deceiver",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any Nonlawful"
+  },
+  {
+    "id": "bear-warrior-2",
+    "name": "Bear Warrior",
+    "type": "prestige",
+    "hitDice": "d12"
+  },
+  {
+    "id": "blade-dancer",
+    "name": "Blade Dancer",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any Lawful"
+  },
+  {
+    "id": "daidoji-bodyguard",
+    "name": "Daidoji Bodyguard",
+    "type": "prestige",
+    "hitDice": "d12",
+    "alignment": "Any Lawful"
+  },
+  {
+    "id": "eunuch-warlock",
+    "name": "Eunuch Warlock",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any Evil"
+  },
+  {
+    "id": "henshin-mystic",
+    "name": "Henshin Mystic",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any lawful"
+  },
+  {
+    "id": "hida-defender",
+    "name": "Hida Defender",
+    "type": "prestige",
+    "hitDice": "d12",
+    "alignment": "Any Nonevil"
+  },
+  {
+    "id": "iaijutsu-master",
+    "name": "Iaijutsu Master",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Any Lawful"
+  },
+  {
+    "id": "kishi-charger",
+    "name": "Kishi Charger",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "maho-bujin",
+    "name": "Maho-bujin",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "maho-tsukai",
+    "name": "Maho-tsukai",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "mantis-mercenary",
+    "name": "Mantis Mercenary",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "mirumoto-niten-master",
+    "name": "Mirumoto Niten Master",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "moto-avenger",
+    "name": "Moto Avenger",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "ninja-spy",
+    "name": "Ninja Spy",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any Nonchaotic, Nongood"
+  },
+  {
+    "id": "shadow-scout",
+    "name": "Shadow Scout",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Any Nonevil"
+  },
+  {
+    "id": "shapeshifter",
+    "name": "Shapeshifter",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "shiba-protector",
+    "name": "Shiba Protector",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "shintao-monk",
+    "name": "Shintao Monk",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Lawful Good"
+  },
+  {
+    "id": "singh-rager",
+    "name": "Singh Rager",
+    "type": "prestige",
+    "hitDice": "d12",
+    "alignment": "Any Lawful"
+  },
+  {
+    "id": "tattooed-monk-2",
+    "name": "Tattooed Monk",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any Lawful"
+  },
+  {
+    "id": "void-disciple-2",
+    "name": "Void Disciple",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any Neutral"
+  },
+  {
+    "id": "weapon-master-kensei",
+    "name": "Weapon Master (Kensei)",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "witch-hunter",
+    "name": "Witch Hunter",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any Nonevil"
+  },
+  {
+    "id": "yakuza",
+    "name": "Yakuza",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any Nonchaotic, Nongood"
+  },
+  {
+    "id": "gatekeeper-mystagogue",
+    "name": "Gatekeeper Mystagogue",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any non-evil"
+  },
+  {
+    "id": "high-elemental-binder",
+    "name": "High Elemental Binder",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "revenant-blade",
+    "name": "Revenant Blade",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "court-herald",
+    "name": "Court Herald",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "merchant-prince",
+    "name": "Merchant Prince",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "arcane-devotee-2",
+    "name": "Arcane Devotee",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "black-blood-hunter",
+    "name": "Black Blood Hunter",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "celebrant-of-sharess",
+    "name": "Celebrant of Sharess",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "cognition-thief",
+    "name": "Cognition Thief",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "divine-champion-2",
+    "name": "Divine Champion",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "divine-disciple-2",
+    "name": "Divine Disciple",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "divine-seeker-2",
+    "name": "Divine Seeker",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "evereskan-tomb-guardian",
+    "name": "Evereskan Tomb Guardian",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "eye-of-horus-re",
+    "name": "Eye of Horus-re",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Lawful good"
+  },
+  {
+    "id": "hammer-of-moradin",
+    "name": "Hammer of Moradin",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "harper-agent",
+    "name": "Harper Agent",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any nonevil"
+  },
+  {
+    "id": "harper-paragon",
+    "name": "Harper Paragon",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "hathran-2",
+    "name": "Hathran",
+    "type": "prestige",
+    "hitDice": "d4",
+    "alignment": "Lawful good, lawful neutral, or neutral good"
+  },
+  {
+    "id": "incantatrix-2",
+    "name": "Incantatrix",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "justiciar-of-tyr",
+    "name": "Justiciar of Tyr",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Lawful good"
+  },
+  {
+    "id": "maiden-of-pain",
+    "name": "Maiden of Pain",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "martyred-champion-of-ilmater",
+    "name": "Martyred Champion of Ilmater",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "monk-of-the-long-death",
+    "name": "Monk of the Long Death",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any nongood"
+  },
+  {
+    "id": "morninglord-of-lathander",
+    "name": "Morninglord of Lathander",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any good"
+  },
+  {
+    "id": "purple-dragon-knight-3",
+    "name": "Purple Dragon Knight",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Any nonevil and nonchaotic"
+  },
+  {
+    "id": "runecaster-2",
+    "name": "Runecaster",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "shaaryan-hunter",
+    "name": "Shaaryan Hunter",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "shadow-adept-2",
+    "name": "Shadow Adept",
+    "type": "prestige",
+    "hitDice": "d4",
+    "alignment": "Any nongood"
+  },
+  {
+    "id": "shadow-thief-of-amn",
+    "name": "Shadow Thief of Amn",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "slime-lord",
+    "name": "Slime Lord",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "spellguard-of-silverymoon",
+    "name": "Spellguard of Silverymoon",
+    "type": "prestige",
+    "hitDice": "d4",
+    "alignment": "Any nonevil"
+  },
+  {
+    "id": "yathrinshee",
+    "name": "Yathrinshee",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "zhentarim-spy",
+    "name": "Zhentarim Spy",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any evil"
+  },
+  {
+    "id": "ardent-dilettante",
+    "name": "Ardent Dilettante",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "astral-dancer",
+    "name": "Astral Dancer",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "chaotician",
+    "name": "Chaotician",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Any chaotic"
+  },
+  {
+    "id": "cipher-adept",
+    "name": "Cipher Adept",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Neutral"
+  },
+  {
+    "id": "defiant",
+    "name": "Defiant",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "doomlord",
+    "name": "Doomlord",
+    "type": "prestige",
+    "hitDice": "d12"
+  },
+  {
+    "id": "elemental-warrior",
+    "name": "Elemental Warrior",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "fatemaker",
+    "name": "Fatemaker",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "visionary-seeker",
+    "name": "Visionary Seeker",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "battlerager",
+    "name": "Battlerager",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "bladesinger-2",
+    "name": "Bladesinger",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "breachgnome",
+    "name": "Breachgnome",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "elven-high-mage",
+    "name": "Elven High Mage",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "great-rift-skyguard",
+    "name": "Great Rift Skyguard",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "orc-warlord",
+    "name": "Orc Warlord",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "spellsinger",
+    "name": "Spellsinger",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "warrior-skald",
+    "name": "Warrior Skald",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "warsling-sniper",
+    "name": "Warsling Sniper",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "knight-of-the-raven",
+    "name": "Knight of the Raven",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any good."
+  },
+  {
+    "id": "lightbringer",
+    "name": "Lightbringer",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "chameleon",
+    "name": "Chameleon",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "loredelver",
+    "name": "Loredelver",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "menacing-brute",
+    "name": "Menacing Brute",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Any nongood"
+  },
+  {
+    "id": "outcast-champion",
+    "name": "Outcast Champion",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "scar-enforcer",
+    "name": "Scar Enforcer",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any nongood"
+  },
+  {
+    "id": "shadow-sentinel",
+    "name": "Shadow Sentinel",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "urban-soul",
+    "name": "Urban Soul",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "disciple-of-the-eye",
+    "name": "Disciple of the Eye",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any lawful"
+  },
+  {
+    "id": "dracolexi",
+    "name": "Dracolexi",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "dragon-devotee",
+    "name": "Dragon Devotee",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "dragonheart-mage",
+    "name": "Dragonheart Mage",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "singer-of-concordance",
+    "name": "Singer of Concordance",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "atavist",
+    "name": "Atavist",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Lawful good or lawful neutral"
+  },
+  {
+    "id": "cabinet-trickster",
+    "name": "Cabinet Trickster",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "moonspeaker",
+    "name": "Moonspeaker",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "quori-nightmare",
+    "name": "Quori Nightmare",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "reachrunner",
+    "name": "Reachrunner",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "recaster",
+    "name": "Recaster",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "reforged",
+    "name": "Reforged",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "spellcarved-soldier",
+    "name": "Spellcarved Soldier",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "battlesmith",
+    "name": "Battlesmith",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "blade-bravo",
+    "name": "Blade Bravo",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "cragtop-archer",
+    "name": "Cragtop Archer",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "dawncaller",
+    "name": "Dawncaller",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "deepwarden",
+    "name": "Deepwarden",
+    "type": "prestige",
+    "hitDice": "d12"
+  },
+  {
+    "id": "divine-prankster",
+    "name": "Divine Prankster",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "earth-dreamer",
+    "name": "Earth Dreamer",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "goliath-liberator",
+    "name": "Goliath Liberator",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "iron-mind",
+    "name": "Iron Mind",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "peregrine-runner",
+    "name": "Peregrine Runner",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "runesmith",
+    "name": "Runesmith",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "shadowcraft-mage",
+    "name": "Shadowcraft Mage",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "stoneblessed",
+    "name": "Stoneblessed",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "stonedeath-assassin",
+    "name": "Stonedeath Assassin",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "stonespeaker-guardian",
+    "name": "Stonespeaker Guardian",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "doomdreamer",
+    "name": "Doomdreamer",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "arcane-hierophant",
+    "name": "Arcane Hierophant",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any nonlawful"
+  },
+  {
+    "id": "champion-of-corellon-larethian",
+    "name": "Champion of Corellon Larethian",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Any nonevil"
+  },
+  {
+    "id": "luckstealer",
+    "name": "Luckstealer",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "ruathar",
+    "name": "Ruathar",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "skypledged",
+    "name": "Skypledged",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "stormtalon",
+    "name": "Stormtalon",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "whisperknife",
+    "name": "Whisperknife",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "wildrunner",
+    "name": "Wildrunner",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Any good or chaotic"
+  },
+  {
+    "id": "ashworm-dragoon",
+    "name": "Ashworm Dragoon",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "lord-of-tides",
+    "name": "Lord of Tides",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "sand-shaper",
+    "name": "Sand Shaper",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "scion-of-tem-et-nu",
+    "name": "Scion of Tem-et-nu",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "scorpion-heritor",
+    "name": "Scorpion Heritor",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "walker-in-the-waste",
+    "name": "Walker In the Waste",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "dread-pirate-2",
+    "name": "Dread Pirate",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any nonlawful"
+  },
+  {
+    "id": "dungeon-delver-2",
+    "name": "Dungeon Delver",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "fang-of-lolth",
+    "name": "Fang of Lolth",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any nonlawful and nongood"
+  },
+  {
+    "id": "outlaw-of-the-crimson-road",
+    "name": "Outlaw of the Crimson Road",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "royal-explorer",
+    "name": "Royal Explorer",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "spymaster-2",
+    "name": "Spymaster",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "temple-raider-of-olidammara-2",
+    "name": "Temple Raider of Olidammara",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any chaotic"
+  },
+  {
+    "id": "thief-acrobat-2",
+    "name": "Thief-acrobat",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any nonlawful."
+  },
+  {
+    "id": "vigilante-2",
+    "name": "Vigilante",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any nonevil"
+  },
+  {
+    "id": "virtuoso-2",
+    "name": "Virtuoso",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "cavalier-2",
+    "name": "Cavalier",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Lawful"
+  },
+  {
+    "id": "devoted-defender",
+    "name": "Devoted Defender",
+    "type": "prestige",
+    "hitDice": "d12"
+  },
+  {
+    "id": "drunken-master-2",
+    "name": "Drunken Master",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "duelist-2",
+    "name": "Duelist",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "fist-of-hextor",
+    "name": "Fist of Hextor",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Lawful evil, neutral evil, or lawful neutral."
+  },
+  {
+    "id": "ghostwalker",
+    "name": "Ghostwalker",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Lawful good, lawful evil, chaotic good, chaotic evil, or true neutral."
+  },
+  {
+    "id": "gladiator",
+    "name": "Gladiator",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "halfling-outrider-2",
+    "name": "Halfling Outrider",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "knight-protector-of-the-great-kingdom",
+    "name": "Knight Protector of the Great Kingdom",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Lawful"
+  },
+  {
+    "id": "lasher",
+    "name": "Lasher",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "master-of-chains",
+    "name": "Master of Chains",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Any nongood"
+  },
+  {
+    "id": "master-samurai",
+    "name": "Master Samurai",
+    "type": "prestige",
+    "hitDice": "d12"
+  },
+  {
+    "id": "ninja-of-the-crescent-moon",
+    "name": "Ninja of the Crescent Moon",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "order-of-the-bow-initiate-2",
+    "name": "Order of the Bow Initiate",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "ravager-2",
+    "name": "Ravager",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Chaotic evil, chaotic neutral, neutral evil"
+  },
+  {
+    "id": "red-avenger",
+    "name": "Red Avenger",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "tribal-protector",
+    "name": "Tribal Protector",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "The same alignment as the majority of the character’s tribe."
+  },
+  {
+    "id": "warmaster",
+    "name": "Warmaster",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Any nonchaotic, nonevil."
+  },
+  {
+    "id": "weapon-master",
+    "name": "Weapon Master",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "cannith-wand-adept",
+    "name": "Cannith Wand Adept",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "citadel-elite",
+    "name": "Citadel Elite",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any lawful"
+  },
+  {
+    "id": "sharn-skymage",
+    "name": "Sharn Skymage",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "serene-guardian",
+    "name": "Serene Guardian",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any lawful"
+  },
+  {
+    "id": "solar-channeler",
+    "name": "Solar Channeler",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any good"
+  },
+  {
+    "id": "dark-scholar",
+    "name": "Dark Scholar",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "twisted-lord",
+    "name": "Twisted Lord",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "crinti-shadow-marauder",
+    "name": "Crinti Shadow Marauder",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any nongood"
+  },
+  {
+    "id": "great-rift-deep-defender",
+    "name": "Great Rift Deep Defender",
+    "type": "prestige",
+    "hitDice": "d12",
+    "alignment": "Any lawful"
+  },
+  {
+    "id": "great-sea-corsair",
+    "name": "Great Sea Corsair",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "halruaan-elder",
+    "name": "Halruaan Elder",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "halruaan-magehound",
+    "name": "Halruaan Magehound",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "hand-of-the-adama",
+    "name": "Hand of the Adama",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Lawful good or lawful neutral."
+  },
+  {
+    "id": "hin-fist",
+    "name": "Hin Fist",
+    "type": "prestige",
+    "hitDice": "d0",
+    "alignment": "Lawful good"
+  },
+  {
+    "id": "jordain-vizier",
+    "name": "Jordain Vizier",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any lawful"
+  },
+  {
+    "id": "luiren-marchwarden",
+    "name": "Luiren Marchwarden",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any nonevil"
+  },
+  {
+    "id": "maquar-crusader",
+    "name": "Maquar Crusader",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Lawful good or lawful neutral"
+  },
+  {
+    "id": "scourge-maiden",
+    "name": "Scourge Maiden",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Lawful evil, lawful neutral, or neutral evil"
+  },
+  {
+    "id": "ancient-master",
+    "name": "Ancient Master",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any evil (usually chaotic evil)"
+  },
+  {
+    "id": "coiled-cabalist",
+    "name": "Coiled Cabalist",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any evil (usually chaotic evil)"
+  },
+  {
+    "id": "fang-of-sseth",
+    "name": "Fang of Sseth",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any evil (usually chaotic evil)"
+  },
+  {
+    "id": "master-of-vipers",
+    "name": "Master of Vipers",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any evil (usually chaotic evil)"
+  },
+  {
+    "id": "naga-overlord",
+    "name": "Naga Overlord",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any evil"
+  },
+  {
+    "id": "serpent-slayer",
+    "name": "Serpent Slayer",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "giant-killer",
+    "name": "Giant-killer",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "hordebreaker",
+    "name": "Hordebreaker",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "knight-errant-of-silverymoon",
+    "name": "Knight-errant of Silverymoon",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "orc-scout",
+    "name": "Orc Scout",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "peerless-archer",
+    "name": "Peerless Archer",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "wild-scout",
+    "name": "Wild Scout",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "fist-of-dal-quor",
+    "name": "Fist of Dal Quor",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "haztaratain",
+    "name": "Haztaratain",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "emancipated-spawn",
+    "name": "Emancipated Spawn",
+    "type": "prestige",
+    "hitDice": "d12"
+  },
+  {
+    "id": "illithid-savant",
+    "name": "Illithid Savant",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "master-of-flies",
+    "name": "Master of Flies",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any nongood"
+  },
+  {
+    "id": "scaled-horror",
+    "name": "Scaled Horror",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "siren",
+    "name": "Siren",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "slaad-brooder",
+    "name": "Slaad Brooder",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any Chaotic"
+  },
+  {
+    "id": "survivor",
+    "name": "Survivor",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "sybil",
+    "name": "Sybil",
+    "type": "prestige",
+    "hitDice": "d4",
+    "alignment": "Neutral"
+  },
+  {
+    "id": "waverider",
+    "name": "Waverider",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "yuan-ti-cultist",
+    "name": "Yuan-ti Cultist",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "knight-of-the-pearl",
+    "name": "Knight of the Pearl",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Lawful good"
+  },
+  {
+    "id": "legendary-captain",
+    "name": "Legendary Captain",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "leviathan-hunter",
+    "name": "Leviathan Hunter",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "scarlet-corsair",
+    "name": "Scarlet Corsair",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any nonlawful"
+  },
+  {
+    "id": "sea-witch",
+    "name": "Sea Witch",
+    "type": "prestige",
+    "hitDice": "d4",
+    "alignment": "Any chaotic"
+  },
+  {
+    "id": "stormcaster",
+    "name": "Stormcaster",
+    "type": "prestige",
+    "hitDice": "d4",
+    "alignment": "Any nonlawful"
+  },
+  {
+    "id": "wavekeeper",
+    "name": "Wavekeeper",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any neutral"
+  },
+  {
+    "id": "landforged-walker",
+    "name": "Landforged Walker",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "primal-scholar",
+    "name": "Primal Scholar",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "scorpion-wraith",
+    "name": "Scorpion Wraith",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "acolyte-of-the-skin-2",
+    "name": "Acolyte of the Skin",
+    "type": "prestige",
+    "hitDice": "d4",
+    "alignment": "Any nongood"
+  },
+  {
+    "id": "alienist-2",
+    "name": "Alienist",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "arcane-trickster-2",
+    "name": "Arcane Trickster",
+    "type": "prestige",
+    "hitDice": "d4",
+    "alignment": "Any nonlawful"
+  },
+  {
+    "id": "bladesinger-3",
+    "name": "Bladesinger",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "blood-magus-2",
+    "name": "Blood Magus",
+    "type": "prestige",
+    "hitDice": "d4",
+    "alignment": "Any nonlawful"
+  },
+  {
+    "id": "candle-caster",
+    "name": "Candle Caster",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "dragon-disciple-2",
+    "name": "Dragon Disciple",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "elemental-savant-2",
+    "name": "Elemental Savant",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "fatespinner-2",
+    "name": "Fatespinner",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "mage-of-the-arcane-order-2",
+    "name": "Mage of the Arcane Order",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "mindbender-2",
+    "name": "Mindbender",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "pale-master-2",
+    "name": "Pale Master",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "spellsword-2",
+    "name": "Spellsword",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "true-necromancer-2",
+    "name": "True Necromancer",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "wayfarer-guide-2",
+    "name": "Wayfarer Guide",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "anima-mage",
+    "name": "Anima Mage",
+    "type": "prestige",
+    "hitDice": "d4",
+    "alignment": "Any nongood"
+  },
+  {
+    "id": "knight-of-the-sacred-seal",
+    "name": "Knight of the Sacred Seal",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Any nonchaotic"
+  },
+  {
+    "id": "scion-of-dantalion",
+    "name": "Scion of Dantalion",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "tenebrous-apostate",
+    "name": "Tenebrous Apostate",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any nongood"
+  },
+  {
+    "id": "witch-slayer",
+    "name": "Witch Slayer",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "child-of-night",
+    "name": "Child of Night",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "master-of-shadow",
+    "name": "Master of Shadow",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "noctumancer",
+    "name": "Noctumancer",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "shadowblade",
+    "name": "Shadowblade",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "shadowsmith",
+    "name": "Shadowsmith",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "acolyte-of-the-ego",
+    "name": "Acolyte of the Ego",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "bereft",
+    "name": "Bereft",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any neutral"
+  },
+  {
+    "id": "brimstone-speaker",
+    "name": "Brimstone Speaker",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any good"
+  },
+  {
+    "id": "disciple-of-the-word",
+    "name": "Disciple of the Word",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any lawful"
+  },
+  {
+    "id": "fiendbinder",
+    "name": "Fiendbinder",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any nongood"
+  },
+  {
+    "id": "bloodclaw-master",
+    "name": "Bloodclaw Master",
+    "type": "prestige",
+    "hitDice": "d12"
+  },
+  {
+    "id": "bloodstorm-blade",
+    "name": "Bloodstorm Blade",
+    "type": "prestige",
+    "hitDice": "d12"
+  },
+  {
+    "id": "deepstone-sentinel",
+    "name": "Deepstone Sentinel",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "eternal-blade",
+    "name": "Eternal Blade",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "jade-phoenix-mage",
+    "name": "Jade Phoenix Mage",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any nonevil"
+  },
+  {
+    "id": "master-of-nine",
+    "name": "Master of Nine",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "ruby-knight-vindicator",
+    "name": "Ruby Knight Vindicator",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "shadow-sun-ninja",
+    "name": "Shadow Sun Ninja",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any good"
+  },
+  {
+    "id": "battle-scion",
+    "name": "Battle Scion",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "faith-scion",
+    "name": "Faith Scion",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "prestige-bard",
+    "name": "Prestige Bard",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any nonlawful"
+  },
+  {
+    "id": "prestige-paladin",
+    "name": "Prestige Paladin",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Lawful good"
+  },
+  {
+    "id": "prestige-ranger",
+    "name": "Prestige Ranger",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "spell-scion",
+    "name": "Spell Scion",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "swift-scion",
+    "name": "Swift Scion",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "tainted-sorcerer",
+    "name": "Tainted Sorcerer",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "tainted-warrior",
+    "name": "Tainted Warrior",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "aglarondan-griffonrider",
+    "name": "Aglarondan Griffonrider",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any nonevil"
+  },
+  {
+    "id": "black-flame-zealot-2",
+    "name": "Black Flame Zealot",
+    "type": "prestige",
+    "hitDice": "d0"
+  },
+  {
+    "id": "durthan",
+    "name": "Durthan",
+    "type": "prestige",
+    "hitDice": "d4",
+    "alignment": "Any nongood"
+  },
+  {
+    "id": "master-of-the-yuirwood",
+    "name": "Master of the Yuirwood",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any nonevil"
+  },
+  {
+    "id": "nar-demonbinder",
+    "name": "Nar Demonbinder",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "nentyar-hunter",
+    "name": "Nentyar Hunter",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any nonevil"
+  },
+  {
+    "id": "raumathari-battlemage",
+    "name": "Raumathari Battlemage",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "runescarred-berserker",
+    "name": "Runescarred Berserker",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "shou-disciple",
+    "name": "Shou Disciple",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "talontar-blightlord",
+    "name": "Talontar Blightlord",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any evil"
+  },
+  {
+    "id": "telflammar-shadowlord",
+    "name": "Telflammar Shadowlord",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any nongood"
+  },
+  {
+    "id": "thayan-slaver",
+    "name": "Thayan Slaver",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any evil"
+  },
+  {
+    "id": "arachnomancer-2",
+    "name": "Arachnomancer",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any evil"
+  },
+  {
+    "id": "cavelord",
+    "name": "Cavelord",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "deep-diviner",
+    "name": "Deep Diviner",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "drow-judicator",
+    "name": "Drow Judicator",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any evil"
+  },
+  {
+    "id": "illithid-body-tamer",
+    "name": "Illithid Body Tamer",
+    "type": "prestige",
+    "hitDice": "d10"
+  },
+  {
+    "id": "imaskari-vengeance-taker",
+    "name": "Imaskari Vengeance Taker",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any lawful"
+  },
+  {
+    "id": "inquisitor-of-the-drowning-goddess",
+    "name": "Inquisitor of the Drowning Goddess",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Lawful evil or lawful neutral"
+  },
+  {
+    "id": "prime-underdark-guide",
+    "name": "Prime Underdark Guide",
+    "type": "prestige",
+    "hitDice": "d6",
+    "alignment": "Any nonevil"
+  },
+  {
+    "id": "sea-mother-whip",
+    "name": "Sea Mother Whip",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Lawful evil, neutral evil, chaotic evil, or neutral"
+  },
+  {
+    "id": "shadowcrafter",
+    "name": "Shadowcrafter",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "vermin-keeper",
+    "name": "Vermin Keeper",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "yathchol-webrider",
+    "name": "Yathchol Webrider",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "legacy-champion",
+    "name": "Legacy Champion",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "cerebremancer",
+    "name": "Cerebremancer",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "elocater",
+    "name": "Elocater",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "fist-of-zuoken",
+    "name": "Fist of Zuoken",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "illithid-slayer",
+    "name": "Illithid Slayer",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "metamind",
+    "name": "Metamind",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "psion-uncarnate",
+    "name": "Psion Uncarnate",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "pyrokineticist",
+    "name": "Pyrokineticist",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any chaotic."
+  },
+  {
+    "id": "thrallherd",
+    "name": "Thrallherd",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "war-mind",
+    "name": "War Mind",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Any nonchaotic."
+  },
+  {
+    "id": "adept",
+    "name": "Adept",
+    "type": "base",
+    "hitDice": "d6",
+    "alignment": "Any"
+  },
+  {
+    "id": "dungeon-lord",
+    "name": "Dungeon Lord",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "knight-of-the-flying-hunt",
+    "name": "Knight of the Flying Hunt",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Lawful good, neutral good, or lawful neutral"
+  },
+  {
+    "id": "knight-of-the-weave",
+    "name": "Knight of the Weave",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any non-evil"
+  },
+  {
+    "id": "moonsea-skysentinel",
+    "name": "Moonsea Skysentinel",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "triadic-knight",
+    "name": "Triadic Knight",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Lawful good"
+  },
+  {
+    "id": "berronar-valkyrie-paladin",
+    "name": "Berronar Valkyrie (Paladin)",
+    "type": "base",
+    "hitDice": "d10"
+  },
+  {
+    "id": "broken-one-monk",
+    "name": "Broken One (Monk)",
+    "type": "base",
+    "hitDice": "d8"
+  },
+  {
+    "id": "claw-of-the-sun-and-the-ankh-paladin",
+    "name": "Claw of the Sun and the Ankh (Paladin)",
+    "type": "base",
+    "hitDice": "d10"
+  },
+  {
+    "id": "crescent-moon-knight-paladin",
+    "name": "Crescent Moon Knight (Paladin)",
+    "type": "base",
+    "hitDice": "d10"
+  },
+  {
+    "id": "darksong-knight-fighter",
+    "name": "Darksong Knight (Fighter)",
+    "type": "base",
+    "hitDice": "d8"
+  },
+  {
+    "id": "dukar",
+    "name": "Dukar",
+    "type": "base",
+    "hitDice": "d4"
+  },
+  {
+    "id": "eternal-order-paladin",
+    "name": "Eternal Order (Paladin)",
+    "type": "base",
+    "hitDice": "d10"
+  },
+  {
+    "id": "fangshields-barbarian",
+    "name": "Fangshields Barbarian",
+    "type": "base",
+    "hitDice": "d12"
+  },
+  {
+    "id": "fangshields-druid",
+    "name": "Fangshields Druid",
+    "type": "base",
+    "hitDice": "d8"
+  },
+  {
+    "id": "fangshields-ranger",
+    "name": "Fangshields Ranger",
+    "type": "base",
+    "hitDice": "d8"
+  },
+  {
+    "id": "golden-cup-paladin",
+    "name": "Golden Cup (Paladin)",
+    "type": "base",
+    "hitDice": "d10"
+  },
+  {
+    "id": "golden-lion-paladin",
+    "name": "Golden Lion (Paladin)",
+    "type": "base",
+    "hitDice": "d10"
+  },
+  {
+    "id": "holy-judge-paladin",
+    "name": "Holy Judge (Paladin)",
+    "type": "base",
+    "hitDice": "d10"
+  },
+  {
+    "id": "lion-legionnaire-paladin",
+    "name": "Lion Legionnaire (Paladin)",
+    "type": "base",
+    "hitDice": "d10"
+  },
+  {
+    "id": "mystic-fire-knight-paladin",
+    "name": "Mystic Fire Knight (Paladin)",
+    "type": "base",
+    "hitDice": "d8"
+  },
+  {
+    "id": "noble-heart-paladin",
+    "name": "Noble Heart (Paladin)",
+    "type": "base",
+    "hitDice": "d10"
+  },
+  {
+    "id": "phoenix-disciple-monk",
+    "name": "Phoenix Disciple (Monk)",
+    "type": "base",
+    "hitDice": "d8"
+  },
+  {
+    "id": "purple-staff-cleric",
+    "name": "Purple Staff (Cleric)",
+    "type": "base",
+    "hitDice": "d8"
+  },
+  {
+    "id": "red-falcon-paladin",
+    "name": "Red Falcon (Paladin)",
+    "type": "base",
+    "hitDice": "d10"
+  },
+  {
+    "id": "ruby-rose-knight-paladin",
+    "name": "Ruby Rose Knight (Paladin)",
+    "type": "base",
+    "hitDice": "d8"
+  },
+  {
+    "id": "shadow-sword-ranger",
+    "name": "Shadow Sword (Ranger)",
+    "type": "base",
+    "hitDice": "d8"
+  },
+  {
+    "id": "shooting-star-ranger",
+    "name": "Shooting Star (Ranger)",
+    "type": "base",
+    "hitDice": "d8"
+  },
+  {
+    "id": "vigilant-eye-of-helm-paladin",
+    "name": "Vigilant Eye of Helm (Paladin)",
+    "type": "base",
+    "hitDice": "d10"
+  },
+  {
+    "id": "wary-swordknight-paladin",
+    "name": "Wary Swordknight (Paladin)",
+    "type": "base",
+    "hitDice": "d10"
+  },
+  {
+    "id": "demonwrecker-arcane",
+    "name": "Demonwrecker Arcane",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "pixie",
+    "name": "Pixie",
+    "type": "base",
+    "hitDice": "d6"
+  },
+  {
+    "id": "monk-variant-fighting-styles",
+    "name": "Monk Variant: Fighting Styles",
+    "type": "base"
+  },
+  {
+    "id": "barbarian-variant",
+    "name": "Barbarian Variant",
+    "type": "base"
+  },
+  {
+    "id": "bard-variant",
+    "name": "Bard Variant",
+    "type": "base"
+  },
+  {
+    "id": "druid-variant",
+    "name": "Druid Variant",
+    "type": "base"
+  },
+  {
+    "id": "fighter-variant",
+    "name": "Fighter Variant",
+    "type": "base"
+  },
+  {
+    "id": "monk-variant",
+    "name": "Monk Variant",
+    "type": "base"
+  },
+  {
+    "id": "paladin-variant-2",
+    "name": "Paladin Variant",
+    "type": "base"
+  },
+  {
+    "id": "ranger-variant-2",
+    "name": "Ranger Variant",
+    "type": "base"
+  },
+  {
+    "id": "sorcerer-wizard-variant",
+    "name": "Sorcerer/Wizard Variant",
+    "type": "base"
+  },
+  {
+    "id": "rogue-variant",
+    "name": "Rogue Variant",
+    "type": "base"
+  },
+  {
+    "id": "wizard-variant",
+    "name": "Wizard Variant",
+    "type": "base",
+    "hitDice": "d4"
+  },
+  {
+    "id": "abjurer-variant",
+    "name": "Abjurer Variant",
+    "type": "base",
+    "hitDice": "d0"
+  },
+  {
+    "id": "conjurer-variant",
+    "name": "Conjurer Variant",
+    "type": "base"
+  },
+  {
+    "id": "diviner-variant",
+    "name": "Diviner Variant",
+    "type": "base",
+    "hitDice": "d4"
+  },
+  {
+    "id": "enchanter-variant",
+    "name": "Enchanter Variant",
+    "type": "base",
+    "hitDice": "d4"
+  },
+  {
+    "id": "evoker-variant",
+    "name": "Evoker Variant",
+    "type": "base",
+    "hitDice": "d0"
+  },
+  {
+    "id": "illusionist-variant",
+    "name": "Illusionist Variant",
+    "type": "base",
+    "hitDice": "d0"
+  },
+  {
+    "id": "necromancer-variant",
+    "name": "Necromancer Variant",
+    "type": "base"
+  },
+  {
+    "id": "transmuter-variant",
+    "name": "Transmuter Variant",
+    "type": "base",
+    "hitDice": "d0"
+  },
+  {
+    "id": "dweomerkeeper-2",
+    "name": "Dweomerkeeper",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "master-of-shrouds-3",
+    "name": "Master of Shrouds",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "moon-guardian",
+    "name": "Moon Guardian",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any good"
+  },
+  {
+    "id": "nightcloak-2",
+    "name": "Nightcloak",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any evil"
+  },
+  {
+    "id": "cleric-variant",
+    "name": "Cleric Variant",
+    "type": "base"
+  },
+  {
+    "id": "battle-dancer",
+    "name": "Battle Dancer",
+    "type": "base",
+    "hitDice": "d8",
+    "alignment": "Any Chaotic"
+  },
+  {
+    "id": "death-master",
+    "name": "Death Master",
+    "type": "base",
+    "hitDice": "d8",
+    "alignment": "Any Evil"
+  },
+  {
+    "id": "jester",
+    "name": "Jester",
+    "type": "base",
+    "hitDice": "d6",
+    "alignment": "Any Chaotic"
+  },
+  {
+    "id": "mountebank-dragon-compendium",
+    "name": "Mountebank (Dragon Compendium)",
+    "type": "base",
+    "hitDice": "d6",
+    "alignment": "Any non-good"
+  },
+  {
+    "id": "savant",
+    "name": "Savant",
+    "type": "base",
+    "hitDice": "d8"
+  },
+  {
+    "id": "sha-ir",
+    "name": "Sha'ir",
+    "type": "base",
+    "hitDice": "d4",
+    "alignment": "Any"
+  },
+  {
+    "id": "urban-druid",
+    "name": "Urban Druid",
+    "type": "base",
+    "hitDice": "d8",
+    "alignment": "Neutral, Neutral Good, Neutral Evil, or Lawful Neutral"
+  },
+  {
+    "id": "aerial-avenger",
+    "name": "Aerial Avenger",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "arcanopath-monk",
+    "name": "Arcanopath Monk",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any Lawful"
+  },
+  {
+    "id": "blessed-of-gruumsh",
+    "name": "Blessed of Gruumsh",
+    "type": "prestige",
+    "hitDice": "d10",
+    "alignment": "Any non-good"
+  },
+  {
+    "id": "cerebrex",
+    "name": "Cerebrex",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "fleet-runner-of-ehlonna",
+    "name": "Fleet Runner of Ehlonna",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Neutral Good"
+  },
+  {
+    "id": "flux-adept",
+    "name": "Flux Adept",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "force-missile-mage",
+    "name": "Force Missile Mage",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "monk-of-the-enabled-hand",
+    "name": "Monk of the Enabled Hand",
+    "type": "prestige",
+    "hitDice": "d8",
+    "alignment": "Any Lawful"
+  },
+  {
+    "id": "osteomancer",
+    "name": "Osteomancer",
+    "type": "prestige",
+    "hitDice": "d8"
+  },
+  {
+    "id": "shaper-of-form",
+    "name": "Shaper of Form",
+    "type": "prestige",
+    "hitDice": "d6"
+  },
+  {
+    "id": "psychic-theurge",
+    "name": "Psychic Theurge",
+    "type": "prestige",
+    "hitDice": "d4"
+  },
+  {
+    "id": "epic-barbarian-2",
+    "name": "Epic Barbarian",
+    "type": "base",
+    "hitDice": "d12",
+    "alignment": "Any chaotic"
   }
 ]

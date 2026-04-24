@@ -43,3 +43,7 @@ yarn-error.*
 
 */raw
 *.dd5
+
+# Generated D&D 3.5 catalogs (run: node scripts/import-dd35-raw.mjs --what=all)
+data/dnd35/spells.json
+data/dnd35/feats.json

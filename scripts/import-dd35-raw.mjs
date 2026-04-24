@@ -275,12 +275,117 @@ async function importSpells() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// CLASSES
+// ─────────────────────────────────────────────────────────────────────────────
+
+async function importClasses() {
+  console.log('\n── CLASSES ───────────────────────────────────');
+
+  const raw     = readDD35('all-classes.dd35', 7);
+  const current = JSON.parse(readFileSync(join(OUT, 'classes.json'), 'utf8'));
+  console.log(`  Raw total  : ${raw.length}`);
+  console.log(`  Actuales   : ${current.length} (con mecánicas completas)`);
+
+  // Los actuales tienen mecánicas completas → tienen prioridad por nombre
+  const richByName = new Map(current.map(c => [c.name.toLowerCase(), c]));
+
+  const slugCount = new Map();
+  // Reservar slugs de los actuales
+  for (const c of current) slugCount.set(c.id, (slugCount.get(c.id) ?? 0) + 1);
+
+  const catalog = [...current]; // empezar con los 11 ricos
+
+  for (const r of raw) {
+    const key = r.name.toLowerCase();
+    if (richByName.has(key)) continue; // ya tenemos uno más completo
+
+    let base = slugify(r.name);
+    const count = (slugCount.get(base) ?? 0) + 1;
+    slugCount.set(base, count);
+    const id = count === 1 ? base : `${base}-${count}`;
+
+    catalog.push({
+      id,
+      name    : r.name,
+      type    : r.type,                      // 'base' | 'prestige'
+      hitDice : r.hit_die ? `d${r.hit_die}` : undefined,
+      alignment: r.alignment || undefined,
+    });
+  }
+
+  const typeCount = { base: 0, prestige: 0 };
+  catalog.forEach(c => { if (c.type) typeCount[c.type] = (typeCount[c.type] ?? 0) + 1; });
+  console.log(`  Total resultado : ${catalog.length}`);
+  console.log(`  Base: ${typeCount.base}  Prestige: ${typeCount.prestige}`);
+
+  if (DRY) {
+    console.log('  [dry-run] NO se escribió classes.json');
+    console.log('  Muestra 3 nuevas:');
+    catalog.filter(c => !richByName.has(c.name.toLowerCase())).slice(0, 3)
+      .forEach(c => console.log('   ', JSON.stringify(c)));
+    return;
+  }
+
+  const outPath = join(OUT, 'classes.json');
+  writeFileSync(outPath, JSON.stringify(catalog, null, 2), 'utf8');
+  console.log(`  ✓ Escribió ${catalog.length} clases → data/dnd35/classes.json`);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// RACES
+// ─────────────────────────────────────────────────────────────────────────────
+
+async function importRaces() {
+  console.log('\n── RACES ─────────────────────────────────────');
+
+  const raw     = readDD35('all-races.dd35', 5);
+  const current = JSON.parse(readFileSync(join(OUT, 'races.json'), 'utf8'));
+  console.log(`  Raw total : ${raw.length}`);
+  console.log(`  Actuales  : ${current.length} (con abilityMods completos)`);
+
+  const richByName = new Map(current.map(r => [r.name.toLowerCase(), r]));
+
+  const slugCount = new Map();
+  for (const r of current) slugCount.set(r.id, (slugCount.get(r.id) ?? 0) + 1);
+
+  const catalog = [...current];
+
+  for (const r of raw) {
+    const key = r.name.toLowerCase();
+    if (richByName.has(key)) continue;
+
+    let base = slugify(r.name);
+    const count = (slugCount.get(base) ?? 0) + 1;
+    slugCount.set(base, count);
+    const id = count === 1 ? base : `${base}-${count}`;
+
+    catalog.push({ id, name: r.name });
+  }
+
+  console.log(`  Total resultado : ${catalog.length} (${catalog.length - current.length} nuevas)`);
+
+  if (DRY) {
+    console.log('  [dry-run] NO se escribió races.json');
+    console.log('  Nuevas razas:');
+    catalog.filter(r => !richByName.has(r.name.toLowerCase()))
+      .forEach(r => console.log(`    ${r.id}: ${r.name}`));
+    return;
+  }
+
+  const outPath = join(OUT, 'races.json');
+  writeFileSync(outPath, JSON.stringify(catalog, null, 2), 'utf8');
+  console.log(`  ✓ Escribió ${catalog.length} razas → data/dnd35/races.json`);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Main
 // ─────────────────────────────────────────────────────────────────────────────
 
 console.log(`import-dd35-raw.mjs  what=${WHAT}  dry=${DRY}`);
 
-if (WHAT === 'feats' || WHAT === 'all') await importFeats();
-if (WHAT === 'spells' || WHAT === 'all') await importSpells();
+if (WHAT === 'feats'   || WHAT === 'all') await importFeats();
+if (WHAT === 'spells'  || WHAT === 'all') await importSpells();
+if (WHAT === 'classes' || WHAT === 'all') await importClasses();
+if (WHAT === 'races'   || WHAT === 'all') await importRaces();
 
 console.log('\nListo.');

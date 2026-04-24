@@ -10,6 +10,7 @@ const ABILITY_LABEL: Record<(typeof ABILITIES)[number], string> = {
 const fields: FieldDef[] = [
   { key: 'race', label: 'Raza', type: 'text', group: 'Identidad' },
   { key: 'level', label: 'Nivel total', type: 'number', group: 'Identidad', default: 1, min: 1, max: 20 },
+  { key: 'xp', label: 'Experiencia (PX)', type: 'number', group: 'Identidad', default: 0, min: 0 },
   { key: 'ac', label: 'CA base', type: 'number', group: 'Combate', default: 10, help: 'Sin contar armadura/escudo: el equipo aporta su bono.' },
   { key: 'hp_max', label: 'PG Máximos', type: 'number', group: 'Combate', default: 8 },
   ...ABILITIES.map<FieldDef>((a) => ({

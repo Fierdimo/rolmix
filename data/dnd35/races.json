@@ -187,5 +187,145 @@
     "bonusLanguages": [
       "Any"
     ]
+  },
+  {
+    "id": "minotaur",
+    "name": "Minotaur"
+  },
+  {
+    "id": "drow",
+    "name": "Drow"
+  },
+  {
+    "id": "orc",
+    "name": "Orc"
+  },
+  {
+    "id": "doppleganger",
+    "name": "Doppleganger"
+  },
+  {
+    "id": "illumian",
+    "name": "Illumian"
+  },
+  {
+    "id": "half-ogre",
+    "name": "Half-ogre"
+  },
+  {
+    "id": "goliath",
+    "name": "Goliath"
+  },
+  {
+    "id": "feral-gargan",
+    "name": "Feral gargan"
+  },
+  {
+    "id": "raptoran",
+    "name": "Raptoran"
+  },
+  {
+    "id": "aasimar",
+    "name": "Aasimar"
+  },
+  {
+    "id": "skarn",
+    "name": "Skarn"
+  },
+  {
+    "id": "half-moon-elf",
+    "name": "Half-moon elf"
+  },
+  {
+    "id": "tiefling",
+    "name": "Tiefling"
+  },
+  {
+    "id": "kuo-toa",
+    "name": "Kuo-Toa"
+  },
+  {
+    "id": "pixie-sprite",
+    "name": "Pixie (Sprite)"
+  },
+  {
+    "id": "bariaur",
+    "name": "Bariaur"
+  },
+  {
+    "id": "vanara",
+    "name": "Vanara"
+  },
+  {
+    "id": "nezumi",
+    "name": "Nezumi"
+  },
+  {
+    "id": "spirit-folk-bamboo",
+    "name": "Spirit Folk, Bamboo"
+  },
+  {
+    "id": "spirit-folk-river",
+    "name": "Spirit Folk, River"
+  },
+  {
+    "id": "spirit-folk-sea",
+    "name": "Spirit Folk, Sea"
+  },
+  {
+    "id": "diabolus",
+    "name": "Diabolus"
+  },
+  {
+    "id": "diopsid",
+    "name": "Diopsid"
+  },
+  {
+    "id": "dvati",
+    "name": "Dvati"
+  },
+  {
+    "id": "lupin",
+    "name": "Lupin"
+  },
+  {
+    "id": "tibbit",
+    "name": "Tibbit"
+  },
+  {
+    "id": "korobukuru",
+    "name": "Korobukuru"
+  },
+  {
+    "id": "whisper-gnome",
+    "name": "Whisper Gnome"
+  },
+  {
+    "id": "jerren",
+    "name": "Jerren"
+  },
+  {
+    "id": "vashar",
+    "name": "Vashar"
+  },
+  {
+    "id": "hengeyokai",
+    "name": "Hengeyokai"
+  },
+  {
+    "id": "kalashtar",
+    "name": "Kalashtar"
+  },
+  {
+    "id": "half-ogres",
+    "name": "Half-ogres"
+  },
+  {
+    "id": "underfolk",
+    "name": "Underfolk"
+  },
+  {
+    "id": "skulk",
+    "name": "Skulk"
   }
 ]
