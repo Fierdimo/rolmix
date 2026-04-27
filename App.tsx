@@ -14,7 +14,7 @@ export type RootStackParamList = {
   Sessions: undefined;
   Chat: { sessionId: string; sessionName: string };
   Characters: undefined;
-  CharacterEditor: { characterId: string };
+  CharacterEditor: { characterId: string; sessionId?: string; sessionName?: string };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();

@@ -2,17 +2,39 @@ import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react'
 import {
   View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView,
   StatusBar, ActivityIndicator, Alert, Modal, Switch, FlatList, ListRenderItem,
+  useWindowDimensions,
 } from 'react-native';
+import RenderHtml from 'react-native-render-html';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp } from '@react-navigation/native';
 import { supabase } from '../lib/supabase';
 import { Character } from '../lib/types';
 import { getSystem, resolveAction, computeFinalActions, computeFinalStats, aggregateClassGrants } from '../lib/systems';
 import {
-  FieldDef, RollableAction, ClassEntry, EquipmentItem, InventoryItem, SpellEntry, BonusEffect, FeatItem, SkillEntry,
+  FieldDef, RollableAction, ClassEntry, EquipmentItem, InventoryItem, SpellEntry, PrepSlot, BonusEffect, FeatItem, SkillEntry,
+  SpellSlotBreakdown, SpellSlotResult,
 } from '../lib/systems/types';
 import { getCatalog, CatalogSpell, CatalogEquipment, CatalogFeat, CatalogSkill } from '../lib/catalog';
 import { RootStackParamList } from '../App';
+
+/** Convierte texto plano de descripción a HTML para RenderHtml */
+function descToHtml(text: string): string {
+  const escaped = text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+  // Limpia _palabra_:/url/path/ → <em>palabra</em>
+  const noUrlItalic = escaped.replace(/_([^_]+?)_:\/[^\s]*/g, '<em>$1</em>');
+  // Convierte _palabra_ restantes → <em>palabra</em>
+  const italicized = noUrlItalic.replace(/_([^_\n]+?)_/g, '<em>$1</em>');
+  const paras = italicized
+    .split('\n')
+    .map(l => l.trim())
+    .filter(l => l.length > 0)
+    .map(l => `<p>${l}</p>`)
+    .join('');
+  return paras || '<p>Sin descripción.</p>';
+}
 
 type Props = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'CharacterEditor'>;
@@ -24,7 +46,7 @@ type Tab = 'stats' | 'adventure' | 'classes' | 'equipment' | 'inventory' | 'spel
 function uid() { return Math.random().toString(36).slice(2, 10); }
 
 export default function CharacterEditorScreen({ navigation, route }: Props) {
-  const { characterId } = route.params;
+  const { characterId, sessionId, sessionName } = route.params;
   const [character, setCharacter] = useState<Character | null>(null);
   const [name, setName] = useState('');
   const [data, setData] = useState<Record<string, unknown>>({});
@@ -41,9 +63,26 @@ export default function CharacterEditorScreen({ navigation, route }: Props) {
     if (error || !row) { Alert.alert('Error', error?.message ?? 'No encontrado'); navigation.goBack(); return; }
     setCharacter(row);
     setName(row.name);
-    setData(row.data ?? {});
+
+    if (sessionId) {
+      // Modo partida: cargar datos desde la copia de sesión.
+      const { data: sc, error: scErr } = await supabase
+        .from('session_characters')
+        .select('data')
+        .eq('session_id', sessionId)
+        .eq('character_id', characterId)
+        .single();
+      if (scErr || !sc) {
+        Alert.alert('Sin ficha de partida', 'No se encontró la copia de sesión para este personaje. El jugador debe activar el personaje en la partida primero.');
+        navigation.goBack();
+        return;
+      }
+      setData((sc.data as Record<string, unknown>) ?? {});
+    } else {
+      setData(row.data ?? {});
+    }
     setLoading(false);
-  }, [characterId, navigation]);
+  }, [characterId, sessionId, navigation]);
 
   useEffect(() => { fetch(); }, [fetch]);
 
@@ -57,12 +96,21 @@ export default function CharacterEditorScreen({ navigation, route }: Props) {
   }
 
   const persist = useCallback(async (n: string, d: Record<string, unknown>) => {
+    if (sessionId) {
+      // Modo partida: guardar solo en la copia de sesión mediante RPC.
+      const { error } = await supabase.rpc('update_session_character_data', {
+        p_session_id: sessionId,
+        p_character_id: characterId,
+        p_data: d,
+      });
+      return error;
+    }
     const { error } = await supabase
       .from('characters')
       .update({ name: n.trim() || 'Sin nombre', data: d })
       .eq('id', characterId);
     return error;
-  }, [characterId]);
+  }, [characterId, sessionId]);
 
   async function save() {
     setSaving(true);
@@ -135,6 +183,15 @@ export default function CharacterEditorScreen({ navigation, route }: Props) {
         </TouchableOpacity>
       </View>
 
+      {/* Banner de modo partida */}
+      {sessionId ? (
+        <View style={styles.sessionBanner}>
+          <Text style={styles.sessionBannerText}>
+            ⚔️ Modo partida{sessionName ? ` · ${sessionName}` : ''} · Los cambios no afectan al personaje original
+          </Text>
+        </View>
+      ) : null}
+
       {/* Tabs */}
       <View style={styles.tabs}>
         {(['stats', 'adventure', 'classes', 'equipment', 'inventory', ...(system.hasSpells ? ['spells'] as Tab[] : []), 'feats', 'skills', 'rolls'] as Tab[]).map((t) => (
@@ -148,13 +205,14 @@ export default function CharacterEditorScreen({ navigation, route }: Props) {
         {tab === 'stats' && (
           <StatsTab
             name={name}
-            onName={(v) => { setName(v); setDirty(true); }}
+            onName={sessionId ? undefined : (v) => { setName(v); setDirty(true); }}
             system={system}
             data={data}
             setField={setField}
             finalStats={finalStats}
             finalActions={finalActions}
             classFeatures={classFeatures}
+            sessionMode={!!sessionId}
           />
         )}
         {tab === 'adventure' && (
@@ -208,7 +266,7 @@ const TAB_LABEL: Record<Tab, string> = {
 
 // ─── Stats tab ────────────────────────────────────────────────
 function StatsTab({
-  name, onName, system, data, setField, finalStats, finalActions, classFeatures,
+  name, onName, system, data, setField, finalStats, finalActions, classFeatures, sessionMode,
 }: any) {
   const grouped = (system.fields as FieldDef[]).reduce<Record<string, FieldDef[]>>((acc, f) => {
     const g = f.group ?? 'General';
@@ -222,6 +280,7 @@ function StatsTab({
   const HANDLED_KEYS = new Set([
     'race', 'level', 'ac', 'hp_max',
     'str', 'dex', 'con', 'int', 'wis', 'cha',
+    'xp', // Gestionado en el tracker de partida; irrelevante en el personaje base
   ]);
 
   return (
@@ -232,6 +291,7 @@ function StatsTab({
         name={name}
         onName={onName}
         setField={setField}
+        sessionMode={sessionMode}
       />
 
       <SummaryCard system={system} finalStats={finalStats} finalActions={finalActions} data={data} setField={setField} />
@@ -295,13 +355,14 @@ const DND35_XP_TABLE = [0, 0, 1000, 3000, 6000, 10000, 15000, 21000, 28000, 3600
   55000, 66000, 78000, 91000, 105000, 120000, 136000, 153000, 171000, 190000];
 
 function IdentityHeader({
-  system, data, name, onName, setField,
+  system, data, name, onName, setField, sessionMode,
 }: {
   system: any;
   data: Record<string, unknown>;
   name: string;
-  onName: (v: string) => void;
+  onName?: (v: string) => void;
   setField: (k: string, v: unknown) => void;
+  sessionMode?: boolean;
 }) {
   const [racePickerOpen, setRacePickerOpen] = useState(false);
   const [raceQuery, setRaceQuery] = useState('');
@@ -309,7 +370,7 @@ function IdentityHeader({
   const [xpInput, setXpInput] = useState('');
   const [langInput, setLangInput] = useState('');
   const catalog = getCatalog(system.id);
-  const races = (catalog?.races ?? []) as Array<{ id: string; name: string; size?: string; favoredClass?: string }>;
+  const races = (catalog?.races ?? []) as Array<{ id: string; name: string; size?: string; favoredClass?: string; abilityMods?: Record<string, number>; skillBonuses?: Record<string, number>; abilities?: string[] }>;
   const catalogClassesForLabel = catalog?.classes ?? [];
 
   const filteredRaces = useMemo(() => {
@@ -336,9 +397,10 @@ function IdentityHeader({
     <View style={styles.identityCard}>
       <Text style={styles.identityFieldLabel}>Nombre</Text>
       <TextInput
-        style={styles.identityNameInput}
+        style={[styles.identityNameInput, !onName && { color: '#94a3b8' }]}
         value={name}
         onChangeText={onName}
+        editable={!!onName}
         placeholder="Nombre del personaje"
         placeholderTextColor="#475569"
       />
@@ -375,8 +437,46 @@ function IdentityHeader({
         <Text style={styles.help}>Añade clases en la pestaña Clases para calcular el nivel.</Text>
       )}
 
-      {/* ── XP tracker ─────────────────────────────────────── */}
+      {/* ── Rasgos raciales ──────────────────────────────────── */}
       {(() => {
+        if (!currentRace) return null;
+        const raceEntry = races.find((r) => r.name.toLowerCase() === currentRace.toLowerCase());
+        if (!raceEntry) return null;
+        const parts: string[] = [];
+        for (const [attr, val] of Object.entries(raceEntry.abilityMods ?? {})) {
+          const short: Record<string, string> = {
+            Strength: 'FUE', Dexterity: 'DES', Constitution: 'CON',
+            Intelligence: 'INT', Wisdom: 'SAB', Charisma: 'CAR',
+          };
+          const label = short[attr] ?? attr;
+          parts.push(`${val > 0 ? '+' : ''}${val} ${label}`);
+        }
+        for (const [skill, val] of Object.entries(raceEntry.skillBonuses ?? {})) {
+          parts.push(`+${val} ${skill}`);
+        }
+        const traits = raceEntry.abilities ?? [];
+        return (
+          <View style={styles.racialTraitsBox}>
+            {parts.length > 0 ? (
+              <View style={styles.racialBonusRow}>
+                {parts.map((p, i) => (
+                  <View key={i} style={styles.racialBonusChip}>
+                    <Text style={styles.racialBonusText}>{p}</Text>
+                  </View>
+                ))}
+              </View>
+            ) : null}
+            {traits.length > 0 ? (
+              <Text style={styles.racialTraitsList} numberOfLines={3}>
+                {traits.join(' · ')}
+              </Text>
+            ) : null}
+          </View>
+        );
+      })()}
+
+      {/* ── XP tracker ─────────────────────────────────────── */}
+      {sessionMode ? (() => {
         const xp = typeof data.xp === 'number' ? data.xp : 0;
         const nextLvl = Math.min(20, totalLevel + 1);
         const xpNext = DND35_XP_TABLE[nextLvl] ?? 0;
@@ -405,7 +505,7 @@ function IdentityHeader({
             </TouchableOpacity>
           </View>
         );
-      })()}
+      })() : null}
 
       {/* ── Alineamiento ─────────────────────────────────────── */}
       {(() => {
@@ -431,10 +531,7 @@ function IdentityHeader({
                   </TouchableOpacity>
                 );
               })}
-            </View>
-            {curAlign ? (
-              <Text style={styles.alignLabel}>{curAlign.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}</Text>
-            ) : null}
+            </View> 
           </View>
         );
       })()}
@@ -751,11 +848,17 @@ function SummaryCard({
     ['FUE', 'str', 'Fuerza'], ['DES', 'dex', 'Destreza'], ['CON', 'con', 'Constitución'],
     ['INT', 'int', 'Inteligencia'], ['SAB', 'wis', 'Sabiduría'], ['CAR', 'cha', 'Carisma'],
   ];
+  // Bono total al atributo (racial + equipo + dotes) en términos de puntuación.
+  // Fórmula: (modificador final − modificador base) × 2
+  // Ejemplo: enano CON 10, racial +2, equipo +1 al mod → final mod = 2,
+  //   base mod = floor((10-10)/2) = 0 → bonusScore = (2-0)*2 = 4 → "10(+4)"
+  const baseMod = (score: number) => Math.floor((score - 10) / 2);
   const abilCells = ABIL.map(([lbl, k]) => {
     const score = (data as Record<string, unknown>)[k];
     const baseScore = typeof score === 'number' ? score : 10;
     const mod = finalStats[`mod_${k}`] ?? 0;
-    return { lbl, key: k, score: baseScore, mod };
+    const scoreBonus = (mod - baseMod(baseScore)) * 2;
+    return { lbl, key: k, score: baseScore, mod, scoreBonus };
   });
 
   const ac = finalStats.ac;
@@ -780,26 +883,57 @@ function SummaryCard({
       : [];
     return eq.filter((it) => it?.equipped && typeof it.slot === 'string' && it.slot.startsWith('weapon'));
   })();
+  // Normaliza un nombre de arma a la clave attack_with: canónica
+  // (minúsculas, sin tildes, sin caracteres especiales, espacios simples).
+  const slugifyWeapon = (name: string) =>
+    'attack_with:' + name.toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]+/g, ' ').trim()
+      .replace(/\s+/g, ' ');
+
+  // Pre-compute feat bonuses keyed by target for weapon-specific lookup.
+  // Normalizamos los targets almacenados en las dotes con el mismo slug para
+  // que el usuario pueda escribir "Daga", "daga", "Dãga", etc. y se reconozca.
+  const featBonusesByTarget: Record<string, number> = useMemo(() => {
+    const feats: Array<{ bonuses?: Array<{ target: string; value: number }> }> =
+      Array.isArray((data as any).feats) ? (data as any).feats : [];
+    const acc: Record<string, number> = {};
+    for (const f of feats) {
+      for (const b of f.bonuses ?? []) {
+        if (b.target && b.target.startsWith('attack_with:')) {
+          const rawName = b.target.slice('attack_with:'.length);
+          const normalizedKey = slugifyWeapon(rawName);
+          acc[normalizedKey] = (acc[normalizedKey] ?? 0) + (b.value || 0);
+        }
+      }
+    }
+    return acc;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data]);
+
   const parseWeapon = (w: {
     name: string; bonuses?: Array<{ target: string; value: number }>; notes?: string;
   }) => {
     const bonuses = w.bonuses ?? [];
     const meleeBonus = bonuses.filter((b) => b.target === 'attack_melee').reduce((a, b) => a + (b.value || 0), 0);
     const rangedBonus = bonuses.filter((b) => b.target === 'attack_ranged').reduce((a, b) => a + (b.value || 0), 0);
+    const damageBonus = bonuses.filter((b) => b.target === 'damage').reduce((a, b) => a + (b.value || 0), 0);
     const isRanged = bonuses.some((b) => b.target === 'attack_ranged');
     const baseAtk = (isRanged ? (actionMod('attack_ranged') ?? bab + dexMod) : (actionMod('attack_melee') ?? bab + strMod));
     const itemAtk = isRanged ? rangedBonus : meleeBonus;
-    const totalAtk = baseAtk + itemAtk;
+    // Feat bonuses specific to this weapon (e.g. Weapon Focus)
+    const weaponTarget = slugifyWeapon(w.name);
+    const weaponFeatBonus = featBonusesByTarget[weaponTarget] ?? 0;
+    const totalAtk = baseAtk + itemAtk + weaponFeatBonus;
     // Damage dice from notes (primer patrón NdM)
     const notes = String(w.notes ?? '');
     const diceMatch = notes.match(/(\d+d\d+)/i);
     const dice = diceMatch ? diceMatch[1] : '—';
-    // Bono de daño: armas mágicas suelen sumar también al daño; aquí mostramos el bono del arma
-    const dmgItemBonus = itemAtk; // misma cifra que +N de magia
+    const dmgItemBonus = damageBonus !== 0 ? damageBonus : itemAtk; // prefer explicit damage bonus
     const dmgAbil = isRanged ? 0 : strMod;
     const dmgTotal = dmgAbil + dmgItemBonus;
     const dmgStr = `${dice}${dmgTotal !== 0 ? (dmgTotal > 0 ? `+${dmgTotal}` : `${dmgTotal}`) : ''}`;
-    return { isRanged, totalAtk, dmgStr, notes };
+    return { isRanged, totalAtk, dmgStr, notes, weaponFeatBonus };
   };
 
   return (
@@ -855,7 +989,14 @@ function SummaryCard({
             <Text style={styles.abilLabel}>{a.lbl}</Text>
             <Text style={styles.abilMod}>{a.mod >= 0 ? `+${a.mod}` : a.mod}</Text>
             <View style={styles.abilDivider} />
-            <Text style={styles.abilScore}>{a.score}</Text>
+            <View style={styles.abilScoreRow}>
+              <Text style={styles.abilScore}>{a.score}</Text>
+              {a.scoreBonus !== 0 ? (
+                <Text style={[styles.abilRacialBadge, { color: a.scoreBonus > 0 ? '#86efac' : '#fca5a5' }]}>
+                  {a.scoreBonus > 0 ? `(+${a.scoreBonus})` : `(${a.scoreBonus})`}
+                </Text>
+              ) : null}
+            </View>
           </TouchableOpacity>
         ))}
       </View>
@@ -922,29 +1063,6 @@ function SummaryCard({
           </View>
         </>
       ) : null}
-
-      {/* Otros bonos extra (skills con bonos de objetos/dotes que no se ven arriba) */}
-      {(() => {
-        const known = new Set<string>([
-          'ac', 'hp_max', 'bab', 'fort', 'ref', 'will',
-          ...ABIL.map(([, k]) => `mod_${k}`),
-        ]);
-        const extras = Object.entries(finalStats).filter(([k, v]) => !known.has(k) && typeof v === 'number' && v !== 0);
-        if (extras.length === 0) return null;
-        return (
-          <>
-            <Text style={styles.subgroupHero}>Otros bonos activos</Text>
-            <View style={styles.statsGrid}>
-              {extras.map(([k, v]) => (
-                <View key={k} style={styles.statPill}>
-                  <Text style={styles.statKey}>{targetLabel[k] ?? k}</Text>
-                  <Text style={styles.statVal}>{(v as number) >= 0 ? `+${v}` : `${v}`}</Text>
-                </View>
-              ))}
-            </View>
-          </>
-        );
-      })()}
 
       {/* Editor rápido (long-press) */}
       <Modal visible={!!edit} transparent animationType="fade" onRequestClose={() => setEdit(null)}>
@@ -1467,7 +1585,7 @@ function EquipmentTab({ system, data, setData }: any) {
             </TouchableOpacity>
           </View>
 
-          <View style={styles.slotRow}>
+          <View style={styles.slotFilterRow}>
             {slots.map((s: any) => (
               <TouchableOpacity key={s.id}
                 style={[styles.slotChip, it.slot === s.id && styles.slotChipActive]}
@@ -1477,17 +1595,104 @@ function EquipmentTab({ system, data, setData }: any) {
             ))}
           </View>
 
-          <Text style={styles.subgroup}>Bonos automáticos</Text>
-          {it.bonuses.length === 0 ? <Text style={styles.muted}>Sin bonos. Pulsa "+ Añadir bono".</Text> : null}
-          {it.bonuses.map((b, idx) => (
-            <BonusEditorRow
-              key={idx}
-              targets={targets as BonusTargetDef[]}
-              bonus={b}
-              onChange={(p) => toggleBonus(it.id, idx, p)}
-              onRemove={() => removeBonus(it.id, idx)}
-            />
-          ))}
+          {/* ── Bono de arma (solo para slots de arma) ──────────── */}
+          {it.slot.startsWith('weapon') ? (() => {
+            const isRangedSlot = it.slot === 'weapon_off'
+              ? it.bonuses.some((b) => b.target === 'attack_ranged')
+              : it.bonuses.some((b) => b.target === 'attack_ranged');
+            const atkTarget = isRangedSlot ? 'attack_ranged' : 'attack_melee';
+            const enhAtk = it.bonuses.find((b) => b.target === atkTarget && b.type === 'enhancement')?.value ?? 0;
+            const enhDmg = it.bonuses.find((b) => b.target === 'damage' && b.type === 'enhancement')?.value ?? 0;
+
+            function setEnhancement(atkVal: number, dmgVal: number, tgt: string) {
+              let next = it.bonuses.filter(
+                (b) => !(b.type === 'enhancement' && (b.target === 'attack_melee' || b.target === 'attack_ranged' || b.target === 'damage'))
+              );
+              if (atkVal !== 0) next = [...next, { target: tgt, value: atkVal, type: 'enhancement' as const }];
+              if (dmgVal !== 0) next = [...next, { target: 'damage', value: dmgVal, type: 'enhancement' as const }];
+              patch(it.id, { bonuses: next });
+            }
+
+            const step = (field: 'atk' | 'dmg', delta: number) => {
+              const tgt = it.bonuses.some((b) => b.target === 'attack_ranged') ? 'attack_ranged' : 'attack_melee';
+              if (field === 'atk') setEnhancement(enhAtk + delta, enhDmg, tgt);
+              else setEnhancement(enhAtk, enhDmg + delta, tgt);
+            };
+
+            const toggleRanged = () => {
+              const nowRanged = it.bonuses.some((b) => b.target === 'attack_ranged');
+              const newTgt = nowRanged ? 'attack_melee' : 'attack_ranged';
+              const oldTgt = nowRanged ? 'attack_ranged' : 'attack_melee';
+              patch(it.id, {
+                bonuses: it.bonuses.map((b) =>
+                  b.target === oldTgt && b.type === 'enhancement' ? { ...b, target: newTgt } : b
+                ),
+              });
+            };
+
+            return (
+              <View style={styles.weaponStatBox}>
+                <View style={styles.weaponStatRow}>
+                  <View style={styles.weaponStatCell}>
+                    <Text style={styles.weaponStatLabel}>Bono ataque</Text>
+                    <View style={styles.weaponStatStepper}>
+                      <TouchableOpacity style={styles.stepBtn} onPress={() => step('atk', -1)}>
+                        <Text style={styles.stepBtnText}>−</Text>
+                      </TouchableOpacity>
+                      <Text style={styles.stepValue}>{enhAtk >= 0 ? `+${enhAtk}` : `${enhAtk}`}</Text>
+                      <TouchableOpacity style={styles.stepBtn} onPress={() => step('atk', 1)}>
+                        <Text style={styles.stepBtnText}>+</Text>
+                      </TouchableOpacity>
+                    </View>
+                    <Text style={styles.weaponStatHint}>Mejora · apila con dotes</Text>
+                  </View>
+                  <View style={styles.weaponStatCell}>
+                    <Text style={styles.weaponStatLabel}>Bono daño</Text>
+                    <View style={styles.weaponStatStepper}>
+                      <TouchableOpacity style={styles.stepBtn} onPress={() => step('dmg', -1)}>
+                        <Text style={styles.stepBtnText}>−</Text>
+                      </TouchableOpacity>
+                      <Text style={styles.stepValue}>{enhDmg >= 0 ? `+${enhDmg}` : `${enhDmg}`}</Text>
+                      <TouchableOpacity style={styles.stepBtn} onPress={() => step('dmg', 1)}>
+                        <Text style={styles.stepBtnText}>+</Text>
+                      </TouchableOpacity>
+                    </View>
+                    <Text style={styles.weaponStatHint}>Mejora (mismo valor)</Text>
+                  </View>
+                </View>
+                <TouchableOpacity style={styles.rangedToggle} onPress={toggleRanged}>
+                  <Text style={styles.rangedToggleText}>
+                    {it.bonuses.some((b) => b.target === 'attack_ranged') ? '🏹 A distancia' : '⚔ Cuerpo a cuerpo'}
+                    {'  (toca para cambiar)'}
+                  </Text>
+                </TouchableOpacity>
+                <Text style={styles.weaponStatHint} numberOfLines={2}>
+                  {'Para dotes específicas (Concentración en arma): añádelas en la pestaña Dotes → bono "⚔ Ataque con arma específica…"'}
+                </Text>
+              </View>
+            );
+          })() : null}
+
+          <Text style={styles.subgroup}>Otros bonos</Text>
+          {it.bonuses.filter((b) => b.type !== 'enhancement' || !it.slot.startsWith('weapon')).length === 0
+            ? <Text style={styles.muted}>Sin bonos adicionales. Pulsa "+ Añadir bono".</Text>
+            : null}
+          {it.bonuses.map((b, idx) => {
+            // Ocultar en weapons los enhancement ya gestionados arriba
+            if (it.slot.startsWith('weapon') && b.type === 'enhancement' &&
+                (b.target === 'attack_melee' || b.target === 'attack_ranged' || b.target === 'damage')) {
+              return null;
+            }
+            return (
+              <BonusEditorRow
+                key={idx}
+                targets={targets as BonusTargetDef[]}
+                bonus={b}
+                onChange={(p) => toggleBonus(it.id, idx, p)}
+                onRemove={() => removeBonus(it.id, idx)}
+              />
+            );
+          })}
           <TouchableOpacity style={styles.addBonusBtn} onPress={() => addBonus(it.id)}>
             <Text style={styles.addBonusText}>+ Añadir bono</Text>
           </TouchableOpacity>
@@ -1694,10 +1899,12 @@ function InventoryTab({ data, setData }: any) {
 
 // ─── Spells tab ───────────────────────────────────────────────
 function SpellsTab({ system, data, setData }: any) {
+  const { width: windowWidth } = useWindowDimensions();
   const items: SpellEntry[] = Array.isArray(data.spells) ? data.spells : [];
   const [pickerOpen, setPickerOpen] = useState(false);
   const [spellClassFilter, setSpellClassFilter] = useState<string | null>(null);
   const [detailSpell, setDetailSpell] = useState<SpellEntry | null>(null);
+  const [selectedSpellLevel, setSelectedSpellLevel] = useState(0);
   const catalog = getCatalog(system.id);
   const catalogSpells = catalog?.spells ?? [];
 
@@ -1719,8 +1926,14 @@ function SpellsTab({ system, data, setData }: any) {
     );
   }, [catalogSpells, spellClassFilter]);
 
+  // Conjuros del catálogo filtrados por nivel seleccionado (para el picker)
+  const pickerSpells = useMemo(
+    () => visibleSpells.filter((s) => s.level === selectedSpellLevel),
+    [visibleSpells, selectedSpellLevel],
+  );
+
   function update(next: SpellEntry[]) { setData({ ...data, spells: next }); }
-  function add() { update([...items, { id: uid(), name: 'Conjuro', level: 0, prepared: false }]); }
+  function add() { update([...items, { id: uid(), name: 'Conjuro', level: 0 }]); }
 
   // ── Espacios de conjuro ──
   // slots = { 1: {max:4, used:1}, 2: {max:3, used:0}, ... }
@@ -1746,11 +1959,11 @@ function SpellsTab({ system, data, setData }: any) {
     );
     setData({ ...data, spellSlots: reset });
   }
-  const usedLevels = [1,2,3,4,5,6,7,8,9].filter((l) => (slots[l]?.max ?? 0) > 0);
+  const usedLevels = [0,1,2,3,4,5,6,7,8,9].filter((l) => (slots[l]?.max ?? 0) > 0);
 
   function addFromCatalog(c: CatalogSpell) {
     setPickerOpen(false);
-    update([...items, { id: uid(), name: c.name, level: c.level, prepared: false, notes: c.description }]);
+    update([...items, { id: uid(), name: c.name, level: c.level, notes: c.description }]);
   }
   function patch(id: string, p: Partial<SpellEntry>) {
     update(items.map((it) => it.id === id ? { ...it, ...p } : it));
@@ -1764,111 +1977,484 @@ function SpellsTab({ system, data, setData }: any) {
     return acc;
   }, {});
 
+  // ── Cálculo automático de espacios ──────────────────────────
+  const computedSlots: SpellSlotResult | null = useMemo(
+    () => (system.computeSpellSlots ? system.computeSpellSlots(data) as SpellSlotResult : null),
+    [system, data],
+  );
+  const hasPreparedCaster = useMemo(
+    () => computedSlots?.breakdown.some((b: SpellSlotBreakdown) => b.castingType === 'prepared') ?? false,
+    [computedSlots],
+  );
+  const hasSpontaneousCaster = useMemo(
+    () => computedSlots?.breakdown.some((b: SpellSlotBreakdown) => b.castingType === 'spontaneous') ?? false,
+    [computedSlots],
+  );
+  // Si no hay info de sistema, mostramos el tracker manual siempre
+  const showSlotTracker = hasSpontaneousCaster || !computedSlots;
+
+  const hasWizard = useMemo(
+    () => Array.isArray((data as any).classes) &&
+      ((data as any).classes as Array<{ classId: string }>).some((c) => c.classId === 'wizard'),
+    [(data as any).classes],
+  );
+  function syncFromComputed() {
+    if (!computedSlots) return;
+    const newSlots = { ...slots };
+    for (const [sl, t] of Object.entries(computedSlots.totals)) {
+      const k = Number(sl);
+      const cur = newSlots[k] ?? { max: 0, used: 0 };
+      newSlots[k] = { ...cur, max: t as number };
+    }
+    setData({ ...data, spellSlots: newSlots });
+  }
+  // ── Preparaciones del día (mago, clérigo, druida…) ──────────
+  const prepSlots: PrepSlot[] = Array.isArray((data as any).preparedSlots)
+    ? (data as any).preparedSlots as PrepSlot[]
+    : [];
+  function updatePrepSlots(next: PrepSlot[]) { setData({ ...data, preparedSlots: next }); }
+  function addPrepSlot(spellName: string, spellLevel: number, slotLevel: number) {
+    updatePrepSlots([...prepSlots, { id: uid(), spellName, spellLevel, slotLevel, used: false }]);
+  }
+  function removePrepSlot(id: string) {
+    updatePrepSlots(prepSlots.filter((p) => p.id !== id));
+  }
+  function patchPrepSlot(id: string, change: Partial<PrepSlot>) {
+    updatePrepSlots(prepSlots.map((p) => p.id === id ? { ...p, ...change } : p));
+  }
+  const [prepPickerSpell, setPrepPickerSpell] = useState<{ name: string; level: number } | null>(null);
+
+  function longRestPrepared() {
+    updatePrepSlots(prepSlots.map((p) => ({ ...p, used: false })));
+  }
+
+  const CLASS_NAMES_35: Record<string, string> = {
+    wizard: 'Mago', cleric: 'Clérigo', druid: 'Druida', sorcerer: 'Hechicero',
+    bard: 'Bardo', paladin: 'Paladín', ranger: 'Explorador',
+  };
+
   return (
     <View>
       <Text style={styles.sectionTitle}>Conjuros</Text>
 
-      {/* ── Tracker de espacios de conjuro ────────────────────── */}
-      <View style={styles.slotSection}>
-        <View style={styles.slotHeader}>
-          <Text style={styles.subgroupHero}>Espacios de conjuro</Text>
-          {usedLevels.length > 0 ? (
-            <TouchableOpacity onPress={longRestSlots} style={styles.longRestBtn}>
-              <Text style={styles.longRestText}>Descanso largo</Text>
+      {/* ── Panel calculado automáticamente ─────────────────── */}
+      {computedSlots && (
+        <View style={styles.slotSection}>
+          <View style={styles.slotHeader}>
+            <Text style={styles.subgroupHero}>Calculado por clase</Text>
+            <TouchableOpacity onPress={syncFromComputed} style={styles.longRestBtn}>
+              <Text style={styles.longRestText}>▶ Sincronizar</Text>
             </TouchableOpacity>
-          ) : null}
-        </View>
-        {[1,2,3,4,5,6,7,8,9].map((lvl) => {
-          const s = slots[lvl] ?? { max: 0, used: 0 };
-          return (
-            <View key={lvl} style={styles.slotRow}>
-              <Text style={styles.slotLevelLabel}>Nv {lvl}</Text>
-              {/* pips */}
-              <View style={styles.slotPips}>
-                {Array.from({ length: Math.max(s.max, 0) }).map((_, i) => (
-                  <TouchableOpacity
-                    key={i}
-                    style={[styles.slotPip, i < s.used && styles.slotPipUsed]}
-                    onPress={() => i < s.used ? restoreSlot(lvl) : useSlot(lvl)}
-                  />
-                ))}
-              </View>
-              {/* editor max */}
-              <View style={styles.slotMaxEdit}>
-                <TouchableOpacity onPress={() => setSlotMax(lvl, s.max - 1)} style={styles.slotMaxBtn}>
-                  <Text style={styles.slotMaxBtnText}>−</Text>
-                </TouchableOpacity>
-                <Text style={styles.slotMaxVal}>{s.max}</Text>
-                <TouchableOpacity onPress={() => setSlotMax(lvl, s.max + 1)} style={styles.slotMaxBtn}>
-                  <Text style={styles.slotMaxBtnText}>+</Text>
-                </TouchableOpacity>
-              </View>
+          </View>
+
+          {/* Toggle especialización de mago */}
+          {hasWizard && (
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+              <Text style={[styles.help, { flex: 1, marginTop: 0 }]}>Mago especialista (+1 espacio/nivel)</Text>
+              <Switch
+                value={!!(data as any).wizardSpecialty}
+                onValueChange={(v) => setData({ ...data, wizardSpecialty: v })}
+                trackColor={{ false: '#1e1b4b', true: '#7c3aed' }}
+              />
             </View>
-          );
-        })}
-        <Text style={styles.help}>Toca un pip para gastar/recuperar. Cambia el máximo con −/+.</Text>
-      </View>
+          )}
 
-      <Text style={[styles.help, { marginTop: 8 }]}>Marca los conjuros preparados para destacarlos.</Text>
-
-      {items.length === 0 ? <Text style={styles.muted}>Sin conjuros aún.</Text> : null}
-      {Object.keys(grouped).map(Number).sort((a, b) => a - b).map((lvl) => (
-        <View key={lvl} style={{ marginBottom: 10 }}>
-          <Text style={styles.subgroup}>{lvl === 0 ? 'Trucos / Cantrips' : `Nivel ${lvl}`}</Text>
-          {grouped[lvl].map((sp) => (
-            <View key={sp.id} style={styles.spellRow}>
-              <TouchableOpacity style={{ flex: 1 }} onPress={() => setDetailSpell(sp)}>
-                <Text style={[styles.itemNameInput, { color: sp.prepared ? '#e2d9ff' : '#94a3b8' }]} numberOfLines={1}>
-                  {sp.name}
+          {/* Desglose por clase */}
+          {computedSlots.breakdown.map((bd: SpellSlotBreakdown, i: number) => {
+            const allLevels = Array.from(
+              new Set([...Object.keys(bd.base), ...Object.keys(bd.bonus), ...Object.keys(bd.extra)].map(Number)),
+            ).sort((a, b) => a - b);
+            return (
+              <View key={i} style={{ marginBottom: 8 }}>
+                <Text style={styles.subgroup}>
+                  {CLASS_NAMES_35[bd.className] ?? bd.className}{' '}
+                  · {bd.abilityLabel} {bd.mod >= 0 ? `+${bd.mod}` : bd.mod}
                 </Text>
-              </TouchableOpacity>
-              <TextInput style={styles.qtyInput} keyboardType="numeric" value={String(sp.level)}
-                onChangeText={(t) => { const n = Number(t); if (!Number.isNaN(n)) patch(sp.id, { level: n }); }} />
-              <Switch value={!!sp.prepared} onValueChange={(v) => patch(sp.id, { prepared: v })}
-                trackColor={{ false: '#1e1b4b', true: '#7c3aed' }} />
-              <TouchableOpacity onPress={() => remove(sp.id)} style={styles.delBtn}>
-                <Text style={styles.delBtnText}>×</Text>
-              </TouchableOpacity>
-            </View>
-          ))}
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+                  {allLevels.map((sl) => {
+                    const b  = bd.base[sl]  ?? 0;
+                    const bo = bd.bonus[sl] ?? 0;
+                    const ex = bd.extra[sl] ?? 0;
+                    const total = b + bo + ex;
+                    if (total === 0 && b === 0) return null;
+                    const parts = [String(b)];
+                    if (bo > 0) parts.push(`+${bo}`);
+                    if (ex > 0) parts.push(`+${ex}✦`);
+                    return (
+                      <View key={sl} style={styles.slotCalcChip}>
+                        <Text style={styles.slotCalcLevel}>{sl === 0 ? 'Trucos' : `N${sl}`}</Text>
+                        <Text style={styles.slotCalcTotal}>{total}</Text>
+                        {(bo > 0 || ex > 0) && (
+                          <Text style={styles.slotCalcDetail}>{parts.join('')}</Text>
+                        )}
+                      </View>
+                    );
+                  })}
+                </View>
+              </View>
+            );
+          })}
+
+          {/* Totales */}
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', marginTop: 2 }}>
+            <Text style={[styles.help, { marginRight: 6, marginTop: 0 }]}>Total:</Text>
+            {[0,1,2,3,4,5,6,7,8,9].map((sl) => {
+              const t = computedSlots.totals[sl] ?? 0;
+              if (t === 0) return null;
+              return (
+                <View key={sl} style={[styles.slotCalcChip, { backgroundColor: '#3b0764' }]}>
+                  <Text style={styles.slotCalcLevel}>{sl === 0 ? 'Trucos' : `N${sl}`}</Text>
+                  <Text style={[styles.slotCalcTotal, { color: '#e9d5ff' }]}>{t}</Text>
+                </View>
+              );
+            })}
+          </View>
+          <Text style={[styles.help, { marginTop: 4 }]}>
+            ✦ = dominio / especialización · Sincronizar copia los totales al tracker
+          </Text>
         </View>
-      ))}
-      <TouchableOpacity style={styles.addBtn} onPress={add}>
-        <Text style={styles.addBtnText}>+ Añadir conjuro</Text>
-      </TouchableOpacity>
-      {catalogSpells.length > 0 ? (
-        <View>
-          {charClassNames.length > 0 ? (
-            <View style={styles.filterChipRow}>
-              <TouchableOpacity
-                style={[styles.filterChip, !spellClassFilter && styles.filterChipActive]}
-                onPress={() => setSpellClassFilter(null)}>
-                <Text style={[styles.filterChipText, !spellClassFilter && styles.filterChipTextActive]}>Todos</Text>
+      )}
+
+      {/* ── Tracker espontáneo: pool de espacios por nivel (Hechicero, Bardo) ── */}
+      {showSlotTracker && (
+        <View style={styles.slotSection}>
+          <View style={styles.slotHeader}>
+            <Text style={styles.subgroupHero}>
+              {hasSpontaneousCaster ? 'Espacios de conjuro' : 'Espacios de conjuro'}
+            </Text>
+            {usedLevels.length > 0 ? (
+              <TouchableOpacity onPress={longRestSlots} style={styles.longRestBtn}>
+                <Text style={styles.longRestText}>Descanso largo</Text>
               </TouchableOpacity>
-              {charClassNames.map((cn) => (
-                <TouchableOpacity
-                  key={cn}
-                  style={[styles.filterChip, spellClassFilter === cn && styles.filterChipActive]}
-                  onPress={() => setSpellClassFilter(spellClassFilter === cn ? null : cn)}>
-                  <Text style={[styles.filterChipText, spellClassFilter === cn && styles.filterChipTextActive]}>{cn}</Text>
+            ) : null}
+          </View>
+          {hasSpontaneousCaster && (
+            <Text style={[styles.help, { marginBottom: 6, marginTop: 0 }]}>
+              Pool compartido · lanza cualquier conjuro conocido
+            </Text>
+          )}
+          {[0,1,2,3,4,5,6,7,8,9].map((lvl) => {
+            const s = slots[lvl] ?? { max: 0, used: 0 };
+            if (s.max === 0 && !(computedSlots?.totals[lvl])) return null;
+            return (
+              <View key={lvl} style={styles.slotRow}>
+                <Text style={styles.slotLevelLabel}>{lvl === 0 ? 'Trucos' : `Nv ${lvl}`}</Text>
+                <View style={styles.slotPips}>
+                  {Array.from({ length: Math.max(s.max, 0) }).map((_, i) => (
+                    <TouchableOpacity
+                      key={i}
+                      style={[styles.slotPip, i < s.used && styles.slotPipUsed]}
+                      onPress={() => i < s.used ? restoreSlot(lvl) : useSlot(lvl)}
+                    />
+                  ))}
+                </View>
+                <View style={styles.slotMaxEdit}>
+                  <TouchableOpacity onPress={() => setSlotMax(lvl, s.max - 1)} style={styles.slotMaxBtn}>
+                    <Text style={styles.slotMaxBtnText}>−</Text>
+                  </TouchableOpacity>
+                  <Text style={styles.slotMaxVal}>{s.max}</Text>
+                  <TouchableOpacity onPress={() => setSlotMax(lvl, s.max + 1)} style={styles.slotMaxBtn}>
+                    <Text style={styles.slotMaxBtnText}>+</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            );
+          })}
+          <Text style={styles.help}>Toca un pip para gastar/recuperar. Cambia el máximo con −/+.</Text>
+        </View>
+      )}
+
+      {/* ── Preparación del día (Mago, Clérigo, Druida…) ────────────────────── */}
+      {hasPreparedCaster && (() => {
+        const anyUsed = prepSlots.some((p) => p.used);
+        const slotLevelsUsed = [...new Set(prepSlots.map((p) => p.slotLevel))].sort((a, b) => a - b);
+        return (
+          <View style={[styles.slotSection, { borderColor: 'rgba(251,191,36,0.2)' }]}>
+            <View style={styles.slotHeader}>
+              <Text style={[styles.subgroupHero, { color: '#fbbf24' }]}>Preparación del día</Text>
+              {anyUsed ? (
+                <TouchableOpacity onPress={longRestPrepared} style={[styles.longRestBtn, { borderColor: 'rgba(251,191,36,0.3)', backgroundColor: 'rgba(251,191,36,0.1)' }]}>
+                  <Text style={[styles.longRestText, { color: '#fbbf24' }]}>Descanso largo</Text>
                 </TouchableOpacity>
-              ))}
+              ) : null}
             </View>
-          ) : null}
-          <TouchableOpacity style={[styles.addBtn, styles.addBtnSecondary]} onPress={() => setPickerOpen(true)}>
-            <Text style={styles.addBtnText}>📚 Catálogo ({visibleSpells.length}{spellClassFilter ? ` · ${spellClassFilter}` : ''})</Text>
-          </TouchableOpacity>
+            <Text style={[styles.help, { marginBottom: 6, marginTop: 0 }]}>
+              Toca 📖 en el grimorio · cada preparación ocupa un espacio · se puede preparar en espacio superior
+            </Text>
+            {prepSlots.length === 0 ? (
+              <Text style={styles.muted}>Sin preparaciones hoy.</Text>
+            ) : (
+              slotLevelsUsed.map((lvl) => {
+                const slotMax = slots[lvl]?.max || computedSlots?.totals[lvl] || 0;
+                const lvlPreps = prepSlots.filter((p) => p.slotLevel === lvl);
+                const remaining = lvlPreps.filter((p) => !p.used).length;
+                const pct = lvlPreps.length > 0 ? remaining / lvlPreps.length : 1;
+                const barColor = pct > 0.5 ? '#34d399' : pct > 0 ? '#fbbf24' : '#f87171';
+                return (
+                  <View key={lvl} style={{ marginBottom: 10 }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
+                      <Text style={styles.slotLevelLabel}>{lvl === 0 ? 'Trucos' : `Nv ${lvl}`}</Text>
+                      <View style={styles.prepBarBg}>
+                        <View style={[styles.prepBarFill, { flex: remaining / Math.max(lvlPreps.length, 1), backgroundColor: barColor }]} />
+                        <View style={{ flex: (lvlPreps.length - remaining) / Math.max(lvlPreps.length, 1) }} />
+                      </View>
+                      <Text style={[styles.prepCount, { color: barColor }]}>{remaining}/{lvlPreps.length}</Text>
+                      {slotMax > 0 && (
+                        <Text style={[styles.help, { margin: 0, marginLeft: 6, fontSize: 10 }]}>de {slotMax} esp.</Text>
+                      )}
+                    </View>
+                    {lvlPreps.map((ps) => (
+                      <View key={ps.id} style={[styles.spellRow, ps.used && { opacity: 0.5 }]}>
+                        <Text style={[styles.itemNameInput, { flex: 1, color: ps.used ? '#64748b' : '#e2d9ff' }]} numberOfLines={1}>
+                          {ps.spellName}
+                        </Text>
+                        {ps.slotLevel > ps.spellLevel && (
+                          <View style={{ backgroundColor: 'rgba(167,139,250,0.15)', borderRadius: 4, paddingHorizontal: 5, paddingVertical: 2, marginRight: 4 }}>
+                            <Text style={{ color: '#a78bfa', fontSize: 10 }}>en Nv{ps.slotLevel}</Text>
+                          </View>
+                        )}
+                        <TouchableOpacity
+                          onPress={() => patchPrepSlot(ps.id, { used: !ps.used })}
+                          style={[styles.castBtn, ps.used && styles.castBtnUsed]}
+                        >
+                          <Text style={styles.castBtnText}>{ps.used ? '◇' : '◆'}</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => removePrepSlot(ps.id)} style={styles.delBtn}>
+                          <Text style={styles.delBtnText}>×</Text>
+                        </TouchableOpacity>
+                      </View>
+                    ))}
+                  </View>
+                );
+              })
+            )}
+          </View>
+        );
+      })()}
+
+      {/* ── Tabs por nivel (grimorio) ────────────────────────── */}
+      {(() => {
+        // Niveles relevantes: donde hay conjuros, hay slots calculados o hay tracker
+        const spellLevels = new Set(items.map((s) => s.level));
+        const slotLevels = new Set(
+          [0,1,2,3,4,5,6,7,8,9].filter(
+            (l) => (computedSlots?.totals[l] ?? 0) > 0 || (slots[l]?.max ?? 0) > 0,
+          ),
+        );
+        const tabLevels = [...new Set([...spellLevels, ...slotLevels, 0])].sort((a, b) => a - b);
+
+        // Asegurarse de que el tab seleccionado sea válido
+        const activeLevel = tabLevels.includes(selectedSpellLevel) ? selectedSpellLevel : tabLevels[0];
+
+        const levelSpells = items.filter((s) => s.level === activeLevel);
+        const levelSlot = slots[activeLevel] ?? { max: 0, used: 0 };
+        const computedTotal = computedSlots?.totals[activeLevel] ?? 0;
+
+        return (
+          <>
+            {/* Barra de tabs */}
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={styles.spellLevelTabBar}
+              contentContainerStyle={{ paddingRight: 8 }}
+            >
+              {tabLevels.map((lvl) => {
+                const count = items.filter((s) => s.level === lvl).length;
+                const isActive = lvl === activeLevel;
+                const hasUsed = prepSlots.some((p) => p.spellLevel === lvl && p.used);
+                return (
+                  <TouchableOpacity
+                    key={lvl}
+                    style={[styles.spellLevelTab, isActive && styles.spellLevelTabActive]}
+                    onPress={() => setSelectedSpellLevel(lvl)}
+                  >
+                    <Text style={[styles.spellLevelTabLabel, isActive && styles.spellLevelTabLabelActive]}>
+                      {lvl === 0 ? 'Trucos' : `Nv ${lvl}`}
+                    </Text>
+                    {count > 0 && (
+                      <View style={[styles.spellLevelBadge, isActive && styles.spellLevelBadgeActive]}>
+                        <Text style={[styles.spellLevelBadgeText, hasUsed && { color: '#fbbf24' }]}>{count}</Text>
+                      </View>
+                    )}
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
+
+            {/* Estado de slots para este nivel */}
+            {(levelSlot.max > 0 || computedTotal > 0) && (
+              <View style={styles.spellLevelSlotRow}>
+                {showSlotTracker && levelSlot.max > 0 ? (
+                  <>
+                    <View style={styles.slotPips}>
+                      {Array.from({ length: levelSlot.max }).map((_, i) => (
+                        <TouchableOpacity
+                          key={i}
+                          style={[styles.slotPip, i < levelSlot.used && styles.slotPipUsed]}
+                          onPress={() => i < levelSlot.used ? restoreSlot(activeLevel) : useSlot(activeLevel)}
+                        />
+                      ))}
+                    </View>
+                    <View style={styles.slotMaxEdit}>
+                      <TouchableOpacity onPress={() => setSlotMax(activeLevel, levelSlot.max - 1)} style={styles.slotMaxBtn}>
+                        <Text style={styles.slotMaxBtnText}>−</Text>
+                      </TouchableOpacity>
+                      <Text style={styles.slotMaxVal}>{levelSlot.max}</Text>
+                      <TouchableOpacity onPress={() => setSlotMax(activeLevel, levelSlot.max + 1)} style={styles.slotMaxBtn}>
+                        <Text style={styles.slotMaxBtnText}>+</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </>
+                ) : null}
+                {hasPreparedCaster && (() => {
+                  const lvlPreps = prepSlots.filter((p) => p.slotLevel === activeLevel);
+                  if (lvlPreps.length === 0) return null;
+                  const castable = lvlPreps.filter((p) => !p.used).length;
+                  return (
+                    <Text style={[styles.prepCount, { marginLeft: 'auto', color: castable > 0 ? '#34d399' : '#f87171' }]}>
+                      {castable}/{lvlPreps.length} prep.
+                    </Text>
+                  );
+                })()
+                }
+                {computedTotal > 0 && !showSlotTracker ? (
+                  <Text style={[styles.help, { margin: 0, color: '#a78bfa', fontSize: 11 }]}>
+                    {computedTotal} espacios calculados
+                  </Text>
+                ) : null}
+              </View>
+            )}
+
+            {/* Grimorio: lista del nivel activo */}
+
+            {/* Grimorio: lista del nivel activo */}
+            {levelSpells.length === 0 ? (
+              <Text style={styles.muted}>
+                {activeLevel === 0 ? 'Sin trucos en el grimorio.' : `Sin conjuros de Nv ${activeLevel} en el grimorio.`}
+              </Text>
+            ) : null}
+            {levelSpells.map((sp) => (
+              <View key={sp.id} style={styles.spellRow}>
+                <TouchableOpacity style={{ flex: 1 }} onPress={() => setDetailSpell(sp)}>
+                  <Text style={[styles.itemNameInput, { color: '#cbd5e1' }]} numberOfLines={1}>
+                    {sp.name}
+                  </Text>
+                </TouchableOpacity>
+                {hasPreparedCaster && (
+                  <TouchableOpacity
+                    onPress={() => setPrepPickerSpell({ name: sp.name, level: sp.level })}
+                    style={[styles.castBtn, { backgroundColor: 'rgba(167,139,250,0.15)' }]}
+                  >
+                    <Text style={[styles.castBtnText, { color: '#a78bfa' }]}>📖</Text>
+                  </TouchableOpacity>
+                )}
+                <TouchableOpacity onPress={() => remove(sp.id)} style={styles.delBtn}>
+                  <Text style={styles.delBtnText}>×</Text>
+                </TouchableOpacity>
+              </View>
+            ))}
+
+            {/* Acciones del nivel */}
+            <TouchableOpacity style={styles.addBtn} onPress={() => {
+              update([...items, { id: uid(), name: 'Conjuro', level: activeLevel }]);
+            }}>
+              <Text style={styles.addBtnText}>
+                + Añadir {activeLevel === 0 ? 'truco' : `conjuro Nv ${activeLevel}`}
+              </Text>
+            </TouchableOpacity>
+            {catalogSpells.length > 0 ? (
+              <View>
+                {charClassNames.length > 0 ? (
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterChipRow}>
+                    <TouchableOpacity
+                      style={[styles.filterChip, !spellClassFilter && styles.filterChipActive]}
+                      onPress={() => setSpellClassFilter(null)}>
+                      <Text style={[styles.filterChipText, !spellClassFilter && styles.filterChipTextActive]}>Todos</Text>
+                    </TouchableOpacity>
+                    {charClassNames.map((cn) => (
+                      <TouchableOpacity
+                        key={cn}
+                        style={[styles.filterChip, spellClassFilter === cn && styles.filterChipActive]}
+                        onPress={() => setSpellClassFilter(spellClassFilter === cn ? null : cn)}>
+                        <Text style={[styles.filterChipText, spellClassFilter === cn && styles.filterChipTextActive]}>{cn}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                ) : null}
+                <TouchableOpacity style={[styles.addBtn, styles.addBtnSecondary]} onPress={() => setPickerOpen(true)}>
+                  <Text style={styles.addBtnText}>
+                    📚 Catálogo ({visibleSpells.filter((s) => s.level === activeLevel).length} de Nv {activeLevel}
+                    {spellClassFilter ? ` · ${spellClassFilter}` : ''})
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            ) : null}
+          </>
+        );
+      })()}
+      {/* ── Modal: elegir espacio para preparar ──────────────────────────── */}
+      <Modal visible={!!prepPickerSpell} transparent animationType="fade" onRequestClose={() => setPrepPickerSpell(null)}>
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalCard, { maxHeight: '70%' }]}>
+            {prepPickerSpell && (() => {
+              const minLvl = prepPickerSpell.level;
+              const availLevels = [0,1,2,3,4,5,6,7,8,9].filter((l) => {
+                if (l < minLvl) return false;
+                const slotMax = slots[l]?.max || computedSlots?.totals[l] || 0;
+                return slotMax > 0;
+              });
+              return (
+                <>
+                  <Text style={styles.modalTitle}>Preparar: {prepPickerSpell.name}</Text>
+                  <Text style={[styles.help, { marginTop: 0, marginBottom: 8 }]}>
+                    Elige en qué espacio lo preparas (Nv {minLvl === 0 ? 'truco' : minLvl} mínimo):
+                  </Text>
+                  <ScrollView>
+                    {availLevels.length === 0 ? (
+                      <Text style={styles.muted}>Configura los espacios en el tracker primero.</Text>
+                    ) : (
+                      availLevels.map((lvl) => {
+                        const slotMax = slots[lvl]?.max || computedSlots?.totals[lvl] || 0;
+                        const occupied = prepSlots.filter((p) => p.slotLevel === lvl).length;
+                        const free = Math.max(0, slotMax - occupied);
+                        const disabled = free === 0;
+                        return (
+                          <TouchableOpacity
+                            key={lvl}
+                            disabled={disabled}
+                            style={[styles.modalAction, { marginBottom: 6, flexDirection: 'row', justifyContent: 'space-between', opacity: disabled ? 0.4 : 1 }]}
+                            onPress={() => { addPrepSlot(prepPickerSpell.name, prepPickerSpell.level, lvl); setPrepPickerSpell(null); }}
+                          >
+                            <Text style={{ color: '#e2e8f0', fontWeight: '600' }}>
+                              {lvl === 0 ? 'Truco' : `Espacio Nv ${lvl}`}{lvl > minLvl ? ' ↑' : ''}
+                            </Text>
+                            <Text style={{ color: free > 0 ? '#34d399' : '#f87171', fontSize: 12 }}>
+                              {free}/{slotMax} libres
+                            </Text>
+                          </TouchableOpacity>
+                        );
+                      })
+                    )}
+                  </ScrollView>
+                  <TouchableOpacity style={[styles.modalAction, { marginTop: 12 }]} onPress={() => setPrepPickerSpell(null)}>
+                    <Text style={{ color: '#94a3b8', fontWeight: '600' }}>Cancelar</Text>
+                  </TouchableOpacity>
+                </>
+              );
+            })()}
+          </View>
         </View>
-      ) : null}
+      </Modal>
+
       <CatalogPicker
         visible={pickerOpen}
-        title="Conjuros del catálogo"
+        title={`Conjuros Nv ${selectedSpellLevel} del catálogo`}
         source={catalog?.source}
-        items={visibleSpells.map((c) => ({
+        items={pickerSpells.map((c) => ({
           id: c.id,
           title: c.name,
-          subtitle: `Nv ${c.level}` +
-            (c.school ? ` · ${c.school}` : '') +
+          subtitle: (c.school ? `${c.school}` : '') +
             (c.classes && c.classes.length ? ` · ${c.classes.join('/')}` : '') +
             (c.description ? `\n${c.description}` : ''),
           raw: c,
@@ -1880,7 +2466,7 @@ function SpellsTab({ system, data, setData }: any) {
       {/* ── Detalle de conjuro ──────────────────────────────── */}
       <Modal visible={!!detailSpell} transparent animationType="slide" onRequestClose={() => setDetailSpell(null)}>
         <View style={styles.modalOverlay}>
-          <View style={[styles.modalCard, { maxHeight: '80%' }]}>
+          <View style={[styles.modalCard, { maxHeight: '85%', flex: 1, flexShrink: 1 }]}>
             {detailSpell ? (() => {
               // Busca datos enriquecidos en el catálogo
               const cat = catalogSpells.find((s) => s.name.toLowerCase() === detailSpell.name.toLowerCase());
@@ -1897,8 +2483,13 @@ function SpellsTab({ system, data, setData }: any) {
                     {cat?.saving_throw ? <Text style={styles.detailMetaItem}>🛡 {cat.saving_throw}</Text> : null}
                     {cat?.classes?.length ? <Text style={styles.detailMetaItem}>{cat.classes.join(', ')}</Text> : null}
                   </View>
-                  <ScrollView style={{ marginTop: 8, maxHeight: 260 }}>
-                    <Text style={styles.detailDesc}>{cat?.description ?? detailSpell.notes ?? 'Sin descripción.'}</Text>
+                  <ScrollView style={{ marginTop: 8, flex: 1 }} contentContainerStyle={{ paddingBottom: 8 }}>
+                    <RenderHtml
+                      contentWidth={windowWidth - 64}
+                      source={{ html: descToHtml(cat?.description ?? detailSpell.notes ?? '') }}
+                      baseStyle={{ color: '#cbd5e1', fontSize: 13, lineHeight: 20 }}
+                      tagsStyles={{ p: { marginTop: 0, marginBottom: 8 }, em: { color: '#e2e8f0', fontStyle: 'italic' } }}
+                    />
                   </ScrollView>
                   <View style={{ flexDirection: 'row', gap: 8, marginTop: 12 }}>
                     <TouchableOpacity style={[styles.modalAction, { flex: 1 }]} onPress={() => setDetailSpell(null)}>
@@ -1925,6 +2516,7 @@ const FEAT_TYPE_CHIPS = ['General', 'Fighter', 'Metamagic', 'Epic', 'Item Creati
 
 // ─── Feats tab ────────────────────────────────────────────────
 function FeatsTab({ system, data, setData }: any) {
+  const { width: windowWidth } = useWindowDimensions();
   const items: FeatItem[] = Array.isArray(data.feats) ? data.feats : [];
   const targets = system.bonusTargets ?? [];
   const [featTypeFilter, setFeatTypeFilter] = useState<string | null>(null);
@@ -2058,7 +2650,7 @@ function FeatsTab({ system, data, setData }: any) {
       {/* ── Detalle de dote ─────────────────────────────────── */}
       <Modal visible={!!detailFeat} transparent animationType="slide" onRequestClose={() => setDetailFeat(null)}>
         <View style={styles.modalOverlay}>
-          <View style={[styles.modalCard, { maxHeight: '80%' }]}>
+          <View style={[styles.modalCard, { maxHeight: '85%', flex: 1, flexShrink: 1 }]}>
             {detailFeat ? (() => {
               const cat = catalogFeats.find((f) => f.name.toLowerCase() === detailFeat.name.toLowerCase());
               const prereq = cat?.prereq ?? cat?.prereqs ?? null;
@@ -2075,8 +2667,13 @@ function FeatsTab({ system, data, setData }: any) {
                       </Text>
                     ) : null}
                   </View>
-                  <ScrollView style={{ marginTop: 8, maxHeight: 260 }}>
-                    <Text style={styles.detailDesc}>{cat?.description ?? detailFeat.notes ?? 'Sin descripción.'}</Text>
+                  <ScrollView style={{ marginTop: 8, flex: 1 }} contentContainerStyle={{ paddingBottom: 8 }}>
+                    <RenderHtml
+                      contentWidth={windowWidth - 64}
+                      source={{ html: descToHtml(cat?.description ?? detailFeat.notes ?? '') }}
+                      baseStyle={{ color: '#cbd5e1', fontSize: 13, lineHeight: 20 }}
+                      tagsStyles={{ p: { marginTop: 0, marginBottom: 8 }, em: { color: '#e2e8f0', fontStyle: 'italic' } }}
+                    />
                   </ScrollView>
                   <View style={{ flexDirection: 'row', gap: 8, marginTop: 12 }}>
                     <TouchableOpacity style={[styles.modalAction, { flex: 1 }]} onPress={() => setDetailFeat(null)}>
@@ -2103,6 +2700,7 @@ function FeatsTab({ system, data, setData }: any) {
 // En 3.5 los rangos máximos son nivel+3 para habilidades de clase y
 // (nivel+3)/2 para transclase. El bono total = rangos + mod atributo + misc.
 function SkillsTab({ system, data, setData }: any) {
+  const { width: windowWidth } = useWindowDimensions();
   const items: SkillEntry[] = Array.isArray(data.skills) ? data.skills : [];
   const [pickerOpen, setPickerOpen] = useState(false);
   const [detailSkill, setDetailSkill] = useState<SkillEntry | null>(null);
@@ -2219,7 +2817,7 @@ function SkillsTab({ system, data, setData }: any) {
               </View>
             </View>
 
-            <View style={styles.slotRow}>
+            <View style={styles.slotFilterRow}>
               {(['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma'] as const).map((a) => (
                 <TouchableOpacity key={a}
                   style={[styles.slotChip, it.ability === a && styles.slotChipActive]}
@@ -2278,7 +2876,7 @@ function SkillsTab({ system, data, setData }: any) {
       {/* ── Detalle de habilidad ────────────────────────────── */}
       <Modal visible={!!detailSkill} transparent animationType="slide" onRequestClose={() => setDetailSkill(null)}>
         <View style={styles.modalOverlay}>
-          <View style={[styles.modalCard, { maxHeight: '80%' }]}>
+          <View style={[styles.modalCard, { maxHeight: '85%', flex: 1, flexShrink: 1 }]}>
             {detailSkill ? (() => {
               const cat = catalogSkills.find((s) => s.name.toLowerCase() === detailSkill.name.toLowerCase());
               const mod = abilMod(detailSkill.ability);
@@ -2298,10 +2896,13 @@ function SkillsTab({ system, data, setData }: any) {
                       Sinergia: {cat.synergy.join(', ')}
                     </Text>
                   ) : null}
-                  <ScrollView style={{ marginTop: 8, maxHeight: 260 }}>
-                    <Text style={styles.detailDesc}>
-                      {cat?.description ?? detailSkill.notes ?? 'Sin descripción en el catálogo.'}
-                    </Text>
+                  <ScrollView style={{ marginTop: 8, flex: 1 }} contentContainerStyle={{ paddingBottom: 8 }}>
+                    <RenderHtml
+                      contentWidth={windowWidth - 64}
+                      source={{ html: descToHtml(detailSkill.notes ?? '') }}
+                      baseStyle={{ color: '#cbd5e1', fontSize: 13, lineHeight: 20 }}
+                      tagsStyles={{ p: { marginTop: 0, marginBottom: 8 }, em: { color: '#e2e8f0', fontStyle: 'italic' } }}
+                    />
                   </ScrollView>
                   <View style={{ flexDirection: 'row', gap: 8, marginTop: 12 }}>
                     <TouchableOpacity style={[styles.modalAction, { flex: 1 }]} onPress={() => setDetailSkill(null)}>
@@ -2367,14 +2968,28 @@ function BonusEditorRow({
   const [open, setOpen] = useState(false);
   const [typeOpen, setTypeOpen] = useState(false);
   const [query, setQuery] = useState('');
-  const current = targets.find((t) => t.id === bonus.target);
+  // For attack_with:<weaponName> targets
+  const [weaponNameInput, setWeaponNameInput] = useState(
+    bonus.target.startsWith('attack_with:') ? bonus.target.slice('attack_with:'.length) : ''
+  );
+  const isWeaponSpecific = bonus.target === '__attack_with__' || bonus.target.startsWith('attack_with:');
+
+  // Build display targets: include the current attack_with: target as a readable entry
+  const displayTargets = useMemo(() => {
+    if (!bonus.target.startsWith('attack_with:') || targets.find((t) => t.id === bonus.target)) return targets;
+    const weaponName = bonus.target.slice('attack_with:'.length);
+    return [...targets, { id: bonus.target, label: `⚔ Ataque con: ${weaponName}` }];
+  }, [targets, bonus.target]);
+
+  const current = displayTargets.find((t) => t.id === bonus.target)
+    ?? (isWeaponSpecific ? { id: '__attack_with__', label: '⚔ Ataque con arma específica…' } : undefined);
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return targets;
-    return targets.filter((t) =>
+    if (!q) return displayTargets;
+    return displayTargets.filter((t) =>
       t.label.toLowerCase().includes(q) || t.id.toLowerCase().includes(q)
     );
-  }, [targets, query]);
+  }, [displayTargets, query]);
   const currentType = (bonus.type ?? 'untyped') as string;
   const currentTypeLabel = BONUS_TYPE_OPTIONS.find((o) => o.id === currentType)?.label ?? 'Sin tipo';
 
@@ -2390,6 +3005,25 @@ function BonusEditorRow({
           </Text>
           <Text style={styles.targetSelectChevron}>▾</Text>
         </TouchableOpacity>
+        {isWeaponSpecific ? (
+          <TextInput
+            style={[styles.fieldInput, { marginTop: 0, marginBottom: 0 }]}
+            value={weaponNameInput}
+            onChangeText={(t) => {
+              setWeaponNameInput(t);
+              if (t.trim()) {
+                // Normalizar para que sea inmune a tildes, mayúsculas y caracteres raros.
+                const slug = t.trim().toLowerCase()
+                  .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                  .replace(/[^a-z0-9]+/g, ' ').trim().replace(/\s+/g, ' ');
+                onChange({ target: `attack_with:${slug}` });
+              }
+            }}
+            placeholder="Nombre del arma (ej. Espada larga)"
+            placeholderTextColor="#475569"
+            autoCorrect={false}
+          />
+        ) : null}
         <TouchableOpacity
           style={styles.bonusTypeBtn}
           onPress={() => setTypeOpen(true)}
@@ -2433,7 +3067,15 @@ function BonusEditorRow({
                   <TouchableOpacity
                     key={t.id}
                     style={[styles.targetPickRow, active && styles.targetPickRowActive]}
-                    onPress={() => { onChange({ target: t.id }); setOpen(false); }}
+                    onPress={() => {
+                      if (t.id === '__attack_with__') {
+                        // Switch to weapon-specific mode; weapon name typed separately
+                        onChange({ target: weaponNameInput.trim() ? `attack_with:${weaponNameInput.trim()}` : '__attack_with__' });
+                      } else {
+                        onChange({ target: t.id });
+                      }
+                      setOpen(false);
+                    }}
                   >
                     <Text style={[styles.targetPickName, active && { color: '#fff', fontWeight: '700' }]}>
                       {t.label}
@@ -2649,6 +3291,20 @@ const styles = StyleSheet.create({
   saveBtn: { paddingHorizontal: 12, paddingVertical: 8 },
   saveText: { color: '#7c3aed', fontWeight: '700' },
 
+  sessionBanner: {
+    backgroundColor: 'rgba(124,58,237,0.18)',
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(167,139,250,0.25)',
+    paddingVertical: 7,
+    paddingHorizontal: 14,
+  },
+  sessionBannerText: {
+    color: '#c4b5fd',
+    fontSize: 11,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+
   tabs: {
     flexDirection: 'row', paddingHorizontal: 8, paddingTop: 8, paddingBottom: 4,
     borderBottomWidth: 1, borderBottomColor: 'rgba(167,139,250,0.1)', flexWrap: 'wrap', gap: 4,
@@ -2715,6 +3371,54 @@ const styles = StyleSheet.create({
   },
   slotMaxBtnText: { color: '#a78bfa', fontSize: 14, fontWeight: '700', lineHeight: 16 },
   slotMaxVal: { color: '#e2d9ff', fontSize: 12, fontWeight: '700', minWidth: 18, textAlign: 'center' },
+  // ── Chips del panel calculado
+  slotCalcChip: {
+    alignItems: 'center', backgroundColor: 'rgba(124,58,237,0.18)', borderRadius: 8,
+    borderWidth: 1, borderColor: 'rgba(167,139,250,0.25)',
+    paddingHorizontal: 7, paddingVertical: 3, marginRight: 5, marginBottom: 4,
+  },
+  slotCalcLevel: { color: '#94a3b8', fontSize: 9, fontWeight: '700', letterSpacing: 0.5 },
+  slotCalcTotal: { color: '#c4b5fd', fontSize: 15, fontWeight: '800', lineHeight: 18 },
+  slotCalcDetail: { color: '#64748b', fontSize: 8 },
+  // ── Barra de preparados
+  prepBarBg: {
+    flex: 1, height: 8, borderRadius: 4, overflow: 'hidden',
+    backgroundColor: 'rgba(255,255,255,0.06)', flexDirection: 'row', marginHorizontal: 8,
+  },
+  prepBarFill: { borderRadius: 4 },
+  prepCount: { fontSize: 11, fontWeight: '700', minWidth: 28, textAlign: 'right' },
+  // ── Botón lanzar (toggle used en conjuro preparado)
+  castBtn: {
+    width: 24, height: 24, borderRadius: 6, alignItems: 'center', justifyContent: 'center',
+    backgroundColor: 'rgba(251,191,36,0.12)', borderWidth: 1, borderColor: 'rgba(251,191,36,0.35)',
+    marginLeft: 2,
+  },
+  castBtnUsed: { backgroundColor: 'rgba(255,255,255,0.05)', borderColor: 'rgba(255,255,255,0.1)' },
+  castBtnText: { color: '#fbbf24', fontSize: 13, fontWeight: '700', lineHeight: 16 },
+  // ── Tabs de nivel de conjuro
+  spellLevelTabBar: { flexDirection: 'row', marginVertical: 8, marginHorizontal: -4 },
+  spellLevelTab: {
+    alignItems: 'center', paddingHorizontal: 10, paddingVertical: 7, marginHorizontal: 3,
+    borderRadius: 10, borderWidth: 1, borderColor: 'rgba(167,139,250,0.15)',
+    backgroundColor: 'rgba(255,255,255,0.04)', minWidth: 54,
+  },
+  spellLevelTabActive: {
+    backgroundColor: 'rgba(124,58,237,0.28)', borderColor: '#7c3aed',
+  },
+  spellLevelTabLabel: { color: '#94a3b8', fontSize: 11, fontWeight: '600' },
+  spellLevelTabLabelActive: { color: '#e2d9ff' },
+  spellLevelBadge: {
+    marginTop: 2, minWidth: 18, height: 16, borderRadius: 8,
+    backgroundColor: 'rgba(167,139,250,0.15)', alignItems: 'center', justifyContent: 'center',
+    paddingHorizontal: 4,
+  },
+  spellLevelBadgeActive: { backgroundColor: 'rgba(167,139,250,0.35)' },
+  spellLevelBadgeText: { color: '#c4b5fd', fontSize: 9, fontWeight: '700' },
+  spellLevelSlotRow: {
+    flexDirection: 'row', alignItems: 'center', gap: 6,
+    paddingVertical: 5, borderTopWidth: 1, borderTopColor: 'rgba(167,139,250,0.1)',
+    marginBottom: 6,
+  },
   help: { color: '#64748b', fontSize: 11, marginTop: 4, marginBottom: 4 },
   muted: { color: '#64748b', fontSize: 12, marginVertical: 8 },
   statsCard: {
@@ -2786,6 +3490,24 @@ const styles = StyleSheet.create({
     minWidth: 20, textAlign: 'center',
     paddingHorizontal: 6, borderRadius: 999,
   },
+
+  // Rasgos raciales
+  racialTraitsBox: {
+    marginTop: 10,
+    padding: 8,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(167,139,250,0.15)',
+  },
+  racialBonusRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 5, marginBottom: 4 },
+  racialBonusChip: {
+    backgroundColor: 'rgba(124,58,237,0.2)',
+    borderRadius: 999,
+    paddingHorizontal: 8, paddingVertical: 3,
+  },
+  racialBonusText: { color: '#c4b5fd', fontSize: 11, fontWeight: '700' },
+  racialTraitsList: { color: '#64748b', fontSize: 11, lineHeight: 16 },
 
   // XP tracker
   xpRow: {
@@ -2886,7 +3608,7 @@ const styles = StyleSheet.create({
   coinBtnText: { color: '#f87171', fontWeight: '700', fontSize: 12 },
 
   // Detalle conjuro/dote
-  detailMeta: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 6 },
+  detailMeta: { flexDirection: 'column', gap: 6, marginTop: 6 },
   detailMetaItem: {
     color: '#a78bfa', fontSize: 11, paddingHorizontal: 8, paddingVertical: 3,
     backgroundColor: 'rgba(124,58,237,0.15)', borderRadius: 999,
@@ -2973,6 +3695,8 @@ const styles = StyleSheet.create({
     width: 28, height: 1, backgroundColor: 'rgba(167,139,250,0.3)', marginVertical: 6,
   },
   abilScore: { color: '#cbd5e1', fontSize: 13, fontWeight: '600' },
+  abilScoreRow: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'center', gap: 2 },
+  abilRacialBadge: { fontSize: 9, fontWeight: '700', lineHeight: 14 },
 
   // Salvaciones / Ataques en dos columnas
   twoColRow: { flexDirection: 'row', gap: 10, marginTop: 4 },
@@ -3037,7 +3761,7 @@ const styles = StyleSheet.create({
   },
   equipToggle: { alignItems: 'center' },
   equipToggleLabel: { color: '#94a3b8', fontSize: 10, marginBottom: 2 },
-  slotRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginVertical: 6 },
+  slotFilterRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginVertical: 6 },
   slotChip: {
     paddingHorizontal: 8, paddingVertical: 4, borderRadius: 999,
     backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1, borderColor: 'rgba(167,139,250,0.15)',
@@ -3086,6 +3810,31 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: 'rgba(167,139,250,0.2)', borderRadius: 8, paddingVertical: 4,
   },
   addBonusBtn: { marginTop: 6, paddingVertical: 6, alignItems: 'center' },
+
+  // Weapon quick-edit panel
+  weaponStatBox: {
+    marginTop: 10, marginBottom: 4,
+    backgroundColor: 'rgba(124,58,237,0.08)',
+    borderRadius: 10, borderWidth: 1, borderColor: 'rgba(124,58,237,0.2)',
+    padding: 10,
+  },
+  weaponStatRow: { flexDirection: 'row', gap: 12 },
+  weaponStatCell: { flex: 1, alignItems: 'center', gap: 4 },
+  weaponStatHint: { color: '#475569', fontSize: 10, textAlign: 'center', marginTop: 2 },
+  weaponStatStepper: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  stepBtn: {
+    width: 30, height: 30, borderRadius: 15,
+    backgroundColor: 'rgba(124,58,237,0.25)',
+    justifyContent: 'center', alignItems: 'center',
+  },
+  stepBtnText: { color: '#c4b5fd', fontSize: 18, lineHeight: 20, fontWeight: '700' },
+  stepValue: { color: '#fff', fontSize: 18, fontWeight: '900', minWidth: 36, textAlign: 'center' },
+  rangedToggle: {
+    marginTop: 8, paddingVertical: 4, paddingHorizontal: 8,
+    backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 8,
+    alignSelf: 'flex-start',
+  },
+  rangedToggleText: { color: '#94a3b8', fontSize: 11 },
   addBonusText: { color: '#a78bfa', fontSize: 12, fontWeight: '600' },
 
   // Skills
@@ -3169,7 +3918,7 @@ const styles = StyleSheet.create({
 
   // Modal (class picker)
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'flex-end' },
-  modalCard: { backgroundColor: '#1e1b4b', borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 20, paddingBottom: 30 },
+  modalCard: { backgroundColor: '#1e1b4b', borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 20, paddingBottom: 30, maxHeight: '85%' },
   modalTitle: { color: '#e2e8f0', fontSize: 16, fontWeight: '700', marginBottom: 12 },
   modalAction: { marginTop: 10, alignItems: 'center', paddingVertical: 12, backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 10 },
   charPickRow: { paddingVertical: 12, paddingHorizontal: 12, borderRadius: 10, backgroundColor: 'rgba(255,255,255,0.05)', marginBottom: 6 },

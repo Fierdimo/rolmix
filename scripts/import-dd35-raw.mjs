@@ -249,7 +249,7 @@ async function importSpells() {
       ...(s.duration           ? { duration: s.duration }             : {}),
       ...(s.saving_throw       ? { saving_throw: s.saving_throw }     : {}),
       ...(s.spell_resistance   ? { spell_resistance: s.spell_resistance } : {}),
-      ...(s.short_description  ? { description: stripHtml(s.short_description) } : {}),
+      ...(s.description        ? { description: stripHtml(s.description) }        : {}),
     };
     catalog.push(entry);
   }

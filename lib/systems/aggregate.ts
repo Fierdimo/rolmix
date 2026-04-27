@@ -99,14 +99,19 @@ export function aggregateClassGrants(
   return out;
 }
 
-/** Devuelve los bonos del equipo equipado agrupados por target (sin resolver apilamiento). */
+/** Devuelve los bonos del equipo equipado agrupados por target (sin resolver apilamiento).
+ *  Los ítems en slot 'weapon*' NO aportan bonos a attack_melee / attack_ranged en el pool
+ *  general, porque el bono de mejora de un arma sólo aplica a los ataques con esa arma. */
 export function aggregateEquipmentBonusList(data: CharacterData): Record<string, BonusEffect[]> {
   const out: Record<string, BonusEffect[]> = {};
   const items: EquipmentItem[] = Array.isArray(data.equipment) ? data.equipment : [];
   for (const it of items) {
     if (!it.equipped) continue;
+    const isWeaponSlot = typeof it.slot === 'string' && it.slot.startsWith('weapon');
     for (const b of it.bonuses ?? []) {
       if (!b.target || typeof b.value !== 'number') continue;
+      // Los bonos de ataque y daño de las armas no son generales
+      if (isWeaponSlot && (b.target === 'attack_melee' || b.target === 'attack_ranged' || b.target === 'damage')) continue;
       (out[b.target] ??= []).push(b);
     }
   }

@@ -1,11 +1,52 @@
-import { SystemDefinition, abilityModifier, num, FieldDef, ClassDef, BonusEffect } from './types';
+import { SystemDefinition, abilityModifier, num, FieldDef, ClassDef, BonusEffect, SpellSlotResult, CharacterData, ClassEntry } from './types';
 import { resolveBonusStack } from './aggregate';
+import _dnd35Races from '../../data/dnd35/races.json';
 
 const ABILITIES = ['str', 'dex', 'con', 'int', 'wis', 'cha'] as const;
 const ABILITY_LABEL: Record<(typeof ABILITIES)[number], string> = {
   str: 'Fuerza', dex: 'Destreza', con: 'Constitución',
   int: 'Inteligencia', wis: 'Sabiduría', cha: 'Carisma',
 };
+
+// ── Bonos raciales ────────────────────────────────────────────
+const ABILITY_NAME_TO_KEY: Record<string, (typeof ABILITIES)[number]> = {
+  strength: 'str', dexterity: 'dex', constitution: 'con',
+  intelligence: 'int', wisdom: 'wis', charisma: 'cha',
+};
+
+interface RaceBonus {
+  abilityMods: Partial<Record<(typeof ABILITIES)[number], number>>;
+  /** sk_* target id → racial bonus value */
+  skillBonuses: Record<string, number>;
+}
+
+function slugifySkill(name: string): string {
+  return 'sk_' + name.toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '');
+}
+
+function getRaceBonus(raceName: string): RaceBonus {
+  const empty: RaceBonus = { abilityMods: {}, skillBonuses: {} };
+  if (!raceName) return empty;
+  const normalized = raceName.trim().toLowerCase();
+  const race = (_dnd35Races as Array<Record<string, unknown>>).find(
+    (r) => (r.name as string)?.toLowerCase() === normalized ||
+            (r.id as string)?.toLowerCase() === normalized
+  );
+  if (!race) return empty;
+  const abilityMods: Partial<Record<(typeof ABILITIES)[number], number>> = {};
+  for (const [eng, val] of Object.entries(race.abilityMods ?? {})) {
+    const key = ABILITY_NAME_TO_KEY[eng.toLowerCase()];
+    if (key) abilityMods[key] = val as number;
+  }
+  const skillBonuses: Record<string, number> = {};
+  for (const [skillName, val] of Object.entries(race.skillBonuses ?? {})) {
+    skillBonuses[slugifySkill(skillName)] = val as number;
+  }
+  return { abilityMods, skillBonuses };
+}
 
 const fields: FieldDef[] = [
   { key: 'race', label: 'Raza', type: 'text', group: 'Identidad' },
@@ -136,11 +177,237 @@ const CLASSES_35: ClassDef[] = [
   }),
   makeClass('wizard', 'Mago', babHalf, { fort: 'poor', ref: 'poor', will: 'good' }, () => ['Lanzamiento de conjuros (Int)', 'Familiar']),
   makeClass('cleric', 'Clérigo', babThreeQuarters, { fort: 'good', ref: 'poor', will: 'good' }, () => ['Lanzamiento de conjuros (Sab)', 'Expulsar/dominar muertos vivientes']),
+  makeClass('druid', 'Druida', babThreeQuarters, { fort: 'good', ref: 'poor', will: 'good' }, () => ['Lanzamiento de conjuros (Sab)', 'Compañero animal']),
+  makeClass('sorcerer', 'Hechicero', babHalf, { fort: 'poor', ref: 'poor', will: 'good' }, (lvl) => {
+    const known = 4 + Math.floor(lvl * 1.5);
+    return [`Conjuros conocidos aprox.: ${known}`, 'Lanzamiento espontáneo (Car)'];
+  }),
+  makeClass('bard', 'Bardo', babThreeQuarters, { fort: 'poor', ref: 'good', will: 'good' }, () => ['Lanzamiento espontáneo (Car)', 'Música de bardo']),
+  makeClass('paladin', 'Paladín', babFull, { fort: 'good', ref: 'poor', will: 'poor' }, (lvl) => {
+    const out = ['Detectar el mal', 'Imposición de manos'];
+    if (lvl >= 4) out.push('Lanzamiento de conjuros (Sab)');
+    return out;
+  }),
+  makeClass('ranger', 'Explorador', babFull, { fort: 'good', ref: 'good', will: 'poor' }, (lvl) => {
+    const out = ['Estilo de combate', 'Enemigo favorito'];
+    if (lvl >= 4) out.push('Lanzamiento de conjuros (Sab)');
+    return out;
+  }),
   makeClass('barbarian', 'Bárbaro', babFull, { fort: 'good', ref: 'poor', will: 'poor' }, (lvl) => {
     const rages = 1 + Math.floor(lvl / 4);
     return [`Furia ${rages}/día`, 'Movimiento rápido'];
   }),
+  makeClass('monk', 'Monje', babThreeQuarters, { fort: 'good', ref: 'good', will: 'good' }, () => ['Golpe desarmado', 'Movimiento mejorado']),
 ];
+
+// ─── Tablas de conjuros por día (D&D 3.5 PHB) ────────────────────────────────
+// Índice: [nivelDeClase-1][nivelDeConjuro]
+// -1 = sin acceso todavía  |  0 = tiene acceso pero 0 usos base
+//
+// Lanzador completo: Mago, Clérigo, Druida  (niveles 0-9 en columnas 0-9)
+const FULL_CASTER_TABLE: number[][] = [
+  [ 3, 1,-1,-1,-1,-1,-1,-1,-1,-1], // nivel 1
+  [ 4, 2,-1,-1,-1,-1,-1,-1,-1,-1], // nivel 2
+  [ 4, 2, 1,-1,-1,-1,-1,-1,-1,-1], // nivel 3
+  [ 4, 3, 2,-1,-1,-1,-1,-1,-1,-1], // nivel 4
+  [ 4, 3, 2, 1,-1,-1,-1,-1,-1,-1], // nivel 5
+  [ 4, 3, 3, 2,-1,-1,-1,-1,-1,-1], // nivel 6
+  [ 4, 4, 3, 2, 1,-1,-1,-1,-1,-1], // nivel 7
+  [ 4, 4, 3, 3, 2,-1,-1,-1,-1,-1], // nivel 8
+  [ 4, 4, 4, 3, 2, 1,-1,-1,-1,-1], // nivel 9
+  [ 4, 4, 4, 3, 3, 2,-1,-1,-1,-1], // nivel 10
+  [ 4, 4, 4, 4, 3, 2, 1,-1,-1,-1], // nivel 11
+  [ 4, 4, 4, 4, 3, 3, 2,-1,-1,-1], // nivel 12
+  [ 4, 4, 4, 4, 4, 3, 2, 1,-1,-1], // nivel 13
+  [ 4, 4, 4, 4, 4, 3, 3, 2,-1,-1], // nivel 14
+  [ 4, 4, 4, 4, 4, 4, 3, 2, 1,-1], // nivel 15
+  [ 4, 4, 4, 4, 4, 4, 3, 3, 2,-1], // nivel 16
+  [ 4, 4, 4, 4, 4, 4, 4, 3, 2, 1], // nivel 17
+  [ 4, 4, 4, 4, 4, 4, 4, 3, 3, 2], // nivel 18
+  [ 4, 4, 4, 4, 4, 4, 4, 4, 3, 3], // nivel 19
+  [ 4, 4, 4, 4, 4, 4, 4, 4, 4, 4], // nivel 20
+];
+
+// Hechicero (conjuros espontáneos, niveles 0-9, más usos/día que el Mago)
+const SORCERER_TABLE: number[][] = [
+  [ 5, 3,-1,-1,-1,-1,-1,-1,-1,-1], // nivel 1
+  [ 6, 4,-1,-1,-1,-1,-1,-1,-1,-1], // nivel 2
+  [ 6, 5,-1,-1,-1,-1,-1,-1,-1,-1], // nivel 3
+  [ 6, 6, 3,-1,-1,-1,-1,-1,-1,-1], // nivel 4
+  [ 6, 6, 4,-1,-1,-1,-1,-1,-1,-1], // nivel 5
+  [ 6, 6, 5, 3,-1,-1,-1,-1,-1,-1], // nivel 6
+  [ 6, 6, 6, 4,-1,-1,-1,-1,-1,-1], // nivel 7
+  [ 6, 6, 6, 5, 3,-1,-1,-1,-1,-1], // nivel 8
+  [ 6, 6, 6, 6, 4,-1,-1,-1,-1,-1], // nivel 9
+  [ 6, 6, 6, 6, 5, 3,-1,-1,-1,-1], // nivel 10
+  [ 6, 6, 6, 6, 6, 4,-1,-1,-1,-1], // nivel 11
+  [ 6, 6, 6, 6, 6, 5, 3,-1,-1,-1], // nivel 12
+  [ 6, 6, 6, 6, 6, 6, 4,-1,-1,-1], // nivel 13
+  [ 6, 6, 6, 6, 6, 6, 5, 3,-1,-1], // nivel 14
+  [ 6, 6, 6, 6, 6, 6, 6, 4,-1,-1], // nivel 15
+  [ 6, 6, 6, 6, 6, 6, 6, 5, 3,-1], // nivel 16
+  [ 6, 6, 6, 6, 6, 6, 6, 6, 4,-1], // nivel 17
+  [ 6, 6, 6, 6, 6, 6, 6, 6, 5, 3], // nivel 18
+  [ 6, 6, 6, 6, 6, 6, 6, 6, 6, 4], // nivel 19
+  [ 6, 6, 6, 6, 6, 6, 6, 6, 6, 6], // nivel 20
+];
+
+// Bardo (espontáneo, sólo niveles 0-6, columnas 0-6)
+const BARD_TABLE: number[][] = [
+  [ 2,-1,-1,-1,-1,-1,-1], // nivel 1
+  [ 3, 0,-1,-1,-1,-1,-1], // nivel 2  (tiene acceso al 1er nivel pero 0 usos)
+  [ 3, 1,-1,-1,-1,-1,-1], // nivel 3
+  [ 3, 2, 0,-1,-1,-1,-1], // nivel 4
+  [ 3, 3, 1,-1,-1,-1,-1], // nivel 5
+  [ 3, 3, 2,-1,-1,-1,-1], // nivel 6
+  [ 3, 3, 2, 0,-1,-1,-1], // nivel 7
+  [ 3, 3, 3, 1,-1,-1,-1], // nivel 8
+  [ 3, 3, 3, 2,-1,-1,-1], // nivel 9
+  [ 3, 3, 3, 2, 0,-1,-1], // nivel 10
+  [ 3, 3, 3, 3, 1,-1,-1], // nivel 11
+  [ 3, 3, 3, 3, 2,-1,-1], // nivel 12
+  [ 3, 3, 3, 3, 2, 0,-1], // nivel 13
+  [ 3, 3, 3, 3, 3, 1,-1], // nivel 14
+  [ 3, 3, 3, 3, 3, 2,-1], // nivel 15
+  [ 3, 3, 3, 3, 3, 2, 0], // nivel 16
+  [ 3, 3, 3, 3, 3, 3, 1], // nivel 17
+  [ 3, 3, 3, 3, 3, 3, 2], // nivel 18
+  [ 3, 3, 3, 3, 3, 3, 3], // nivel 19
+  [ 3, 3, 3, 3, 3, 3, 3], // nivel 20
+];
+
+// Paladín / Explorador (semi-lanzador, sólo niveles 1-4, columnas 0-3)
+// Sin oraciones: la columna 0 representa el nivel de conjuro 1.
+const HALF_CASTER_TABLE: number[][] = [
+  [-1,-1,-1,-1], // nivel 1
+  [-1,-1,-1,-1], // nivel 2
+  [-1,-1,-1,-1], // nivel 3
+  [ 0,-1,-1,-1], // nivel 4  (acceso al nivel 1 pero 0 usos)
+  [ 0,-1,-1,-1], // nivel 5
+  [ 1,-1,-1,-1], // nivel 6
+  [ 1,-1,-1,-1], // nivel 7
+  [ 1, 0,-1,-1], // nivel 8
+  [ 1, 0,-1,-1], // nivel 9
+  [ 1, 1,-1,-1], // nivel 10
+  [ 1, 1, 0,-1], // nivel 11
+  [ 1, 1, 1,-1], // nivel 12
+  [ 1, 1, 1, 0], // nivel 13
+  [ 2, 1, 1, 1], // nivel 14
+  [ 2, 1, 1, 1], // nivel 15
+  [ 2, 2, 1, 1], // nivel 16
+  [ 2, 2, 2, 1], // nivel 17
+  [ 3, 2, 2, 1], // nivel 18
+  [ 3, 3, 3, 2], // nivel 19
+  [ 3, 3, 3, 3], // nivel 20
+];
+
+type CasterInfo = {
+  table: number[][];
+  ability: 'int' | 'wis' | 'cha';
+  /** A qué nivel de conjuro corresponde la columna 0 de la tabla */
+  spellLevelOffset: number;
+  /** Prepared = memorizan conjuros; spontaneous = lanzan libremente de los conocidos */
+  castingType: 'prepared' | 'spontaneous';
+  /** El clérigo obtiene +1 espacio de dominio por nivel de conjuro accesible */
+  hasDomain?: boolean;
+  /** El mago especialista obtiene +1 espacio por nivel de conjuro accesible */
+  hasSpecialty?: boolean;
+};
+
+const CASTER_MAP: Record<string, CasterInfo> = {
+  wizard:   { table: FULL_CASTER_TABLE, ability: 'int', spellLevelOffset: 0, castingType: 'prepared',    hasSpecialty: true },
+  cleric:   { table: FULL_CASTER_TABLE, ability: 'wis', spellLevelOffset: 0, castingType: 'prepared',    hasDomain: true },
+  druid:    { table: FULL_CASTER_TABLE, ability: 'wis', spellLevelOffset: 0, castingType: 'prepared' },
+  sorcerer: { table: SORCERER_TABLE,    ability: 'cha', spellLevelOffset: 0, castingType: 'spontaneous' },
+  bard:     { table: BARD_TABLE,        ability: 'cha', spellLevelOffset: 0, castingType: 'spontaneous' },
+  paladin:  { table: HALF_CASTER_TABLE, ability: 'wis', spellLevelOffset: 1, castingType: 'prepared' },
+  ranger:   { table: HALF_CASTER_TABLE, ability: 'wis', spellLevelOffset: 1, castingType: 'prepared' },
+};
+
+/**
+ * Bonus de conjuros de atributo alto (PHB 3.5, Tabla 1-1).
+ * Modificador N → +1 espacio a cada nivel de conjuro de 1 a N (máx 9).
+ * Para modificadores >= 10 el primer nivel obtiene +2, etc.
+ */
+function bonusSpellsFromMod(mod: number): Record<number, number> {
+  if (mod <= 0) return {};
+  const out: Record<number, number> = {};
+  for (let sl = 1; sl <= 9; sl++) {
+    if (sl > mod) break;
+    out[sl] = Math.floor((mod - sl) / 9) + 1;
+  }
+  return out;
+}
+
+function computeSpellSlots35(data: CharacterData): SpellSlotResult | null {
+  const classes = Array.isArray(data.classes) ? (data.classes as ClassEntry[]) : [];
+  const hasCaster = classes.some((c) => !!CASTER_MAP[c.classId]);
+  if (!hasCaster) return null;
+
+  // Especialización de Mago: el usuario puede activarla en data.wizardSpecialty
+  const wizardSpecialty = !!(data as Record<string, unknown>).wizardSpecialty;
+
+  const breakdown: SpellSlotResult['breakdown'] = [];
+  const totals: Record<number, number> = {};
+
+  function addTo(rec: Record<number, number>, sl: number, v: number) {
+    if (v > 0) rec[sl] = (rec[sl] ?? 0) + v;
+  }
+
+  for (const entry of classes) {
+    const info = CASTER_MAP[entry.classId];
+    if (!info) continue;
+
+    const lvl = Math.max(1, Math.min(20, entry.level));
+    const row = info.table[lvl - 1];
+    const abilityScore = num(data, info.ability, 10);
+    const mod = abilityModifier(abilityScore);
+    const bonusFromMod = bonusSpellsFromMod(mod);
+
+    const base: Record<number, number> = {};
+    const bonus: Record<number, number> = {};
+    const extra: Record<number, number> = {};
+
+    for (let col = 0; col < row.length; col++) {
+      const slots = row[col];
+      if (slots < 0) continue; // sin acceso aún
+      const sl = col + info.spellLevelOffset; // nivel de conjuro real
+
+      // Usos base
+      if (slots > 0) addTo(base, sl, slots);
+
+      // Bonus por atributo (sólo para niveles 1+)
+      if (sl >= 1 && bonusFromMod[sl]) addTo(bonus, sl, bonusFromMod[sl]);
+
+      // Espacio extra: dominio de clérigo (siempre 1 por nivel accesible ≥1)
+      if (info.hasDomain && sl >= 1) addTo(extra, sl, 1);
+
+      // Espacio extra: especialización de mago (si activado, 1 por nivel ≥1)
+      if (info.hasSpecialty && wizardSpecialty && sl >= 1) addTo(extra, sl, 1);
+    }
+
+    // Acumular en totals
+    const allLevels = new Set([
+      ...Object.keys(base), ...Object.keys(bonus), ...Object.keys(extra),
+    ].map(Number));
+    for (const sl of allLevels) {
+      const t = (base[sl] ?? 0) + (bonus[sl] ?? 0) + (extra[sl] ?? 0);
+      addTo(totals, sl, t);
+    }
+
+    breakdown.push({
+      className: entry.classId,
+      castingType: info.castingType,
+      abilityLabel: info.ability.toUpperCase(),
+      mod,
+      base,
+      bonus,
+      extra,
+    });
+  }
+
+  return { totals, breakdown };
+}
 
 const dnd35: SystemDefinition = {
   id: 'dnd35',
@@ -149,6 +416,7 @@ const dnd35: SystemDefinition = {
   fields,
   classes: CLASSES_35,
   hasSpells: true,
+  computeSpellSlots: computeSpellSlots35,
   equipmentSlots: [
     { id: 'weapon_main', label: 'Arma principal' },
     { id: 'weapon_off', label: 'Arma secundaria' },
@@ -173,6 +441,8 @@ const dnd35: SystemDefinition = {
     ...ABILITIES.map((a) => ({ id: `mod_${a}`, label: `Mod. ${ABILITY_LABEL[a]}` })),
     { id: 'attack_melee', label: 'Ataque cuerpo a cuerpo' },
     { id: 'attack_ranged', label: 'Ataque a distancia' },
+    { id: 'damage', label: 'Daño (arma)' },
+    { id: '__attack_with__', label: '⚔ Ataque con arma específica…' },
     { id: 'initiative', label: 'Iniciativa' },
     ...Object.keys(SKILL_LABEL).map((k) => ({ id: k, label: SKILL_LABEL[k] })),
     // Bonus targets para todas las habilidades del PHB (las dotes/objetos pueden apuntar a sk_balance, sk_escape_artist, etc.).
@@ -181,8 +451,12 @@ const dnd35: SystemDefinition = {
       .map((s) => ({ id: s.id, label: s.label })),
   ],
   computeStats(data) {
+    const raceBonus = getRaceBonus(String(data.race ?? ''));
     const out: Record<string, number> = {};
-    for (const a of ABILITIES) out[`mod_${a}`] = abilityModifier(num(data, a, 10));
+    for (const a of ABILITIES) {
+      const racialMod = raceBonus.abilityMods[a] ?? 0;
+      out[`mod_${a}`] = abilityModifier(num(data, a, 10) + racialMod);
+    }
     out.bab = 0;          // las clases lo suben vía aggregate
     out.fort = out.mod_con ?? 0;
     out.ref = out.mod_dex ?? 0;
@@ -192,8 +466,13 @@ const dnd35: SystemDefinition = {
     return out;
   },
   actions(data) {
+    const raceBonus = getRaceBonus(String(data.race ?? ''));
     const stats: Record<string, number> = {};
-    for (const a of ABILITIES) stats[`mod_${a}`] = abilityModifier(num(data, a, 10));
+    for (const a of ABILITIES) {
+      const racialMod = raceBonus.abilityMods[a] ?? 0;
+      stats[`mod_${a}`] = abilityModifier(num(data, a, 10) + racialMod);
+    }
+    const raceSkill = raceBonus.skillBonuses;
     const acts = [];
     for (const a of ABILITIES) {
       acts.push({ id: `check_${a}`, label: `Chequeo de ${ABILITY_LABEL[a]}`, group: 'Atributos', die: 'd20', modifier: stats[`mod_${a}`] ?? 0 });
@@ -213,7 +492,8 @@ const dnd35: SystemDefinition = {
     for (const skKey of Object.keys(SKILL_TO_ABILITY)) {
       const ability = SKILL_TO_ABILITY[skKey];
       const ranks = num(data, skKey, 0);
-      acts.push({ id: skKey, label: SKILL_LABEL[skKey], group: 'Habilidades', die: 'd20', modifier: ranks + (stats[`mod_${ability}`] ?? 0) });
+      const racialSkMod = raceSkill[skKey] ?? 0;
+      acts.push({ id: skKey, label: SKILL_LABEL[skKey], group: 'Habilidades', die: 'd20', modifier: ranks + (stats[`mod_${ability}`] ?? 0) + racialSkMod });
     }
 
     // Habilidades adicionales (incluye transclase) introducidas por el usuario
@@ -269,12 +549,13 @@ const dnd35: SystemDefinition = {
       const misc = Number(sk.miscMod) || 0;
       const targetId = `sk_${slugify(sk.name)}`;
       const extra = skillTargetBonus[targetId] ?? 0;
+      const racialSkMod = raceSkill[targetId] ?? 0;
       acts.push({
         id: `skill_${sk.id}`,
         label: sk.name,
         group: 'Habilidades',
         die: 'd20',
-        modifier: ranks + abilMod + misc + extra,
+        modifier: ranks + abilMod + misc + extra + racialSkMod,
       });
     }
     return acts;

@@ -100,7 +100,11 @@ export default function ChatScreen({ navigation, route }: Props) {
 
       const { data: accepted } = await supabase
         .from('session_members')
-        .select('*, profiles:profiles!session_members_user_id_fkey(username, avatar_color)')
+        .select(`
+          *,
+          profiles:profiles!session_members_user_id_fkey(username, avatar_color),
+          active_character:characters(id, name, system_id)
+        `)
         .eq('session_id', sessionId)
         .eq('status', 'accepted')
         .neq('user_id', user.id);
@@ -266,11 +270,21 @@ export default function ChatScreen({ navigation, route }: Props) {
   // ── Personajes ───────────────────────────────────────────
   async function pickActiveCharacter(characterId: string | null) {
     setPickerVisible(false);
-    const { error } = await supabase.rpc('set_active_character', {
-      p_session_id: sessionId,
-      p_character_id: characterId,
-    });
-    if (error) { Alert.alert('Error', error.message); return; }
+    if (characterId) {
+      // Activa el personaje Y crea (o reutiliza) la copia de sesión.
+      const { error } = await supabase.rpc('activate_character_in_session', {
+        p_session_id: sessionId,
+        p_character_id: characterId,
+      });
+      if (error) { Alert.alert('Error', error.message); return; }
+    } else {
+      // Limpiar personaje activo sin borrar la copia de sesión.
+      const { error } = await supabase.rpc('set_active_character', {
+        p_session_id: sessionId,
+        p_character_id: null,
+      });
+      if (error) { Alert.alert('Error', error.message); return; }
+    }
     fetchMembership();
   }
 
@@ -345,9 +359,21 @@ export default function ChatScreen({ navigation, route }: Props) {
             <Text style={styles.charBarBtnText}>{activeCharacter ? 'Cambiar' : 'Elegir'}</Text>
           </TouchableOpacity>
           {activeCharacter ? (
-            <TouchableOpacity style={[styles.charBarBtn, { backgroundColor: '#7c3aed' }]} onPress={() => setRollPanelVisible(true)}>
-              <Text style={[styles.charBarBtnText, { color: '#fff' }]}>Tirar</Text>
-            </TouchableOpacity>
+            <>
+              <TouchableOpacity style={[styles.charBarBtn, { backgroundColor: '#7c3aed' }]} onPress={() => setRollPanelVisible(true)}>
+                <Text style={[styles.charBarBtnText, { color: '#fff' }]}>Tirar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.charBarBtn, { backgroundColor: 'rgba(124,58,237,0.3)' }]}
+                onPress={() => navigation.navigate('CharacterEditor', {
+                  characterId: activeCharacter.id,
+                  sessionId,
+                  sessionName,
+                })}
+              >
+                <Text style={[styles.charBarBtnText, { color: '#c4b5fd' }]}>Ficha</Text>
+              </TouchableOpacity>
+            </>
           ) : null}
         </View>
       ) : null}
@@ -415,15 +441,40 @@ export default function ChatScreen({ navigation, route }: Props) {
 
             {acceptedMembers.length > 0 ? (
               <>
-                <Text style={[styles.dmTitle, { marginTop: 12 }]}>Tirada dirigida</Text>
-                <Text style={styles.dmEmpty}>Selecciona un jugador para tirar usando su personaje activo.</Text>
-                <View style={styles.directedRow}>
-                  {acceptedMembers.map((m) => (
-                    <TouchableOpacity key={m.id} style={styles.directedChip} onPress={() => openDirectedRollFor(m)}>
-                      <Text style={styles.directedChipText}>{m.profiles?.username ?? '???'}</Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
+                <Text style={[styles.dmTitle, { marginTop: 12 }]}>Jugadores en partida</Text>
+                {acceptedMembers.map((m) => (
+                  <View key={m.id} style={styles.memberRow}>
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.memberName}>{m.profiles?.username ?? 'Usuario'}</Text>
+                      {m.active_character ? (
+                        <Text style={styles.memberMeta}>
+                          {m.active_character.name} · {getSystem(m.active_character.system_id)?.name ?? m.active_character.system_id}
+                        </Text>
+                      ) : (
+                        <Text style={styles.memberMeta}>Sin personaje activo</Text>
+                      )}
+                    </View>
+                    <View style={styles.memberActions}>
+                      {m.active_character_id ? (
+                        <>
+                          <TouchableOpacity style={styles.acceptButton} onPress={() => openDirectedRollFor(m)}>
+                            <Text style={styles.acceptButtonText}>Tirar</Text>
+                          </TouchableOpacity>
+                          <TouchableOpacity
+                            style={[styles.acceptButton, { backgroundColor: 'rgba(124,58,237,0.25)' }]}
+                            onPress={() => navigation.navigate('CharacterEditor', {
+                              characterId: m.active_character_id!,
+                              sessionId,
+                              sessionName,
+                            })}
+                          >
+                            <Text style={[styles.acceptButtonText, { color: '#a78bfa' }]}>Ficha</Text>
+                          </TouchableOpacity>
+                        </>
+                      ) : null}
+                    </View>
+                  </View>
+                ))}
               </>
             ) : null}
           </View>

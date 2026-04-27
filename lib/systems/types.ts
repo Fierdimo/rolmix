@@ -94,8 +94,18 @@ export interface SpellEntry {
   id: string;
   name: string;
   level: number;            // 0 = truco / cantrip
-  prepared?: boolean;
+  prepared?: boolean;       // @deprecated – usar data.preparedSlots
+  used?: boolean;           // @deprecated
   notes?: string;
+}
+
+/** Una preparación de conjuro en un espacio de nivel concreto (lanzadores memorizadores) */
+export interface PrepSlot {
+  id: string;
+  spellName: string;   // nombre del conjuro preparado
+  spellLevel: number;  // nivel mínimo del conjuro
+  slotLevel: number;   // nivel del espacio consumido (>= spellLevel)
+  used: boolean;       // ya lanzado hoy
 }
 
 /**
@@ -156,6 +166,26 @@ export interface ClassDef {
   perLevel: (level: number) => ClassGrant;
 }
 
+/** Resultado del cálculo automático de espacios de conjuro. */
+export interface SpellSlotBreakdown {
+  className: string;
+  castingType: 'prepared' | 'spontaneous';
+  abilityLabel: string;
+  mod: number;
+  /** Nivel de conjuro → espacios base de la tabla de clase/nivel */
+  base: Record<number, number>;
+  /** Nivel de conjuro → bonus por atributo alto */
+  bonus: Record<number, number>;
+  /** Nivel de conjuro → espacio extra (dominio de clérigo / especialización) */
+  extra: Record<number, number>;
+}
+
+export interface SpellSlotResult {
+  /** Nivel de conjuro → total de espacios (suma de todas las clases) */
+  totals: Record<number, number>;
+  breakdown: SpellSlotBreakdown[];
+}
+
 export interface SystemDefinition {
   id: string;
   name: string;
@@ -169,6 +199,8 @@ export interface SystemDefinition {
   bonusTargets?: { id: string; label: string }[];
   /** Si true, se muestra la sección de conjuros en el editor. */
   hasSpells?: boolean;
+  /** Calcula automáticamente los espacios de conjuro a partir de clase/nivel/atributo. */
+  computeSpellSlots?: (data: CharacterData) => SpellSlotResult | null;
   /** Devuelve estadísticas derivadas SIN considerar equipo/clases. */
   computeStats: (data: CharacterData) => Record<string, number>;
   /** Devuelve acciones lanzables SIN considerar equipo/clases. */

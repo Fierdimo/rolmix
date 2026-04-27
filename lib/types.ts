@@ -36,6 +36,23 @@ export interface SessionMember {
   updated_at: string;
   active_character_id: string | null;
   profiles?: Profile;
+  /** Datos básicos del personaje activo (join con characters). Solo presente en queries que lo solicitan. */
+  active_character?: { id: string; name: string; system_id: string } | null;
+}
+
+/**
+ * Copia de trabajo de un personaje para una partida concreta.
+ * El personaje original (tabla characters) nunca se modifica durante la partida.
+ * El DM y el jugador pueden editar esta copia.
+ */
+export interface SessionCharacter {
+  id: string;
+  session_id: string;
+  character_id: string;
+  owner_id: string;
+  data: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Message {
