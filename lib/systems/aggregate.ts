@@ -161,7 +161,9 @@ export function computeFinalStats(
   return merged;
 }
 
-/** Acciones finales = base + bonos de clase y de equipo cuyo target coincida con el id. */
+/** Acciones finales = base + bonos de clase y de equipo cuyo target coincida con el id.
+ *  Además añade una acción por cada arma equipada, usando el modificador final
+ *  de attack_melee / attack_ranged (que ya incluye BAB) más el bono del arma. */
 export function computeFinalActions(
   system: SystemDefinition,
   data: CharacterData,
@@ -173,9 +175,47 @@ export function computeFinalActions(
     aggregateFeatBonusList(data),
   );
   const resolved = resolveStackMap(stackMap);
-  return base.map((a) => {
+
+  const actions: RollableAction[] = base.map((a) => {
     const extra = (cls[a.id] ?? 0) + (resolved[a.id] ?? 0);
     return extra ? { ...a, modifier: a.modifier + extra } : a;
   });
+
+  // Modificadores de ataque final (ya incluyen BAB / bono de competencia)
+  const meleeMod  = actions.find((a) => a.id === 'attack_melee')?.modifier  ?? 0;
+  const rangedMod = actions.find((a) => a.id === 'attack_ranged')?.modifier ?? 0;
+
+  // Una acción por cada arma equipada
+  const weapons: EquipmentItem[] = Array.isArray(data.equipment)
+    ? (data.equipment as EquipmentItem[]).filter(
+        (it) => it.equipped && typeof it.slot === 'string' && it.slot.startsWith('weapon'),
+      )
+    : [];
+
+  for (const weapon of weapons) {
+    const bonuses = weapon.bonuses ?? [];
+    const meleeBon  = resolveBonusStack(bonuses.filter((b) => b.target === 'attack_melee'));
+    const rangedBon = resolveBonusStack(bonuses.filter((b) => b.target === 'attack_ranged'));
+    // Si solo tiene bono de disparo (y no de melé) se trata como arma a distancia
+    const isRanged = rangedBon > 0 && meleeBon === 0;
+    const modifier = isRanged ? rangedMod + rangedBon : meleeMod + meleeBon;
+    actions.push({
+      id: `weapon_${weapon.id}`,
+      label: weapon.name,
+      group: 'Combate',
+      die: 'd20',
+      modifier,
+    });
+  }
+
+  // Ordenar las habilidades alfabéticamente por label
+  actions.sort((a, b) => {
+    if (a.group === 'Habilidades' && b.group === 'Habilidades') {
+      return a.label.localeCompare(b.label, 'es');
+    }
+    return 0;
+  });
+
+  return actions;
 }
 

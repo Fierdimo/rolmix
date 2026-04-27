@@ -181,11 +181,11 @@ const dnd5e: SystemDefinition = {
     acts.push({ id: 'attack_ranged', label: 'Ataque a distancia', group: 'Combate', die: 'd20', modifier: mod.dex + prof });
 
     for (const a of ABILITIES) {
-      acts.push({ id: `check_${a}`, label: `Tirada de ${ABILITY_LABEL[a]}`, group: 'Atributos', die: 'd20', modifier: mod[a] });
+      acts.push({ id: `check_${a}`, label: ABILITY_LABEL[a], group: 'Atributos', die: 'd20', modifier: mod[a] });
       const isProf = profSaves.has(`save_${a}`);
       acts.push({
         id: `save_${a}`,
-        label: `Salvación de ${ABILITY_LABEL[a]}${isProf ? ' (✦)' : ''}`,
+        label: `${ABILITY_LABEL[a]}${isProf ? ' ✦' : ''}`,
         group: 'Salvaciones',
         die: 'd20',
         modifier: mod[a] + (isProf ? prof : 0),

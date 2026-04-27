@@ -56,14 +56,16 @@ create table if not exists sessions (
 );
 
 create table if not exists session_members (
-  id          uuid primary key default uuid_generate_v4(),
-  session_id  uuid not null references sessions(id) on delete cascade,
-  user_id     uuid not null references profiles(id) on delete cascade,
-  role        session_role not null default 'player',
-  status      member_status not null default 'pending',
-  invited_by  uuid references profiles(id) on delete set null,
-  created_at  timestamptz not null default now(),
-  updated_at  timestamptz not null default now(),
+  id                   uuid primary key default uuid_generate_v4(),
+  session_id           uuid not null references sessions(id) on delete cascade,
+  user_id              uuid not null references profiles(id) on delete cascade,
+  role                 session_role not null default 'player',
+  status               member_status not null default 'pending',
+  invited_by           uuid references profiles(id) on delete set null,
+  -- FK a characters se añade/mantiene por characters.sql (tabla aún no existe aquí)
+  active_character_id  uuid,
+  created_at           timestamptz not null default now(),
+  updated_at           timestamptz not null default now(),
   unique (session_id, user_id)
 );
 
@@ -343,7 +345,22 @@ create policy "members_delete" on session_members for delete
 
 drop policy if exists "messages_select" on messages;
 create policy "messages_select" on messages for select
-  using (auth.role() = 'authenticated');
+  using (
+    auth.role() = 'authenticated'
+    and (
+      -- Mensajes no-whisper: visibles para todos los autenticados de la sesión
+      type <> 'whisper'
+      -- Whisper: sólo el emisor o los destinatarios en metadata->whisper_to
+      or user_id = auth.uid()
+      or auth.uid()::text = any(
+        array(
+          select jsonb_array_elements_text(
+            coalesce(metadata -> 'whisper_to', '[]'::jsonb)
+          )
+        )
+      )
+    )
+  );
 
 drop policy if exists "messages_insert" on messages;
 create policy "messages_insert" on messages for insert

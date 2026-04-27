@@ -41,6 +41,17 @@ export function useAuth() {
   }
 
   async function signUp(email: string, password: string, username: string) {
+    // Verificar que el nombre de usuario no está ya en uso.
+    const { data: existing } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('username', username.trim())
+      .maybeSingle();
+
+    if (existing) {
+      throw new Error('Ese nombre de aventurero ya está en uso. Elige otro.');
+    }
+
     const avatarColor = randomColor();
     const emailRedirectTo = Linking.createURL('auth/callback');
 

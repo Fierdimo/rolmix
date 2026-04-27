@@ -22,8 +22,16 @@ create trigger characters_updated_at
   for each row execute function set_updated_at();
 
 -- Personaje activo del jugador en una partida concreta.
+-- La columna ya se crea (sin FK) en schema.sql para que sea siempre disponible.
+-- Aquí añadimos/aseguramos la FK hacia characters de forma idempotente.
 alter table session_members
-  add column if not exists active_character_id uuid references characters(id) on delete set null;
+  add column if not exists active_character_id uuid;
+
+do $$ begin
+  alter table session_members
+    add constraint session_members_active_character_id_fkey
+      foreign key (active_character_id) references characters(id) on delete set null;
+exception when duplicate_object then null; end $$;
 
 -- ── RLS ──────────────────────────────────────────────────────
 alter table characters enable row level security;

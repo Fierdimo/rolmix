@@ -77,6 +77,10 @@ export interface DiceMetadata {
   action_label?: string;
   /** Si fue lanzada por el DM en nombre del jugador. */
   directed?: boolean;
+  /** Tirada en secreto: sólo visible para los user_ids listados en whisper_to. */
+  secret?: boolean;
+  /** Lista de user_ids que pueden ver el resultado de la tirada secreta. */
+  whisper_to?: string[];
 }
 
 /** Hoja de personaje. La forma de `data` la define la SystemDefinition. */

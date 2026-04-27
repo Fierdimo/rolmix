@@ -170,6 +170,51 @@ begin
 end;
 $$;
 
+-- ── RPC: el DM agrega un NPC/monstruo a la partida ──────────
+-- Crea la copia de sesión del personaje (snapshot) sin tocar
+-- active_character_id del DM. El personaje debe pertenecer al DM.
+-- Si ya existe la copia, devuelve el id existente sin sobrescribir.
+drop function if exists add_npc_to_session(uuid, uuid);
+create or replace function add_npc_to_session(
+  p_session_id   uuid,
+  p_character_id uuid
+) returns uuid language plpgsql security definer as $$
+declare
+  v_char_data  jsonb;
+  v_sc_id      uuid;
+begin
+  -- El personaje debe pertenecer al usuario que llama.
+  select data into v_char_data
+  from characters
+  where id = p_character_id and owner_id = auth.uid();
+
+  if not found then
+    raise exception 'El personaje no existe o no te pertenece';
+  end if;
+
+  -- El usuario debe ser el DM de la partida.
+  if not exists (
+    select 1 from sessions where id = p_session_id and dm_id = auth.uid()
+  ) then
+    raise exception 'Solo el DM puede agregar NPCs a la partida';
+  end if;
+
+  -- Insertar solo si no existe ya (preservar datos de sesión anteriores).
+  insert into session_characters (session_id, character_id, owner_id, data)
+  values (p_session_id, p_character_id, auth.uid(), v_char_data)
+  on conflict (session_id, character_id) do nothing
+  returning id into v_sc_id;
+
+  if v_sc_id is null then
+    select id into v_sc_id
+    from session_characters
+    where session_id = p_session_id and character_id = p_character_id;
+  end if;
+
+  return v_sc_id;
+end;
+$$;
+
 -- ── RPC: resetear copia al estado actual del personaje original ─
 -- Solo el dueño puede resetear. Útil para "iniciar" limpio una partida
 -- usando el estado actual del personaje.

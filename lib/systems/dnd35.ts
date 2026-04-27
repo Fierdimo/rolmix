@@ -435,12 +435,12 @@ const dnd35: SystemDefinition = {
     { id: 'ac', label: 'CA' },
     { id: 'hp_max', label: 'PG máximos' },
     { id: 'bab', label: 'BAB' },
-    { id: 'fort', label: 'Salvación Fortaleza' },
-    { id: 'ref', label: 'Salvación Reflejos' },
-    { id: 'will', label: 'Salvación Voluntad' },
+    { id: 'fort', label: 'Fortaleza' },
+    { id: 'ref', label: 'Reflejos' },
+    { id: 'will', label: 'Voluntad' },
     ...ABILITIES.map((a) => ({ id: `mod_${a}`, label: `Mod. ${ABILITY_LABEL[a]}` })),
-    { id: 'attack_melee', label: 'Ataque cuerpo a cuerpo' },
-    { id: 'attack_ranged', label: 'Ataque a distancia' },
+    { id: 'attack_melee', label: 'C. a cuerpo' },
+    { id: 'attack_ranged', label: 'A distancia' },
     { id: 'damage', label: 'Daño (arma)' },
     { id: '__attack_with__', label: '⚔ Ataque con arma específica…' },
     { id: 'initiative', label: 'Iniciativa' },
@@ -475,25 +475,28 @@ const dnd35: SystemDefinition = {
     const raceSkill = raceBonus.skillBonuses;
     const acts = [];
     for (const a of ABILITIES) {
-      acts.push({ id: `check_${a}`, label: `Chequeo de ${ABILITY_LABEL[a]}`, group: 'Atributos', die: 'd20', modifier: stats[`mod_${a}`] ?? 0 });
+      acts.push({ id: `check_${a}`, label: ABILITY_LABEL[a], group: 'Atributos', die: 'd20', modifier: stats[`mod_${a}`] ?? 0 });
     }
     // bab=0 base; lo suma aggregate via class statBonuses → action.modifier no se ve afectado.
     // En su lugar, salvaciones y ataques se exponen con su modificador base de atributo,
     // y el bonus de clase se aplica como actionBonuses en perLevel. Pero hicimos statBonuses
     // a "fort/ref/will/bab" (claves de stat). Para que el modificador de la acción los recoja,
     // exponemos también action ids gemelos: 'fort','ref','will','attack_melee','attack_ranged'.
-    acts.push({ id: 'fort', label: 'Salvación Fortaleza', group: 'Salvaciones', die: 'd20', modifier: stats.mod_con ?? 0 });
-    acts.push({ id: 'ref', label: 'Salvación Reflejos', group: 'Salvaciones', die: 'd20', modifier: stats.mod_dex ?? 0 });
-    acts.push({ id: 'will', label: 'Salvación Voluntad', group: 'Salvaciones', die: 'd20', modifier: stats.mod_wis ?? 0 });
-    acts.push({ id: 'attack_melee', label: 'Ataque cuerpo a cuerpo', group: 'Combate', die: 'd20', modifier: stats.mod_str ?? 0 });
-    acts.push({ id: 'attack_ranged', label: 'Ataque a distancia', group: 'Combate', die: 'd20', modifier: stats.mod_dex ?? 0 });
+    acts.push({ id: 'fort', label: 'Fortaleza', group: 'Salvaciones', die: 'd20', modifier: stats.mod_con ?? 0 });
+    acts.push({ id: 'ref', label: 'Reflejos', group: 'Salvaciones', die: 'd20', modifier: stats.mod_dex ?? 0 });
+    acts.push({ id: 'will', label: 'Voluntad', group: 'Salvaciones', die: 'd20', modifier: stats.mod_wis ?? 0 });
+    acts.push({ id: 'attack_melee', label: 'C. a cuerpo', group: 'Combate', die: 'd20', modifier: stats.mod_str ?? 0 });
+    acts.push({ id: 'attack_ranged', label: 'A distancia', group: 'Combate', die: 'd20', modifier: stats.mod_dex ?? 0 });
     acts.push({ id: 'initiative', label: 'Iniciativa', group: 'Combate', die: 'd20', modifier: stats.mod_dex ?? 0 });
 
-    for (const skKey of Object.keys(SKILL_TO_ABILITY)) {
-      const ability = SKILL_TO_ABILITY[skKey];
-      const ranks = num(data, skKey, 0);
-      const racialSkMod = raceSkill[skKey] ?? 0;
-      acts.push({ id: skKey, label: SKILL_LABEL[skKey], group: 'Habilidades', die: 'd20', modifier: ranks + (stats[`mod_${ability}`] ?? 0) + racialSkMod });
+    // Todas las habilidades del PHB — las 8 con campo dedicado usan sus rangos guardados;
+    // el resto aparece con 0 rangos para que el jugador siempre pueda tirar cualquier skill.
+    for (const sk of ALL_PHB_SKILLS) {
+      const ability = sk.ability;
+      // Si tiene campo dedicado usamos los rangos guardados, si no, 0
+      const ranks = SKILL_TO_ABILITY[sk.id] !== undefined ? num(data, sk.id, 0) : 0;
+      const racialSkMod = raceSkill[sk.id] ?? 0;
+      acts.push({ id: sk.id, label: sk.label, group: 'Habilidades', die: 'd20', modifier: ranks + (stats[`mod_${ability}`] ?? 0) + racialSkMod });
     }
 
     // Habilidades adicionales (incluye transclase) introducidas por el usuario

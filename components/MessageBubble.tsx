@@ -6,6 +6,8 @@ import { DiceMetadata } from '../lib/types';
 interface Props {
   message: Message;
   isOwn: boolean;
+  /** ID del usuario actual, necesario para evaluar visibilidad de tiradas secretas. */
+  currentUserId?: string;
 }
 
 const TYPE_STYLES: Record<MessageType, { label: string; color: string; bg: string }> = {
@@ -13,24 +15,50 @@ const TYPE_STYLES: Record<MessageType, { label: string; color: string; bg: strin
   action:    { label: '* ',      color: '#fbbf24', bg: 'rgba(251,191,36,0.08)'  },
   narration: { label: '📖 ',    color: '#a78bfa', bg: 'rgba(167,139,250,0.10)' },
   dice:      { label: '🎲 ',    color: '#34d399', bg: 'rgba(52,211,153,0.10)'  },
-  whisper:   { label: '🤫 ',    color: '#94a3b8', bg: 'rgba(148,163,184,0.08)' },
+  whisper:   { label: '🔒 ',    color: '#fbbf24', bg: 'rgba(251,191,36,0.08)' },
 };
 
-export default function MessageBubble({ message, isOwn }: Props) {
+export default function MessageBubble({ message, isOwn, currentUserId }: Props) {
   const cfg = TYPE_STYLES[message.type] ?? TYPE_STYLES.message;
 
+  // Solo los whispers que tienen metadata de dado (campo `die`) son tiradas secretas.
+  // Un whisper sin metadata de dado es un mensaje de texto privado ordinario.
+  const isDiceMsg = message.type === 'dice' || message.type === 'whisper';
+  const meta = isDiceMsg
+    ? (message.metadata as DiceMetadata | null)
+    : null;
+  const hasDiceMeta = !!meta?.die;
+  const isSecretRoll = (message.type === 'whisper' && hasDiceMeta) || !!(meta?.secret);
+  // El RLS ya filtra los whispers en el servidor; este guard es sólo por si el mensaje
+  // llega igualmente (p.ej. propio mensaje en tiempo real antes de guardarse).
+  const canSeeSecret = !isSecretRoll || !currentUserId ||
+    !!(meta?.whisper_to?.includes(currentUserId));
+
   function renderContent() {
-    if (message.type === 'dice') {
-      const meta = message.metadata as DiceMetadata | null;
+    if (hasDiceMeta || message.type === 'dice') {
+      if (!canSeeSecret) {
+        // El rol no permite ver este resultado: mostrar aviso
+        return (
+          <View>
+            <Text style={[styles.content, { color: '#64748b', fontStyle: 'italic' }]}>
+              {message.content}
+            </Text>
+            <View style={[styles.diceResult, { backgroundColor: 'rgba(100,116,139,0.15)' }]}>
+              <Text style={{ color: '#64748b', fontSize: 13, fontStyle: 'italic' }}>🔒 Tirada secreta</Text>
+            </View>
+          </View>
+        );
+      }
       if (meta) {
         return (
           <View>
             <Text style={[styles.content, { color: cfg.color }]}>
               {message.content}
             </Text>
-            {meta.character_name || meta.action_label ? (
+            {(meta.character_name || meta.action_label) ? (
               <Text style={styles.diceTag}>
                 {meta.directed ? '🎯 Tirada dirigida · ' : ''}
+                {isSecretRoll ? '🔒 Secreta · ' : ''}
                 {meta.action_label ?? ''}{meta.character_name ? ` · ${meta.character_name}` : ''}
               </Text>
             ) : null}
@@ -53,8 +81,9 @@ export default function MessageBubble({ message, isOwn }: Props) {
     );
   }
 
-  // Narration and dice are always full-width, centered
-  const isFullWidth = message.type === 'narration' || message.type === 'dice';
+  // Narration, dice and whisper-dice are full-width, centered
+  const isFullWidth = message.type === 'narration' || message.type === 'dice'
+    || (message.type === 'whisper' && hasDiceMeta);
 
   if (isFullWidth) {
     return (

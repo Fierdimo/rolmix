@@ -66,18 +66,38 @@ export default function CharacterEditorScreen({ navigation, route }: Props) {
 
     if (sessionId) {
       // Modo partida: cargar datos desde la copia de sesión.
-      const { data: sc, error: scErr } = await supabase
+      let { data: sc, error: scErr } = await supabase
         .from('session_characters')
         .select('data')
         .eq('session_id', sessionId)
         .eq('character_id', characterId)
         .single();
+
+      // Si no existe la copia, intentar crearla automáticamente (el jugador es el dueño).
       if (scErr || !sc) {
-        Alert.alert('Sin ficha de partida', 'No se encontró la copia de sesión para este personaje. El jugador debe activar el personaje en la partida primero.');
-        navigation.goBack();
-        return;
+        const { error: activateErr } = await supabase.rpc('activate_character_in_session', {
+          p_session_id: sessionId,
+          p_character_id: characterId,
+        });
+        if (!activateErr) {
+          // Reintento: ahora sí debería existir el registro.
+          const retry = await supabase
+            .from('session_characters')
+            .select('data')
+            .eq('session_id', sessionId)
+            .eq('character_id', characterId)
+            .single();
+          sc = retry.data;
+          scErr = retry.error;
+        }
       }
-      setData((sc.data as Record<string, unknown>) ?? {});
+
+      if (scErr || !sc) {
+        // El DM u otro usuario ve la ficha: mostrar datos base en modo solo-lectura.
+        setData(row.data ?? {});
+      } else {
+        setData((sc.data as Record<string, unknown>) ?? {});
+      }
     } else {
       setData(row.data ?? {});
     }
