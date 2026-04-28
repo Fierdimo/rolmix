@@ -1,4 +1,4 @@
-﻿import React, { useRef, useState, useCallback } from 'react';
+﻿import React, { useRef, useState, useCallback, useMemo } from 'react';
 import {
   View,
   FlatList,
@@ -13,14 +13,17 @@ import {
 } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp } from '@react-navigation/native';
-import { Character, DiceMetadata, MessageType, SessionMember } from '../lib/types';
+import { Character, Combatant, DiceMetadata, MessageType, SessionMember } from '../lib/types';
 import { useAuth } from '../hooks/useAuth';
 import { useSessionChat } from '../hooks/useSessionChat';
+import { useCombat, CombatParticipant } from '../hooks/useCombat';
 import MessageBubble from '../components/MessageBubble';
 import MessageInput from '../components/MessageInput';
 import SessionDrawer from '../components/chat/SessionDrawer';
 import CharacterPickerModal from '../components/chat/CharacterPickerModal';
 import { PlayerRollPanelModal, DirectedRollPanelModal, GroupRollPanelModal, GroupRollEntry, RollOptions } from '../components/chat/RollPanelModal';
+import CombatTrackerPanel from '../components/chat/CombatTrackerPanel';
+import CombatActionModal, { CombatAttackResult } from '../components/chat/CombatActionModal';
 import { resolveAction } from '../lib/systems';
 import { RollableAction } from '../lib/systems/types';
 import { chatStyles as s } from '../components/chat/chatStyles';
@@ -43,6 +46,7 @@ export default function ChatScreen({ navigation, route }: Props) {
   const [groupRollVisible, setGroupRollVisible] = useState(false);
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [npcPickerMode, setNpcPickerMode] = useState(false);
+  const [combatActingFor, setCombatActingFor] = useState<Combatant | null>(null);
 
   const listRef = useRef<FlatList>(null);
   const drawerAnim = useRef(new Animated.Value(Dimensions.get('window').width)).current;
@@ -80,6 +84,12 @@ export default function ChatScreen({ navigation, route }: Props) {
     sendMessage, updateMemberStatus, acceptInvitation, invitePlayer,
     pickActiveCharacter, addDmNpc, removeDmNpc, openDirectedRollFor, setInviteUsername,
   } = useSessionChat(sessionId, handleDirectedRollOpen);
+
+  // ── Combat ────────────────────────────────────────────────────────────────
+  const {
+    encounter, combatants, activeCombatant, characterMap,
+    startCombat, endCombat, nextTurn, updateHp,
+  } = useCombat(sessionId, isDm);
 
   // ── Scroll to bottom on new message ──────────────────────────────────────
   const handleContentSizeChange = useCallback(() => {
@@ -144,6 +154,112 @@ export default function ChatScreen({ navigation, route }: Props) {
     setTimeout(() => { setDirectedCharacter(character); setDirectedFor(null); }, 260);
   }
 
+  // ── Combat handlers ───────────────────────────────────────────────────────
+
+  async function drawerThenStartCombat() {
+    closeDrawer();
+    if (encounter) {
+      // Ya hay combate activo — el botón actúa como indicador visual, no hace nada extra
+      return;
+    }
+    // Recopilar participantes: PCs aceptados + NPCs del DM
+    const participants: CombatParticipant[] = [];
+
+    // Cargar personajes de jugadores aceptados
+    const memberCharIds = acceptedMembers
+      .map((m) => m.active_character_id)
+      .filter(Boolean) as string[];
+
+    let pcChars: Character[] = [];
+    if (memberCharIds.length > 0) {
+      const { data } = await (await import('../lib/supabase')).supabase
+        .from('characters')
+        .select('*')
+        .in('id', memberCharIds);
+      pcChars = (data ?? []) as Character[];
+    }
+
+    // El propio personaje del DM (si existe)
+    if (activeCharacter && !pcChars.find((c) => c.id === activeCharacter.id)) {
+      pcChars.push(activeCharacter);
+    }
+
+    for (const ch of pcChars) participants.push({ character: ch, isNpc: false });
+    for (const npc of dmNpcs) participants.push({ character: npc, isNpc: true });
+
+    if (participants.length === 0) return;
+
+    const order = await startCombat(participants);
+    if (!order) return;
+
+    // Publicar en el chat el orden de iniciativa
+    const lines = order
+      .map((e, i) => `${i + 1}. ${e.character.name} — INI ${e.initiative} (🎲${e.roll}${e.dexMod >= 0 ? '+' : ''}${e.dexMod})`)
+      .join('\n');
+    await sendMessage(`⚔️ ¡Combate iniciado!\n${lines}`, 'narration');
+  }
+
+  function handleCombatAct(combatant: Combatant) {
+    setCombatActingFor(combatant);
+  }
+
+  async function handleCombatResult(result: CombatAttackResult) {
+    const { attacker, target, actionType, actionLabel, weaponLabel, rolls, acBonus } = result;
+    const char = characterMap[attacker.character_id ?? ''] ?? null;
+
+    if (actionType === 'total_defense' || actionType === 'defensive') {
+      const bonus = acBonus ?? (actionType === 'total_defense' ? 4 : 2);
+      await sendMessage(
+        `🛡️ ${attacker.name} realiza ${actionLabel} (+${bonus} CA esquiva este turno)`,
+        'action',
+      );
+      return;
+    }
+
+    if (actionType === 'def_cast' && rolls.length > 0) {
+      const r = rolls[0];
+      const meta: DiceMetadata = {
+        die: 'd20',
+        result: r.d20,
+        modifier: r.modifier,
+        total: r.total,
+        character_name: attacker.name,
+        action_label: 'Concentración (Conjurar Defensivamente)',
+        target_name: target?.name,
+        combat_action_type: actionType,
+      };
+      await sendMessage(
+        `🔮 ${attacker.name} conjura defensivamente`,
+        'dice',
+        meta as unknown as Record<string, unknown>,
+      );
+      return;
+    }
+
+    // Tirada(s) de ataque
+    if (rolls.length === 0) return;
+
+    const targetStr = target ? ` → ${target.name}` : '';
+    const content = `${attacker.name} · ${actionLabel}${weaponLabel ? ` · ${weaponLabel}` : ''}${targetStr}`;
+
+    const meta: DiceMetadata = {
+      // Para compatibilidad con el renderizado simple (1 tirada)
+      die:    'd20',
+      result: rolls[0].d20,
+      modifier: rolls[0].modifier,
+      total:  rolls[0].total,
+      character_name: attacker.name,
+      action_label: weaponLabel || actionLabel,
+      directed: isDm,
+      // Siempre usamos combat_rolls (incluso para 1 ataque) para unificar el renderizado
+      combat_rolls: rolls,
+      target_name: target?.name,
+      combat_action_type: actionType,
+    };
+
+    await sendMessage(content, 'dice', meta as unknown as Record<string, unknown>);
+  }
+
   async function handleGroupRoll(rolls: GroupRollEntry[]) {
     for (const { character, action } of rolls) {
       await rollAction(character, action, true, { secret: false, whisperTo: [] });
@@ -168,6 +284,20 @@ export default function ChatScreen({ navigation, route }: Props) {
           <Text style={s.menuBtnText}>🟰</Text>
         </TouchableOpacity>
       </View>
+
+      {/* Panel de combate (visible a todos mientras haya encuentro activo) */}
+      {encounter && (
+        <CombatTrackerPanel
+          encounter={encounter}
+          combatants={combatants}
+          isDm={isDm}
+          myCharacterId={activeCharacter?.id}
+          onNextTurn={nextTurn}
+          onEndCombat={endCombat}
+          onUpdateHp={updateHp}
+          onAct={handleCombatAct}
+        />
+      )}
 
       {/* Chat + input */}
       <KeyboardAvoidingView
@@ -228,6 +358,8 @@ export default function ChatScreen({ navigation, route }: Props) {
         onDirectedRoll={drawerThenDirected}
         onViewPlayerSheet={drawerThenSheet}
         onGroupRoll={drawerThenGroupRoll}
+        combatActive={!!encounter}
+        onStartCombat={drawerThenStartCombat}
         dmNpcs={dmNpcs}
         onAddNpc={drawerThenAddNpc}
         onRemoveNpc={removeDmNpc}
@@ -271,6 +403,15 @@ export default function ChatScreen({ navigation, route }: Props) {
         extraCharacters={dmNpcs}
         onGroupRoll={handleGroupRoll}
         onClose={() => setGroupRollVisible(false)}
+      />
+
+      <CombatActionModal
+        visible={!!combatActingFor}
+        attacker={combatActingFor}
+        character={combatActingFor?.character_id ? (characterMap[combatActingFor.character_id] ?? null) : null}
+        combatants={combatants}
+        onResult={handleCombatResult}
+        onClose={() => setCombatActingFor(null)}
       />
     </View>
   );

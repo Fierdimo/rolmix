@@ -66,6 +66,12 @@ export interface Message {
   profiles?: Profile;
 }
 
+export interface CombatRoll {
+  d20: number;
+  modifier: number;
+  total: number;
+}
+
 export interface DiceMetadata {
   die: string;
   result: number;
@@ -81,6 +87,38 @@ export interface DiceMetadata {
   secret?: boolean;
   /** Lista de user_ids que pueden ver el resultado de la tirada secreta. */
   whisper_to?: string[];
+  /** Múltiples tiradas de ataque (Ataque completo D&D 3.5). */
+  combat_rolls?: CombatRoll[];
+  /** Nombre del objetivo del ataque. */
+  target_name?: string;
+  /** Tipo de acción de combate: 'standard', 'full', 'total_defense', 'defensive'. */
+  combat_action_type?: string;
+}
+
+/** Encuentro de combate activo en una sesión. */
+export interface CombatEncounter {
+  id: string;
+  session_id: string;
+  round: number;
+  active_index: number;
+  is_active: boolean;
+  started_at: string;
+  ended_at: string | null;
+}
+
+/** Combatiente dentro de un encuentro (snapshot de nombre, iniciativa y PG). */
+export interface Combatant {
+  id: string;
+  encounter_id: string;
+  character_id: string | null;
+  name: string;
+  initiative: number;
+  dex_mod: number;
+  turn_order: number;
+  hp_max: number;
+  hp_current: number;
+  is_npc: boolean;
+  is_defeated: boolean;
 }
 
 /** Hoja de personaje. La forma de `data` la define la SystemDefinition. */

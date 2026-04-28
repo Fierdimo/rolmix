@@ -28,6 +28,9 @@ export interface RollableAction {
   group?: string;
   die: string;          // 'd20', 'd100', '1d8', etc.
   modifier: number;     // bonus/penalty ya calculado
+  /** Ataques iterativos adicionales (D&D 3.5): modificadores absolutos del 2.º, 3.º y 4.º
+   *  ataque cuando BAB ≥ 6. Solo presente en acciones de ataque con arma o a cuerpo/distancia. */
+  extraAttacks?: number[];
 }
 
 /**

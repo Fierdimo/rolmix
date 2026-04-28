@@ -34,6 +34,9 @@ interface Props {
   onDirectedRoll: (member: SessionMember) => void;
   onViewPlayerSheet: (characterId: string) => void;
   onGroupRoll: () => void;
+  // Combate
+  combatActive: boolean;
+  onStartCombat: () => void;
   // NPCs del DM
   dmNpcs: Character[];
   onAddNpc: () => void;
@@ -69,6 +72,8 @@ export default function SessionDrawer({
   onDirectedRoll,
   onViewPlayerSheet,
   onGroupRoll,
+  combatActive,
+  onStartCombat,
   dmNpcs,
   onAddNpc,
   onRemoveNpc,
@@ -199,10 +204,18 @@ export default function SessionDrawer({
                 {/* Jugadores aceptados */}
                 <View style={s.drawerSection}>
                   <TouchableOpacity
-                    style={[s.drawerBtn, s.drawerBtnPrimary, { marginBottom: 12 }]}
+                    style={[s.drawerBtn, s.drawerBtnPrimary, { marginBottom: 8 }]}
                     onPress={onGroupRoll}
                   >
                     <Text style={[s.drawerBtnText, { color: '#fff' }]}>⚔️  Tirada grupal</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[s.drawerBtn, { marginBottom: 12, backgroundColor: combatActive ? 'rgba(239,68,68,0.2)' : 'rgba(239,68,68,0.1)', borderColor: combatActive ? '#f87171' : 'rgba(239,68,68,0.3)', borderWidth: 1 }]}
+                    onPress={onStartCombat}
+                  >
+                    <Text style={[s.drawerBtnText, { color: combatActive ? '#f87171' : '#fca5a5' }]}>
+                      {combatActive ? '🔴  Combate activo' : '⚔️  Iniciar Combate'}
+                    </Text>
                   </TouchableOpacity>
 
                   {/* NPCs/monstruos del DM */}

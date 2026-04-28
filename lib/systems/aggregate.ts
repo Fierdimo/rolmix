@@ -169,23 +169,34 @@ export function computeFinalActions(
   data: CharacterData,
 ): RollableAction[] {
   const base = system.actions(data);
-  const cls = aggregateClassGrants(system, data).actionBonuses ?? {};
+  const grants = aggregateClassGrants(system, data);
+  const cls = grants.actionBonuses ?? {};
+  // BAB acumulado de todas las clases (necesario para ataques iterativos D&D 3.5/PF)
+  const bab = grants.statBonuses?.bab ?? 0;
   const stackMap = mergeStackMaps(
     aggregateEquipmentBonusList(data),
     aggregateFeatBonusList(data),
   );
   const resolved = resolveStackMap(stackMap);
 
-  const actions: RollableAction[] = base.map((a) => {
+  // Paso 1: aplicar bonos de clase + equipo/dotes a las acciones base
+  const baseActions: RollableAction[] = base.map((a) => {
     const extra = (cls[a.id] ?? 0) + (resolved[a.id] ?? 0);
     return extra ? { ...a, modifier: a.modifier + extra } : a;
   });
 
-  // Modificadores de ataque final (ya incluyen BAB / bono de competencia)
+  // Paso 2: añadir ataques iterativos a acciones de ataque base (BAB >= 6)
+  const actions: RollableAction[] = baseActions.map((a) => {
+    if (a.id !== 'attack_melee' && a.id !== 'attack_ranged') return a;
+    const extra: number[] = [];
+    for (let p = 5; bab - p > 0; p += 5) extra.push(a.modifier - p);
+    return extra.length > 0 ? { ...a, extraAttacks: extra } : a;
+  });
+
+  // Paso 3: una acción por cada arma equipada (con sus propios ataques iterativos)
   const meleeMod  = actions.find((a) => a.id === 'attack_melee')?.modifier  ?? 0;
   const rangedMod = actions.find((a) => a.id === 'attack_ranged')?.modifier ?? 0;
 
-  // Una acción por cada arma equipada
   const weapons: EquipmentItem[] = Array.isArray(data.equipment)
     ? (data.equipment as EquipmentItem[]).filter(
         (it) => it.equipped && typeof it.slot === 'string' && it.slot.startsWith('weapon'),
@@ -196,15 +207,19 @@ export function computeFinalActions(
     const bonuses = weapon.bonuses ?? [];
     const meleeBon  = resolveBonusStack(bonuses.filter((b) => b.target === 'attack_melee'));
     const rangedBon = resolveBonusStack(bonuses.filter((b) => b.target === 'attack_ranged'));
-    // Si solo tiene bono de disparo (y no de melé) se trata como arma a distancia
-    const isRanged = rangedBon > 0 && meleeBon === 0;
-    const modifier = isRanged ? rangedMod + rangedBon : meleeMod + meleeBon;
+    const isRanged  = rangedBon > 0 && meleeBon === 0;
+    const modifier  = isRanged ? rangedMod + rangedBon : meleeMod + meleeBon;
+
+    const extra: number[] = [];
+    for (let p = 5; bab - p > 0; p += 5) extra.push(modifier - p);
+
     actions.push({
       id: `weapon_${weapon.id}`,
       label: weapon.name,
       group: 'Combate',
       die: 'd20',
       modifier,
+      ...(extra.length > 0 ? { extraAttacks: extra } : {}),
     });
   }
 

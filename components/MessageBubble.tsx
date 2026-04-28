@@ -50,6 +50,36 @@ export default function MessageBubble({ message, isOwn, currentUserId }: Props) 
         );
       }
       if (meta) {
+        // Múltiples tiradas de ataque (Ataque completo D&D 3.5)
+        if (meta.combat_rolls && meta.combat_rolls.length > 0) {
+          return (
+            <View>
+              <Text style={[styles.content, { color: cfg.color }]}>{message.content}</Text>
+              {(meta.character_name || meta.action_label) ? (
+                <Text style={styles.diceTag}>
+                  {meta.action_label ?? ''}{meta.character_name ? ` · ${meta.character_name}` : ''}
+                  {meta.target_name ? ` → ${meta.target_name}` : ''}
+                </Text>
+              ) : null}
+              {meta.combat_rolls.map((r, i) => {
+                const isCrit   = r.d20 === 20;
+                const isFumble = r.d20 === 1;
+                const label    = meta.combat_rolls!.length > 1 ? `Ataque ${i + 1}: ` : '';
+                return (
+                  <View key={i} style={[styles.diceResult, isCrit && styles.diceResultCrit, isFumble && styles.diceResultFumble]}>
+                    <Text style={styles.diceResultText}>
+                      {label}d20 [{r.d20}]
+                      {r.modifier !== 0 ? ` ${r.modifier > 0 ? '+' : ''}${r.modifier}` : ''}
+                      {' '}= <Text style={[styles.diceTotal, isCrit && { color: '#fbbf24' }, isFumble && { color: '#f87171' }]}>{r.total}</Text>
+                      {isCrit ? ' ✨ ¡Crítico!' : isFumble ? ' 💀 ¡Pifia!' : ''}
+                    </Text>
+                  </View>
+                );
+              })}
+            </View>
+          );
+        }
+        // Tirada de ataque simple o habilidad
         return (
           <View>
             <Text style={[styles.content, { color: cfg.color }]}>
@@ -60,14 +90,16 @@ export default function MessageBubble({ message, isOwn, currentUserId }: Props) 
                 {meta.directed ? '🎯 Tirada dirigida · ' : ''}
                 {isSecretRoll ? '🔒 Secreta · ' : ''}
                 {meta.action_label ?? ''}{meta.character_name ? ` · ${meta.character_name}` : ''}
+                {meta.target_name ? ` → ${meta.target_name}` : ''}
               </Text>
             ) : null}
-            <View style={styles.diceResult}>
+            <View style={[styles.diceResult, meta.result === 20 && styles.diceResultCrit, meta.result === 1 && styles.diceResultFumble]}>
               <Text style={styles.diceResultText}>
                 {meta.die}: {meta.result}
                 {meta.modifier !== undefined && meta.modifier !== 0
                   ? ` ${meta.modifier > 0 ? '+' : ''}${meta.modifier}` : ''}
-                {' '}= <Text style={styles.diceTotal}>{meta.total}</Text>
+                {' '}= <Text style={[styles.diceTotal, meta.result === 20 && { color: '#fbbf24' }, meta.result === 1 && { color: '#f87171' }]}>{meta.total}</Text>
+                {meta.result === 20 ? ' ✨ ¡Crítico!' : meta.result === 1 ? ' 💀 ¡Pifia!' : ''}
               </Text>
             </View>
           </View>
@@ -161,6 +193,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 4,
     alignSelf: 'center',
+  },
+  diceResultCrit: {
+    backgroundColor: 'rgba(251,191,36,0.2)',
+    borderWidth: 1,
+    borderColor: 'rgba(251,191,36,0.4)',
+  },
+  diceResultFumble: {
+    backgroundColor: 'rgba(239,68,68,0.15)',
+    borderWidth: 1,
+    borderColor: 'rgba(239,68,68,0.3)',
   },
   diceResultText: { color: '#34d399', fontSize: 14, fontWeight: '600' },
   diceTotal: { fontSize: 18, fontWeight: '800' },
