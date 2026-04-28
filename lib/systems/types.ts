@@ -31,6 +31,41 @@ export interface RollableAction {
   /** Ataques iterativos adicionales (D&D 3.5): modificadores absolutos del 2.º, 3.º y 4.º
    *  ataque cuando BAB ≥ 6. Solo presente en acciones de ataque con arma o a cuerpo/distancia. */
   extraAttacks?: number[];
+  /** Dado de daño del arma, p. ej. '1d8', '2d6'. Sólo presente en acciones de arma equipada. */
+  damageDie?: string;
+  /** Modificador de daño ya calculado (Fuerza + bonos de mejora, etc.). */
+  damageMod?: number;
+  /** Para conjuros/habilidades: contra qué CA se compara el ataque. */
+  attackTarget?: 'ac' | 'touch_ac' | 'ff_ac';
+  /** CD de salvación calculada (para conjuros con tirada de salvación). */
+  saveDC?: number;
+  /** Tipo de tirada de salvación. */
+  saveType?: 'fort' | 'ref' | 'will';
+  /** Descripción del efecto en impacto / en fallo de la tirada de salvación. */
+  effectLabel?: string;
+}
+
+/**
+ * Ataque natural o con arma de un monstruo, parseado del stat block.
+ * Se almacena en `data.monster_attacks` y se usa para generar RollableActions.
+ */
+export interface MonsterAttack {
+  /** Nombre del ataque / arma (ej. 'Tentáculo', 'Claw', 'Bite'). */
+  name: string;
+  /** Bono de ataque total (1.er ataque). */
+  bonus: number;
+  /** Ataques iterativos adicionales, si los hay (2.º, 3.º…). */
+  extra_attacks?: number[];
+  /** Dado de daño, ej. '4d8', '1d6'. */
+  damage_die: string;
+  /** Modificador fijo de daño (ya incluye Fuerza). */
+  damage_mod: number;
+  /** 'melee' | 'ranged'. */
+  type: 'melee' | 'ranged';
+  /** Número de ataques de este tipo en la Full Attack (informativo). */
+  count?: number;
+  /** Texto original del ataque para mostrar en UI. */
+  notes?: string;
 }
 
 /**
@@ -46,6 +81,8 @@ export interface CharacterData {
   spells?: SpellEntry[];
   feats?: FeatItem[];
   skills?: SkillEntry[];
+  /** Ataques de monstruo (sólo presentes en personajes con is_monster=true). */
+  monster_attacks?: MonsterAttack[];
 }
 
 /** Habilidad del personaje (D&D 3.5: transclase = mismo coste de bono pero techo /2). */
@@ -81,6 +118,8 @@ export interface EquipmentItem {
   slot: string;             // ej. 'weapon', 'armor', 'shield', 'ring'
   equipped: boolean;        // si es false sólo "lo tiene"
   bonuses: BonusEffect[];   // efectos automáticos cuando equipped=true
+  /** Dado de daño base del arma, p. ej. '1d8', '2d6'. Solo para armas. */
+  damageDie?: string;
   notes?: string;
 }
 
@@ -100,6 +139,16 @@ export interface SpellEntry {
   prepared?: boolean;       // @deprecated – usar data.preparedSlots
   used?: boolean;           // @deprecated
   notes?: string;
+  /** Tipo de ataque requerido (si aplica). 'none' = sin tirada de ataque. */
+  attack_type?: 'melee_touch' | 'ranged_touch' | 'ranged' | 'none';
+  /** Dado de daño del conjuro, p. ej. '3d6'. */
+  damage_die?: string;
+  /** Tirada de salvación requerida (si aplica). */
+  save_type?: 'fort' | 'ref' | 'will';
+  /** CD de salvación manual (sobrescribe la calculada automáticamente). */
+  save_dc_override?: number;
+  /** Descripción del efecto en impacto o en fallo de la tirada de salvación. */
+  effect_label?: string;
 }
 
 /** Una preparación de conjuro en un espacio de nivel concreto (lanzadores memorizadores) */
@@ -208,6 +257,9 @@ export interface SystemDefinition {
   computeStats: (data: CharacterData) => Record<string, number>;
   /** Devuelve acciones lanzables SIN considerar equipo/clases. */
   actions: (data: CharacterData) => RollableAction[];
+  /** Modificador del atributo de lanzamiento para calcular la CD de conjuros.
+   *  Usado en aggregate.computeFinalActions para generar acciones de conjuro. */
+  spellSaveDCMod?: (data: CharacterData) => number;
 }
 
 /** Helper común: modificador estilo d20 (D&D 3.5/5e/Pathfinder 1e). */

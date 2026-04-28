@@ -28,6 +28,7 @@ export interface SessionChatActions {
   pickActiveCharacter: (characterId: string | null) => Promise<void>;
   addDmNpc: (characterId: string) => Promise<void>;
   removeDmNpc: (characterId: string) => Promise<void>;
+  renameDmNpc: (characterId: string, newName: string) => Promise<void>;
   openDirectedRollFor: (member: SessionMember) => Promise<void>;
   setInviteUsername: (v: string) => void;
   refreshSession: () => void;
@@ -121,16 +122,23 @@ export function useSessionChat(
     if (!user) return;
     const { data: scData } = await supabase
       .from('session_characters')
-      .select('character_id')
+      .select('character_id, data')
       .eq('session_id', sessionId)
       .eq('owner_id', user.id);
-    const ids = (scData ?? []).map((r: { character_id: string }) => r.character_id);
+    const scRows = scData ?? [];
+    const ids = scRows.map((r: { character_id: string }) => r.character_id);
     if (ids.length === 0) { setDmNpcs([]); return; }
     const { data: chars } = await supabase
       .from('characters')
       .select('*')
       .in('id', ids);
-    setDmNpcs(chars ?? []);
+    // Fusionar datos de sesión (HP, slots, etc.) sobre los datos base
+    const scMap: Record<string, Record<string, unknown>> = {};
+    for (const sc of scRows) scMap[sc.character_id] = sc.data as Record<string, unknown>;
+    const merged = (chars ?? []).map((ch: Character) =>
+      scMap[ch.id] ? { ...ch, data: { ...(ch.data as object), ...scMap[ch.id] } } : ch
+    );
+    setDmNpcs(merged);
   }, [sessionId, user]);
 
   // ── Active character by membership ──────────────────────────────────────────
@@ -279,6 +287,17 @@ export function useSessionChat(
     fetchDmNpcs();
   }
 
+  async function renameDmNpc(characterId: string, newName: string) {
+    const trimmed = newName.trim();
+    if (!trimmed) return;
+    const { error } = await supabase
+      .from('characters')
+      .update({ name: trimmed })
+      .eq('id', characterId);
+    if (error) { Alert.alert('Error', error.message); return; }
+    setDmNpcs((prev) => prev.map((n) => n.id === characterId ? { ...n, name: trimmed } : n));
+  }
+
   async function openDirectedRollFor(member: SessionMember) {
     if (!member.active_character_id) {
       Alert.alert('Sin personaje', `${member.profiles?.username ?? 'Ese jugador'} no ha elegido personaje en esta partida.`);
@@ -304,6 +323,6 @@ export function useSessionChat(
     myCharacters, activeCharacter, dmNpcs, loading, inviteUsername, sendingInvite,
     // actions
     sendMessage, updateMemberStatus, acceptInvitation, invitePlayer,
-    pickActiveCharacter, addDmNpc, removeDmNpc, openDirectedRollFor, setInviteUsername, refreshSession,
+    pickActiveCharacter, addDmNpc, removeDmNpc, renameDmNpc, openDirectedRollFor, setInviteUsername, refreshSession,
   };
 }

@@ -117,13 +117,35 @@ export default function CharacterEditorScreen({ navigation, route }: Props) {
 
   const persist = useCallback(async (n: string, d: Record<string, unknown>) => {
     if (sessionId) {
-      // Modo partida: guardar solo en la copia de sesión mediante RPC.
-      const { error } = await supabase.rpc('update_session_character_data', {
-        p_session_id: sessionId,
-        p_character_id: characterId,
-        p_data: d,
-      });
-      return error;
+      // Modo partida: guardar datos en la copia de sesión y el nombre en characters.
+      const trimmedName = n.trim() || 'Sin nombre';
+      const [{ error: dataErr }, { error: nameErr }] = await Promise.all([
+        supabase.rpc('update_session_character_data', {
+          p_session_id: sessionId,
+          p_character_id: characterId,
+          p_data: d,
+        }),
+        supabase.from('characters').update({ name: trimmedName }).eq('id', characterId),
+      ]);
+
+      // Si hay un combate activo, sincronizar el nombre en la tabla combatants
+      if (!dataErr && !nameErr) {
+        const { data: encRow } = await supabase
+          .from('combat_encounters')
+          .select('id')
+          .eq('session_id', sessionId)
+          .eq('is_active', true)
+          .maybeSingle();
+        if (encRow?.id) {
+          await supabase
+            .from('combatants')
+            .update({ name: trimmedName })
+            .eq('encounter_id', encRow.id)
+            .eq('character_id', characterId);
+        }
+      }
+
+      return dataErr ?? nameErr ?? null;
     }
     const { error } = await supabase
       .from('characters')
@@ -225,7 +247,7 @@ export default function CharacterEditorScreen({ navigation, route }: Props) {
         {tab === 'stats' && (
           <StatsTab
             name={name}
-            onName={sessionId ? undefined : (v) => { setName(v); setDirty(true); }}
+            onName={(v) => { setName(v); setDirty(true); }}
             system={system}
             data={data}
             setField={setField}
@@ -882,9 +904,19 @@ function SummaryCard({
   });
 
   const ac = finalStats.ac;
+  const touchAc = finalStats.touch_ac;
+  const ffAc    = finalStats.flat_footed_ac;
   const hp = finalStats.hp_max;
   const init = actionMod('initiative') ?? 0;
   const bab = finalStats.bab ?? 0;
+
+  // Ataques de monstruo (sólo presentes en is_monster=true)
+  const monsterAttacks: Array<{
+    name: string; bonus: number; damage_die: string; damage_mod: number;
+    type: string; count?: number; extra_attacks?: number[];
+  }> = Array.isArray((data as Record<string, unknown>).monster_attacks)
+    ? ((data as any).monster_attacks)
+    : [];
 
   // ─── Armas equipadas ──────────────────────────────────────────────
   // Listamos los items equipados cuyo slot empieza por 'weapon' y
@@ -969,6 +1001,22 @@ function SummaryCard({
           <Text style={styles.heroLabel}>CA</Text>
           <Text style={styles.heroValue}>{raw(ac)}</Text>
           <Text style={styles.heroSub}>Defensa</Text>
+          {(touchAc !== undefined || ffAc !== undefined) && (
+            <View style={{ flexDirection: 'row', gap: 10, marginTop: 5 }}>
+              {touchAc !== undefined && (
+                <View style={{ alignItems: 'center' }}>
+                  <Text style={[styles.heroSub, { fontSize: 9, letterSpacing: 0.5, textTransform: 'uppercase' }]}>Toque</Text>
+                  <Text style={{ color: '#7dd3fc', fontSize: 14, fontWeight: '800' }}>{touchAc}</Text>
+                </View>
+              )}
+              {ffAc !== undefined && (
+                <View style={{ alignItems: 'center' }}>
+                  <Text style={[styles.heroSub, { fontSize: 9, letterSpacing: 0.5, textTransform: 'uppercase' }]}>D.prev.</Text>
+                  <Text style={{ color: '#7dd3fc', fontSize: 14, fontWeight: '800' }}>{ffAc}</Text>
+                </View>
+              )}
+            </View>
+          )}
         </TouchableOpacity>
 
         {/* PG máximos (valor permanente) */}
@@ -1083,6 +1131,41 @@ function SummaryCard({
           </View>
         </>
       ) : null}
+
+      {/* Ataques de monstruo */}
+      {monsterAttacks.length > 0 && (
+        <>
+          <Text style={styles.subgroupHero}>Ataques</Text>
+          <View style={styles.weaponList}>
+            {monsterAttacks.map((atk, i) => {
+              const atkLabel = atk.count && atk.count > 1 ? `${atk.count}× ${atk.name}` : atk.name;
+              const bonus = atk.bonus >= 0 ? `+${atk.bonus}` : `${atk.bonus}`;
+              const dmgMod = atk.damage_mod !== 0
+                ? (atk.damage_mod > 0 ? `+${atk.damage_mod}` : `${atk.damage_mod}`) : '';
+              const dmgStr = `${atk.damage_die}${dmgMod}`;
+              const iterLabel = atk.extra_attacks && atk.extra_attacks.length > 0
+                ? `/${atk.extra_attacks.map(b => b >= 0 ? `+${b}` : `${b}`).join('/')}`
+                : '';
+              return (
+                <View key={i} style={styles.weaponRow}>
+                  <View style={{ flex: 1, minWidth: 0 }}>
+                    <Text style={styles.weaponName} numberOfLines={1}>{atkLabel}</Text>
+                    <Text style={styles.weaponNotes}>{atk.type === 'ranged' ? 'A distancia' : 'Cuerpo a cuerpo'}</Text>
+                  </View>
+                  <View style={styles.weaponStat}>
+                    <Text style={styles.weaponStatLabel}>Ataque</Text>
+                    <Text style={styles.weaponAtk}>{bonus}{iterLabel}</Text>
+                  </View>
+                  <View style={styles.weaponStat}>
+                    <Text style={styles.weaponStatLabel}>Daño</Text>
+                    <Text style={styles.weaponDmg}>{dmgStr}</Text>
+                  </View>
+                </View>
+              );
+            })}
+          </View>
+        </>
+      )}
 
       {/* Editor rápido (long-press) */}
       <Modal visible={!!edit} transparent animationType="fade" onRequestClose={() => setEdit(null)}>
@@ -1686,7 +1769,19 @@ function EquipmentTab({ system, data, setData }: any) {
                     {'  (toca para cambiar)'}
                   </Text>
                 </TouchableOpacity>
-                <Text style={styles.weaponStatHint} numberOfLines={2}>
+                {/* Dado de daño base del arma */}
+                <View style={[styles.weaponStatRow, { marginTop: 8, alignItems: 'center' }]}>
+                  <Text style={[styles.weaponStatLabel, { flex: 1 }]}>Dado de daño</Text>
+                  <TextInput
+                    style={[styles.fieldInput, { flex: 1, marginBottom: 0, textAlign: 'center' }]}
+                    value={it.damageDie ?? ''}
+                    onChangeText={(t) => patch(it.id, { damageDie: t.trim() || undefined })}
+                    placeholder="ej. 1d8"
+                    placeholderTextColor="#475569"
+                    autoCapitalize="none"
+                  />
+                </View>
+                <Text style={[styles.weaponStatHint, { marginTop: 2 }]} numberOfLines={2}>
                   {'Para dotes específicas (Concentración en arma): añádelas en la pestaña Dotes → bono "⚔ Ataque con arma específica…"'}
                 </Text>
               </View>
@@ -2490,6 +2585,23 @@ function SpellsTab({ system, data, setData }: any) {
             {detailSpell ? (() => {
               // Busca datos enriquecidos en el catálogo
               const cat = catalogSpells.find((s) => s.name.toLowerCase() === detailSpell.name.toLowerCase());
+              // Helper para parchear el conjuro en edición
+              const patchSpell = (p: Partial<SpellEntry>) => {
+                update(items.map((sp) => sp.id === detailSpell.id ? { ...sp, ...p } : sp));
+                setDetailSpell((prev) => prev ? { ...prev, ...p } : prev);
+              };
+              const ATTACK_TYPE_OPTS: { label: string; value: SpellEntry['attack_type'] }[] = [
+                { label: 'Ninguno', value: undefined },
+                { label: 'Toque cuerpo', value: 'melee_touch' },
+                { label: 'Toque dist.', value: 'ranged_touch' },
+                { label: 'A distancia', value: 'ranged' },
+              ];
+              const SAVE_TYPE_OPTS: { label: string; value: SpellEntry['save_type'] }[] = [
+                { label: 'Ninguna', value: undefined },
+                { label: 'Fort', value: 'fort' },
+                { label: 'Ref', value: 'ref' },
+                { label: 'Vol', value: 'will' },
+              ];
               return (
                 <>
                   <Text style={styles.modalTitle}>{detailSpell.name}</Text>
@@ -2510,6 +2622,91 @@ function SpellsTab({ system, data, setData }: any) {
                       baseStyle={{ color: '#cbd5e1', fontSize: 13, lineHeight: 20 }}
                       tagsStyles={{ p: { marginTop: 0, marginBottom: 8 }, em: { color: '#e2e8f0', fontStyle: 'italic' } }}
                     />
+                    {/* ── Mecánicas de combate ── */}
+                    <View style={{ borderTopWidth: 1, borderTopColor: 'rgba(124,58,237,0.2)', marginTop: 8, paddingTop: 10, gap: 10 }}>
+                      <Text style={[styles.subgroup, { color: '#a78bfa' }]}>⚔ Mecánicas de combate</Text>
+
+                      {/* Tipo de ataque */}
+                      <View>
+                        <Text style={styles.help}>Tipo de ataque</Text>
+                        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 4 }}>
+                          {ATTACK_TYPE_OPTS.map((opt) => (
+                            <TouchableOpacity
+                              key={String(opt.value)}
+                              style={[styles.filterChip, detailSpell.attack_type === opt.value && styles.filterChipActive]}
+                              onPress={() => patchSpell({ attack_type: opt.value })}
+                            >
+                              <Text style={[styles.filterChipText, detailSpell.attack_type === opt.value && styles.filterChipTextActive]}>
+                                {opt.label}
+                              </Text>
+                            </TouchableOpacity>
+                          ))}
+                        </View>
+                      </View>
+
+                      {/* Dado de daño */}
+                      <View>
+                        <Text style={styles.help}>Dado de daño (p. ej. 3d6)</Text>
+                        <TextInput
+                          style={[styles.shortInput, { marginTop: 4, width: 120 }]}
+                          value={detailSpell.damage_die ?? ''}
+                          onChangeText={(t) => patchSpell({ damage_die: t.trim() || undefined })}
+                          placeholder="ej. 3d6"
+                          placeholderTextColor="#475569"
+                          autoCapitalize="none"
+                          autoCorrect={false}
+                        />
+                      </View>
+
+                      {/* Tirada de salvación */}
+                      <View>
+                        <Text style={styles.help}>Tirada de salvación</Text>
+                        <View style={{ flexDirection: 'row', gap: 6, marginTop: 4 }}>
+                          {SAVE_TYPE_OPTS.map((opt) => (
+                            <TouchableOpacity
+                              key={String(opt.value)}
+                              style={[styles.filterChip, detailSpell.save_type === opt.value && styles.filterChipActive]}
+                              onPress={() => patchSpell({ save_type: opt.value })}
+                            >
+                              <Text style={[styles.filterChipText, detailSpell.save_type === opt.value && styles.filterChipTextActive]}>
+                                {opt.label}
+                              </Text>
+                            </TouchableOpacity>
+                          ))}
+                        </View>
+                      </View>
+
+                      {/* CD manual (opcional) */}
+                      {detailSpell.save_type && (
+                        <View>
+                          <Text style={styles.help}>CD manual (vacío = automática)</Text>
+                          <TextInput
+                            style={[styles.shortInput, { marginTop: 4, width: 80 }]}
+                            value={detailSpell.save_dc_override != null ? String(detailSpell.save_dc_override) : ''}
+                            onChangeText={(t) => {
+                              const n = parseInt(t, 10);
+                              patchSpell({ save_dc_override: isNaN(n) ? undefined : n });
+                            }}
+                            placeholder="auto"
+                            placeholderTextColor="#475569"
+                            keyboardType="number-pad"
+                          />
+                        </View>
+                      )}
+
+                      {/* Efecto */}
+                      <View>
+                        <Text style={styles.help}>Descripción del efecto (en impacto / fallo de salvación)</Text>
+                        <TextInput
+                          style={[styles.shortInput, { marginTop: 4, width: '100%' }]}
+                          value={detailSpell.effect_label ?? ''}
+                          onChangeText={(t) => patchSpell({ effect_label: t.trim() || undefined })}
+                          placeholder="ej. Paralizado 1d4 rondas"
+                          placeholderTextColor="#475569"
+                          autoCorrect={false}
+                        />
+                      </View>
+                    </View>
                   </ScrollView>
                   <View style={{ flexDirection: 'row', gap: 8, marginTop: 12 }}>
                     <TouchableOpacity style={[styles.modalAction, { flex: 1 }]} onPress={() => setDetailSpell(null)}>
@@ -3348,6 +3545,11 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 8,
     paddingHorizontal: 10, paddingVertical: 8, color: '#fff',
     borderWidth: 1, borderColor: 'rgba(167,139,250,0.15)',
+  },
+  shortInput: {
+    backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 8,
+    paddingHorizontal: 10, paddingVertical: 6, color: '#e2e8f0', fontSize: 13,
+    borderWidth: 1, borderColor: 'rgba(167,139,250,0.2)',
   },
   selectWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   selectChip: {

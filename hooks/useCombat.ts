@@ -36,6 +36,15 @@ export interface CombatActions {
   nextTurn: () => Promise<void>;
   /** Aplica un delta a los PG del combatiente (positivo = curación, negativo = daño). */
   updateHp: (combatantId: string, delta: number) => Promise<void>;
+  /** Reordena la iniciativa: el combatiente pasa a actuar justo después de afterCombatantId. */
+  delayAfter: (combatantId: string, afterCombatantId: string | null) => Promise<boolean>;
+  /**
+   * Descuenta el recurso de conjuro del personaje:
+   * - Lanzadores preparados: marca el primer prepSlot sin usar con ese nombre como `used`.
+   * - Lanzadores espontáneos o sin prepSlot coincidente: incrementa spellSlots[level].used.
+   * Persiste en Supabase y actualiza characterMap localmente.
+   */
+  consumeSpell: (characterId: string, spellName: string, spellLevel: number) => Promise<void>;
 }
 
 // ── Hook ──────────────────────────────────────────────────────────────────────
@@ -62,15 +71,31 @@ export function useCombat(sessionId: string, isDm: boolean): CombatState & Comba
   const loadCharactersForCombatants = useCallback(async (list: Combatant[]) => {
     const ids = list.map((c) => c.character_id).filter(Boolean) as string[];
     if (ids.length === 0) return;
-    const { data } = await supabase.from('characters').select('*').in('id', ids);
-    if (data) {
-      setCharacterMap((prev) => {
-        const next = { ...prev };
-        for (const ch of data) next[ch.id] = ch;
-        return next;
-      });
-    }
-  }, []);
+
+    // Cargar datos base
+    const { data: baseRows } = await supabase.from('characters').select('*').in('id', ids);
+    if (!baseRows) return;
+
+    // En modo partida, mezclar con datos de sesión (tienen HP/slots actualizados)
+    const { data: scRows } = await supabase
+      .from('session_characters')
+      .select('character_id, data')
+      .eq('session_id', sessionId)
+      .in('character_id', ids);
+    const scMap: Record<string, Record<string, unknown>> = {};
+    for (const sc of scRows ?? []) scMap[sc.character_id] = sc.data as Record<string, unknown>;
+
+    setCharacterMap((prev) => {
+      const next = { ...prev };
+      for (const ch of baseRows) {
+        // Si existe copia de sesión, usar sus datos (slots, HP…) sobre la base
+        next[ch.id] = scMap[ch.id]
+          ? { ...ch, data: { ...(ch.data as object), ...scMap[ch.id] } }
+          : ch;
+      }
+      return next;
+    });
+  }, [sessionId]);
 
   const fetchCombatants = useCallback(
     async (encounterId: string) => {
@@ -155,6 +180,33 @@ export function useCombat(sessionId: string, isDm: boolean): CombatState & Comba
       .subscribe();
     return () => { supabase.removeChannel(combChan); };
   }, [encounter?.id, fetchCombatants]);
+
+  // Canal de session_characters: sincroniza datos (slots, HP, preps…) mientras el combate está activo
+  useEffect(() => {
+    const scChan = supabase
+      .channel(`combat_sc_${sessionId}`)
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'session_characters', filter: `session_id=eq.${sessionId}` },
+        (payload) => {
+          const sc = payload.new as { character_id: string; data: Record<string, unknown> };
+          if (!sc?.character_id) return;
+          setCharacterMap((prev) => {
+            const existing = prev[sc.character_id];
+            if (!existing) return prev;
+            return {
+              ...prev,
+              [sc.character_id]: {
+                ...existing,
+                data: { ...(existing.data as object), ...sc.data },
+              },
+            };
+          });
+        },
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(scChan); };
+  }, [sessionId]);
 
   // ── Actions ───────────────────────────────────────────────────────────────
 
@@ -249,6 +301,91 @@ export function useCombat(sessionId: string, isDm: boolean): CombatState & Comba
     [isDm],
   );
 
+  const delayAfter = useCallback(
+    async (combatantId: string, afterCombatantId: string | null) => {
+      if (!encounter) return false;
+      const { data, error } = await supabase.rpc('delay_after', {
+        p_encounter_id: encounter.id,
+        p_mover_id:     combatantId,
+        p_after_id:     afterCombatantId,
+      });
+      if (error) {
+        console.error('[useCombat] delay_after error:', error.message);
+        return false;
+      }
+      if (data?.[0]) {
+        setEncounter((prev) =>
+          prev ? { ...prev, active_index: data[0].new_index, round: data[0].new_round } : null,
+        );
+      }
+      // Recargar siempre: turn_order ha cambiado para varios combatientes
+      await fetchCombatants(encounter.id);
+      return true;
+    },
+    [encounter, fetchCombatants],
+  );
+
+  const consumeSpell = useCallback(
+    async (characterId: string, spellName: string, spellLevel: number) => {
+      const ch = characterMap[characterId];
+      if (!ch) return;
+
+      const data = { ...(ch.data as Record<string, unknown>) };
+
+      // ── 1. Intentar consumir un espacio preparado (Mago, Clérigo, Druida…) ──
+      const prepSlots = Array.isArray(data.preparedSlots)
+        ? [...(data.preparedSlots as Array<Record<string, unknown>>)]
+        : [];
+      const prepIdx = prepSlots.findIndex(
+        (p) => !p.used && String(p.spellName).toLowerCase() === spellName.toLowerCase(),
+      );
+      if (prepIdx !== -1) {
+        prepSlots[prepIdx] = { ...prepSlots[prepIdx], used: true };
+        data.preparedSlots = prepSlots;
+      } else {
+        // ── 2. Fallback: consumir espacio espontáneo (Hechicero, Bardo…) ──
+        const spellSlots = { ...((data.spellSlots as Record<number, { max: number; used: number }>) ?? {}) };
+        const cur = spellSlots[spellLevel] ?? { max: 0, used: 0 };
+        if (cur.max > 0 && cur.used < cur.max) {
+          spellSlots[spellLevel] = { ...cur, used: cur.used + 1 };
+          data.spellSlots = spellSlots;
+        }
+      }
+
+      // Persistir en Supabase (en modo sesión → session_characters vía RPC)
+      const { data: scCheck } = await supabase
+        .from('session_characters')
+        .select('character_id')
+        .eq('session_id', sessionId)
+        .eq('character_id', characterId)
+        .maybeSingle();
+
+      if (scCheck) {
+        // Hay copia de sesión: actualizar ahí (misma ruta que CharacterEditorScreen)
+        const { error } = await supabase.rpc('update_session_character_data', {
+          p_session_id: sessionId,
+          p_character_id: characterId,
+          p_data: data,
+        });
+        if (error) { console.error('[useCombat] consumeSpell (session) error:', error.message); return; }
+      } else {
+        // Sin copia de sesión: actualizar directamente en characters
+        const { error } = await supabase
+          .from('characters')
+          .update({ data })
+          .eq('id', characterId);
+        if (error) { console.error('[useCombat] consumeSpell error:', error.message); return; }
+      }
+
+      // Actualizar characterMap local
+      setCharacterMap((prev) => ({
+        ...prev,
+        [characterId]: { ...ch, data },
+      }));
+    },
+    [characterMap],
+  );
+
   return {
     encounter,
     combatants,
@@ -259,5 +396,7 @@ export function useCombat(sessionId: string, isDm: boolean): CombatState & Comba
     endCombat,
     nextTurn,
     updateHp,
+    delayAfter,
+    consumeSpell,
   };
 }

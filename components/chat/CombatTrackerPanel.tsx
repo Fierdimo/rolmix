@@ -3,11 +3,12 @@ import {
   View, Text, FlatList, TouchableOpacity,
   TextInput, Modal, StyleSheet, KeyboardAvoidingView, Platform,
 } from 'react-native';
-import { CombatEncounter, Combatant } from '../../lib/types';
+import { CombatEncounter, Combatant, Character } from '../../lib/types';
 
 interface Props {
   encounter: CombatEncounter;
   combatants: Combatant[];
+  characterMap: Record<string, Character>;
   isDm: boolean;
   myCharacterId?: string | null;
   onNextTurn: () => void;
@@ -21,11 +22,12 @@ interface Props {
 
 interface HpEditModalProps {
   combatant: Combatant;
+  displayName: string;
   onApply: (delta: number) => void;
   onClose: () => void;
 }
 
-function HpEditModal({ combatant, onApply, onClose }: HpEditModalProps) {
+function HpEditModal({ combatant, displayName, onApply, onClose }: HpEditModalProps) {
   const [value, setValue] = useState('');
 
   function apply() {
@@ -44,7 +46,7 @@ function HpEditModal({ combatant, onApply, onClose }: HpEditModalProps) {
         style={ms.container}
       >
         <View style={ms.card}>
-          <Text style={ms.title}>{combatant.name}</Text>
+          <Text style={ms.title}>{displayName}</Text>
           <Text style={ms.sub}>
             PG actuales: {combatant.hp_current} / {combatant.hp_max}
           </Text>
@@ -91,6 +93,7 @@ function HpEditModal({ combatant, onApply, onClose }: HpEditModalProps) {
 export default function CombatTrackerPanel({
   encounter,
   combatants,
+  characterMap,
   isDm,
   myCharacterId,
   onNextTurn,
@@ -113,18 +116,15 @@ export default function CombatTrackerPanel({
 
     return (
       <View style={[s.card, isActive && s.cardActive, c.is_defeated && s.cardDefeated]}>
-        {/* Indicador de turno activo */}
-        {isActive && <Text style={s.turnArrow}>▶</Text>}
-
-        {/* Nombre */}
-        <Text style={[s.name, c.is_defeated && s.textDefeated]} numberOfLines={1}>
-          {c.name}
-        </Text>
-
-        {/* Iniciativa */}
-        <Text style={[s.initiative, c.is_defeated && s.textDefeated]}>
-          INI {c.initiative}
-        </Text>
+        {/* Fila nombre + iniciativa */}
+        <View style={s.nameRow}>
+          <Text style={[s.name, c.is_defeated && s.textDefeated]} numberOfLines={1}>
+            {isActive ? '▶ ' : ''}{(c.character_id && characterMap[c.character_id]?.name) || c.name}
+          </Text>
+          <Text style={[s.initiative, c.is_defeated && s.textDefeated]}>
+            {c.initiative}
+          </Text>
+        </View>
 
         {/* Barra de PG */}
         <View style={s.hpBarBg}>
@@ -191,6 +191,7 @@ export default function CombatTrackerPanel({
       {editingHp && (
         <HpEditModal
           combatant={editingHp}
+          displayName={(editingHp.character_id && characterMap[editingHp.character_id]?.name) || editingHp.name}
           onApply={(delta) => onUpdateHp(editingHp.id, delta)}
           onClose={() => setEditingHp(null)}
         />
@@ -207,6 +208,7 @@ const s = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(124,58,237,0.3)',
     paddingBottom: 6,
+    maxHeight: 210,
   },
   header: {
     flexDirection: 'row',
@@ -233,13 +235,13 @@ const s = StyleSheet.create({
 
   // Tarjeta de combatiente
   card: {
-    width: 130,
+    width: 120,
     backgroundColor: 'rgba(30,27,60,0.9)',
-    borderRadius: 10,
-    padding: 10,
+    borderRadius: 8,
+    padding: 8,
     borderWidth: 1,
     borderColor: 'rgba(124,58,237,0.25)',
-    gap: 4,
+    gap: 3,
   },
   cardActive: {
     borderColor: '#f87171',
@@ -251,12 +253,19 @@ const s = StyleSheet.create({
     opacity: 0.6,
   },
   turnArrow: { color: '#f87171', fontSize: 10, fontWeight: '700', marginBottom: -2 },
+  nameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 4,
+  },
   name: {
     color: '#e2e8f0',
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '700',
+    flex: 1,
   },
-  initiative: { color: '#a78bfa', fontSize: 11 },
+  initiative: { color: '#a78bfa', fontSize: 11, fontWeight: '600' },
   textDefeated: { color: '#64748b' },
 
   // Barra de PG

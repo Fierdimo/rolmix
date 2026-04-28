@@ -10,6 +10,8 @@ import {
   TouchableOpacity,
   Animated,
   Dimensions,
+  Modal,
+  TextInput,
 } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp } from '@react-navigation/native';
@@ -24,6 +26,8 @@ import CharacterPickerModal from '../components/chat/CharacterPickerModal';
 import { PlayerRollPanelModal, DirectedRollPanelModal, GroupRollPanelModal, GroupRollEntry, RollOptions } from '../components/chat/RollPanelModal';
 import CombatTrackerPanel from '../components/chat/CombatTrackerPanel';
 import CombatActionModal, { CombatAttackResult } from '../components/chat/CombatActionModal';
+import DamageResolutionModal, { ResolvedAttack } from '../components/chat/DamageResolutionModal';
+import MonsterPickerModal, { MonsterEntry } from '../components/chat/MonsterPickerModal';
 import { resolveAction } from '../lib/systems';
 import { RollableAction } from '../lib/systems/types';
 import { chatStyles as s } from '../components/chat/chatStyles';
@@ -46,7 +50,21 @@ export default function ChatScreen({ navigation, route }: Props) {
   const [groupRollVisible, setGroupRollVisible] = useState(false);
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [npcPickerMode, setNpcPickerMode] = useState(false);
+  const [monsterPickerVisible, setMonsterPickerVisible] = useState(false);
+  const [monsterPickerLoading, setMonsterPickerLoading] = useState(false);
+  const [pendingMonster, setPendingMonster] = useState<MonsterEntry | null>(null);
+  const [pendingMonsterName, setPendingMonsterName] = useState('');
   const [combatActingFor, setCombatActingFor] = useState<Combatant | null>(null);
+  // Damage resolution
+  const [damageModalVisible, setDamageModalVisible] = useState(false);
+  const [pendingAttacks, setPendingAttacks] = useState<ResolvedAttack[]>([]);
+  const [pendingDamageDie, setPendingDamageDie] = useState<string | undefined>(undefined);
+  const [pendingDamageMod, setPendingDamageMod] = useState<number>(0);
+  const [pendingAttacker, setPendingAttacker] = useState<Combatant | null>(null);
+  const [pendingAttackTarget, setPendingAttackTarget] = useState<'ac' | 'touch_ac' | 'ff_ac' | undefined>(undefined);
+  const [pendingSaveDC, setPendingSaveDC] = useState<number | undefined>(undefined);
+  const [pendingSaveType, setPendingSaveType] = useState<'fort' | 'ref' | 'will' | undefined>(undefined);
+  const [pendingEffectLabel, setPendingEffectLabel] = useState<string | undefined>(undefined);
 
   const listRef = useRef<FlatList>(null);
   const drawerAnim = useRef(new Animated.Value(Dimensions.get('window').width)).current;
@@ -82,13 +100,13 @@ export default function ChatScreen({ navigation, route }: Props) {
     myCharacters, activeCharacter, dmNpcs, loading,
     inviteUsername, sendingInvite,
     sendMessage, updateMemberStatus, acceptInvitation, invitePlayer,
-    pickActiveCharacter, addDmNpc, removeDmNpc, openDirectedRollFor, setInviteUsername,
+    pickActiveCharacter, addDmNpc, removeDmNpc, renameDmNpc, openDirectedRollFor, setInviteUsername,
   } = useSessionChat(sessionId, handleDirectedRollOpen);
 
   // ── Combat ────────────────────────────────────────────────────────────────
   const {
     encounter, combatants, activeCombatant, characterMap,
-    startCombat, endCombat, nextTurn, updateHp,
+    startCombat, endCombat, nextTurn, updateHp, delayAfter, consumeSpell,
   } = useCombat(sessionId, isDm);
 
   // ── Scroll to bottom on new message ──────────────────────────────────────
@@ -148,7 +166,7 @@ export default function ChatScreen({ navigation, route }: Props) {
     setTimeout(() => openDirectedRollFor(member), 260);
   }
   function drawerThenGroupRoll() { closeDrawer(); setTimeout(() => setGroupRollVisible(true), 260); }
-  function drawerThenAddNpc() { closeDrawer(); setTimeout(() => { setNpcPickerMode(true); setPickerVisible(true); }, 260); }
+  function drawerThenAddNpc() { closeDrawer(); setTimeout(() => setMonsterPickerVisible(true), 260); }
   function drawerThenNpcRoll(character: Character) {
     closeDrawer();
     setTimeout(() => { setDirectedCharacter(character); setDirectedFor(null); }, 260);
@@ -172,11 +190,17 @@ export default function ChatScreen({ navigation, route }: Props) {
 
     let pcChars: Character[] = [];
     if (memberCharIds.length > 0) {
-      const { data } = await (await import('../lib/supabase')).supabase
-        .from('characters')
-        .select('*')
-        .in('id', memberCharIds);
-      pcChars = (data ?? []) as Character[];
+      const { supabase: sb } = await import('../lib/supabase');
+      const [{ data: baseChars }, { data: scRows }] = await Promise.all([
+        sb.from('characters').select('*').in('id', memberCharIds),
+        sb.from('session_characters').select('character_id, data')
+          .eq('session_id', sessionId).in('character_id', memberCharIds),
+      ]);
+      const scMap: Record<string, Record<string, unknown>> = {};
+      for (const sc of scRows ?? []) scMap[sc.character_id] = sc.data as Record<string, unknown>;
+      pcChars = (baseChars ?? []).map((ch: Character) =>
+        scMap[ch.id] ? { ...ch, data: { ...(ch.data as object), ...scMap[ch.id] } } as Character : ch
+      );
     }
 
     // El propio personaje del DM (si existe)
@@ -204,8 +228,19 @@ export default function ChatScreen({ navigation, route }: Props) {
   }
 
   async function handleCombatResult(result: CombatAttackResult) {
-    const { attacker, target, actionType, actionLabel, weaponLabel, rolls, acBonus } = result;
-    const char = characterMap[attacker.character_id ?? ''] ?? null;
+    const { attacker, target, actionType, actionLabel, weaponLabel, rolls, acBonus, perAttack, damageDie, damageMod } = result;
+
+    // Conjuro: primero descontar el recurso, luego anunciar
+    if (actionType === 'cast' && result.castSpellName != null && attacker.character_id) {
+      await consumeSpell(attacker.character_id, result.castSpellName, result.castSpellLevel ?? 0);
+    }
+
+    if (actionType === 'delay') {
+      const afterName = target ? ` (después de ${target.name})` : ' (al final)';
+      const ok = await delayAfter(attacker.id, target?.id ?? null);
+      if (ok) await sendMessage(`⏸️ ${attacker.name} se retrasa${afterName}`, 'narration');
+      return;
+    }
 
     if (actionType === 'total_defense' || actionType === 'defensive') {
       const bonus = acBonus ?? (actionType === 'total_defense' ? 4 : 2);
@@ -228,10 +263,20 @@ export default function ChatScreen({ navigation, route }: Props) {
         target_name: target?.name,
         combat_action_type: actionType,
       };
+      await sendMessage(`🔮 ${attacker.name} conjura defensivamente`, 'dice', meta as unknown as Record<string, unknown>);
+      return;
+    }
+
+    // Conjuro sin tirada de ataque (solo salvación o utilidad)
+    if (actionType === 'cast' && rolls.length === 0) {
+      const targetStr = target ? ` → ${target.name}` : '';
+      const saveStr = result.saveDC != null
+        ? ` (CD ${result.saveDC} ${result.saveType === 'fort' ? 'Fortaleza' : result.saveType === 'ref' ? 'Reflejos' : 'Voluntad'})`
+        : '';
+      const effectStr = result.effectLabel ? ` · ${result.effectLabel}` : '';
       await sendMessage(
-        `🔮 ${attacker.name} conjura defensivamente`,
-        'dice',
-        meta as unknown as Record<string, unknown>,
+        `🔮 ${attacker.name} lanza ${weaponLabel}${targetStr}${saveStr}${effectStr}`,
+        'action',
       );
       return;
     }
@@ -239,25 +284,58 @@ export default function ChatScreen({ navigation, route }: Props) {
     // Tirada(s) de ataque
     if (rolls.length === 0) return;
 
-    const targetStr = target ? ` → ${target.name}` : '';
+    // Construir per_attacks para el metadata (normalizado desde perAttack)
+    const perAttackMeta = perAttack?.map((p) => ({
+      index: p.index,
+      modifier: p.modifier,
+      roll: p.roll,
+      targetId: p.target?.id ?? null,
+      targetName: p.target?.name ?? null,
+    }));
+
+    // Resumen de objetivos para el contenido del mensaje
+    const uniqueTargets = perAttack
+      ? [...new Set(perAttack.map((p) => p.target?.name).filter(Boolean))].join(', ')
+      : target?.name;
+    const targetStr = uniqueTargets ? ` → ${uniqueTargets}` : '';
     const content = `${attacker.name} · ${actionLabel}${weaponLabel ? ` · ${weaponLabel}` : ''}${targetStr}`;
 
     const meta: DiceMetadata = {
-      // Para compatibilidad con el renderizado simple (1 tirada)
-      die:    'd20',
+      die: 'd20',
       result: rolls[0].d20,
       modifier: rolls[0].modifier,
-      total:  rolls[0].total,
+      total: rolls[0].total,
       character_name: attacker.name,
       action_label: weaponLabel || actionLabel,
       directed: isDm,
-      // Siempre usamos combat_rolls (incluso para 1 ataque) para unificar el renderizado
       combat_rolls: rolls,
-      target_name: target?.name,
+      target_name: uniqueTargets ?? undefined,
       combat_action_type: actionType,
+      per_attacks: perAttackMeta,
+      damage_die: damageDie,
+      damage_mod: damageMod,
     };
 
     await sendMessage(content, 'dice', meta as unknown as Record<string, unknown>);
+
+    // DM: abrir modal de resolución de daño
+    if (isDm && rolls.length > 0) {
+      const resolvedAttacks: ResolvedAttack[] = (perAttack ?? [{ index: 0, modifier: rolls[0].modifier, roll: rolls[0], target }]).map((p) => ({
+        index: p.index,
+        modifier: p.modifier,
+        roll: p.roll,
+        target: p.target,
+      }));
+      setPendingAttacker(attacker);
+      setPendingAttacks(resolvedAttacks);
+      setPendingDamageDie(damageDie);
+      setPendingDamageMod(damageMod ?? 0);
+      setPendingAttackTarget(result.attackTarget);
+      setPendingSaveDC(result.saveDC);
+      setPendingSaveType(result.saveType);
+      setPendingEffectLabel(result.effectLabel);
+      setDamageModalVisible(true);
+    }
   }
 
   async function handleGroupRoll(rolls: GroupRollEntry[]) {
@@ -290,6 +368,7 @@ export default function ChatScreen({ navigation, route }: Props) {
         <CombatTrackerPanel
           encounter={encounter}
           combatants={combatants}
+          characterMap={characterMap}
           isDm={isDm}
           myCharacterId={activeCharacter?.id}
           onNextTurn={nextTurn}
@@ -315,6 +394,7 @@ export default function ChatScreen({ navigation, route }: Props) {
             renderItem={({ item }) => (
               <MessageBubble message={item} isOwn={item.user_id === user?.id} currentUserId={user?.id} />
             )}
+            style={s.flex}
             contentContainerStyle={s.messagesList}
             onContentSizeChange={handleContentSizeChange}
             ListEmptyComponent={
@@ -363,6 +443,7 @@ export default function ChatScreen({ navigation, route }: Props) {
         dmNpcs={dmNpcs}
         onAddNpc={drawerThenAddNpc}
         onRemoveNpc={removeDmNpc}
+        onRenameNpc={renameDmNpc}
         onNpcRoll={drawerThenNpcRoll}
         onNpcSheet={drawerThenSheet}
         drawerAnim={drawerAnim}
@@ -380,6 +461,70 @@ export default function ChatScreen({ navigation, route }: Props) {
         }}
         onClose={() => { setPickerVisible(false); setNpcPickerMode(false); }}
       />
+
+      <MonsterPickerModal
+        visible={monsterPickerVisible}
+        loading={monsterPickerLoading}
+        onPick={async (monster: MonsterEntry) => {
+          setMonsterPickerVisible(false);
+          // Pedir nombre personalizado antes de crear
+          setPendingMonster(monster);
+          setPendingMonsterName(monster.name);
+        }}
+        onClose={() => setMonsterPickerVisible(false)}
+      />
+
+      {/* ── Modal nombre de monstruo ─────────────────────────── */}
+      {pendingMonster && (
+        <Modal transparent animationType="fade" visible onRequestClose={() => setPendingMonster(null)}>
+          <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'center', alignItems: 'center', padding: 24 }}>
+            <View style={{ backgroundColor: '#1e1b4b', borderRadius: 12, padding: 20, width: '100%', maxWidth: 380, borderWidth: 1, borderColor: 'rgba(167,139,250,0.3)' }}>
+              <Text style={{ color: '#e2d9ff', fontSize: 16, fontWeight: '700', marginBottom: 4 }}>Añadir monstruo</Text>
+              <Text style={{ color: '#94a3b8', fontSize: 13, marginBottom: 14 }}>Elige un nombre para esta instancia (puede ser diferente al tipo base).</Text>
+              <TextInput
+                value={pendingMonsterName}
+                onChangeText={setPendingMonsterName}
+                placeholder={pendingMonster.name}
+                placeholderTextColor="#475569"
+                style={{ backgroundColor: '#0f0d2e', borderWidth: 1, borderColor: 'rgba(167,139,250,0.3)', borderRadius: 8, color: '#e2d9ff', paddingHorizontal: 12, paddingVertical: 10, fontSize: 15, marginBottom: 16 }}
+                autoFocus
+                selectTextOnFocus
+              />
+              <View style={{ flexDirection: 'row', gap: 10 }}>
+                <TouchableOpacity
+                  onPress={() => setPendingMonster(null)}
+                  style={{ flex: 1, paddingVertical: 10, borderRadius: 8, borderWidth: 1, borderColor: '#475569', alignItems: 'center' }}
+                >
+                  <Text style={{ color: '#94a3b8', fontWeight: '600' }}>Cancelar</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={async () => {
+                    const monster = pendingMonster;
+                    const customName = pendingMonsterName.trim() || monster.name;
+                    setPendingMonster(null);
+                    setMonsterPickerLoading(true);
+                    try {
+                      const { supabase } = await import('../lib/supabase');
+                      const { data: newChar, error } = await supabase
+                        .from('characters')
+                        .insert({ owner_id: user?.id, system_id: 'dnd35', name: customName, data: monster.data })
+                        .select()
+                        .single();
+                      if (error || !newChar) { console.error('Error creando monstruo:', error?.message); }
+                      else { await addDmNpc(newChar.id); }
+                    } finally {
+                      setMonsterPickerLoading(false);
+                    }
+                  }}
+                  style={{ flex: 1, paddingVertical: 10, borderRadius: 8, backgroundColor: '#7c3aed', alignItems: 'center' }}
+                >
+                  <Text style={{ color: '#fff', fontWeight: '700' }}>Añadir</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
+      )}
 
       <PlayerRollPanelModal
         visible={rollPanelVisible}
@@ -412,6 +557,21 @@ export default function ChatScreen({ navigation, route }: Props) {
         combatants={combatants}
         onResult={handleCombatResult}
         onClose={() => setCombatActingFor(null)}
+      />
+
+      <DamageResolutionModal
+        visible={damageModalVisible}
+        attacker={pendingAttacker}
+        attacks={pendingAttacks}
+        damageDie={pendingDamageDie}
+        damageMod={pendingDamageMod}
+        characterMap={characterMap}
+        attackTarget={pendingAttackTarget}
+        saveDC={pendingSaveDC}
+        saveType={pendingSaveType}
+        effectLabel={pendingEffectLabel}
+        onApplyDamage={(targetId, delta) => updateHp(targetId, delta)}
+        onClose={() => setDamageModalVisible(false)}
       />
     </View>
   );

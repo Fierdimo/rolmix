@@ -93,6 +93,22 @@ export interface DiceMetadata {
   target_name?: string;
   /** Tipo de acción de combate: 'standard', 'full', 'total_defense', 'defensive'. */
   combat_action_type?: string;
+  /** Ataques por turno con objetivo individual (ataque completo con múltiples blancos). */
+  per_attacks?: PerAttackEntry[];
+  /** Dado de daño del arma (ej. '1d8') para resolución post-tirada. */
+  damage_die?: string;
+  /** Modificador de daño ya calculado. */
+  damage_mod?: number;
+}
+
+/** Un ataque individual dentro de un ataque completo (permite objetivos distintos). */
+export interface PerAttackEntry {
+  /** Índice del ataque (0 = primer ataque al BAB completo). */
+  index: number;
+  modifier: number;
+  roll: CombatRoll;
+  targetId: string | null;
+  targetName: string | null;
 }
 
 /** Encuentro de combate activo en una sesión. */

@@ -417,6 +417,19 @@ const dnd35: SystemDefinition = {
   classes: CLASSES_35,
   hasSpells: true,
   computeSpellSlots: computeSpellSlots35,
+  spellSaveDCMod(data) {
+    const classes = Array.isArray(data.classes) ? (data.classes as ClassEntry[]) : [];
+    const raceBonus = getRaceBonus(String(data.race ?? ''));
+    let best = 0;
+    for (const entry of classes) {
+      const info = CASTER_MAP[entry.classId];
+      if (!info) continue;
+      const racialMod = raceBonus.abilityMods[info.ability as keyof typeof raceBonus.abilityMods] ?? 0;
+      const mod = abilityModifier(num(data, info.ability, 10) + racialMod);
+      if (mod > best) best = mod;
+    }
+    return best;
+  },
   equipmentSlots: [
     { id: 'weapon_main', label: 'Arma principal' },
     { id: 'weapon_off', label: 'Arma secundaria' },
@@ -463,6 +476,11 @@ const dnd35: SystemDefinition = {
     out.will = out.mod_wis ?? 0;
     out.ac = num(data, 'ac', 10);
     out.hp_max = num(data, 'hp_max', 8);
+    // CA de toque y desprevenido: si están almacenados directamente (monstruos)
+    // se usan tal cual; para PJs los calculará computeFinalStats a partir de
+    // los bonos tipados del equipo.
+    if (typeof data.touch_ac === 'number') out.touch_ac = data.touch_ac as number;
+    if (typeof data.flat_footed_ac === 'number') out.flat_footed_ac = data.flat_footed_ac as number;
     return out;
   },
   actions(data) {

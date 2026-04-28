@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   Modal,
   View,
@@ -41,6 +41,7 @@ interface Props {
   dmNpcs: Character[];
   onAddNpc: () => void;
   onRemoveNpc: (characterId: string) => void;
+  onRenameNpc: (characterId: string, newName: string) => void;
   onNpcRoll: (character: Character) => void;
   onNpcSheet: (characterId: string) => void;
   // drawer
@@ -48,40 +49,28 @@ interface Props {
   onClose: () => void;
 }
 
-/**
- * Drawer lateral animado que contiene:
- *  - Sección de personaje propio (jugador y DM)
- *  - Sección de gestión de partida (sólo DM)
- */
 export default function SessionDrawer({
-  visible,
-  sessionName,
-  isDm,
-  hasAcceptedAccess,
-  activeCharacter,
-  onPickCharacter,
-  onRollOwn,
-  onViewSheet,
-  inviteUsername,
-  sendingInvite,
-  pendingMembers,
-  acceptedMembers,
-  onInviteUsernameChange,
-  onInvitePlayer,
-  onUpdateMemberStatus,
-  onDirectedRoll,
-  onViewPlayerSheet,
-  onGroupRoll,
-  combatActive,
-  onStartCombat,
-  dmNpcs,
-  onAddNpc,
-  onRemoveNpc,
-  onNpcRoll,
-  onNpcSheet,
-  drawerAnim,
-  onClose,
+  visible, sessionName, isDm, hasAcceptedAccess,
+  activeCharacter, onPickCharacter, onRollOwn, onViewSheet,
+  inviteUsername, sendingInvite, pendingMembers, acceptedMembers,
+  onInviteUsernameChange, onInvitePlayer, onUpdateMemberStatus,
+  onDirectedRoll, onViewPlayerSheet, onGroupRoll,
+  combatActive, onStartCombat,
+  dmNpcs, onAddNpc, onRemoveNpc, onRenameNpc, onNpcRoll, onNpcSheet,
+  drawerAnim, onClose,
 }: Props) {
+  const [editingNpcId, setEditingNpcId] = useState<string | null>(null);
+  const [editingNpcName, setEditingNpcName] = useState('');
+
+  function startRename(npc: Character) {
+    setEditingNpcId(npc.id);
+    setEditingNpcName(npc.name);
+  }
+  function commitRename() {
+    if (editingNpcId) onRenameNpc(editingNpcId, editingNpcName);
+    setEditingNpcId(null);
+  }
+
   const showCharSection = hasAcceptedAccess || isDm;
 
   return (
@@ -223,7 +212,20 @@ export default function SessionDrawer({
                   {dmNpcs.map((npc) => (
                     <View key={npc.id} style={s.memberRow}>
                       <View style={{ flex: 1 }}>
-                        <Text style={s.memberName} numberOfLines={1}>{npc.name}</Text>
+                        {editingNpcId === npc.id ? (
+                          <TextInput
+                            value={editingNpcName}
+                            onChangeText={setEditingNpcName}
+                            onBlur={commitRename}
+                            onSubmitEditing={commitRename}
+                            autoFocus
+                            style={[s.memberName, { borderBottomWidth: 1, borderBottomColor: '#7c3aed', paddingVertical: 0 }]}
+                          />
+                        ) : (
+                          <TouchableOpacity onLongPress={() => startRename(npc)}>
+                            <Text style={s.memberName} numberOfLines={1}>{npc.name}</Text>
+                          </TouchableOpacity>
+                        )}
                         <Text style={s.memberMeta}>
                           {getSystem(npc.system_id)?.name ?? npc.system_id}
                         </Text>

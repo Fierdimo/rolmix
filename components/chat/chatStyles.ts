@@ -4,7 +4,7 @@ import { StyleSheet } from 'react-native';
 export const chatStyles = StyleSheet.create({
   // ── Estructura principal ─────────────────────────────────
   flex: { flex: 1 },
-  container: { flex: 1, backgroundColor: '#0f0c29' },
+  container: { flex: 1, backgroundColor: '#0f0c29', },
 
   // ── Header ───────────────────────────────────────────────
   header: {
@@ -137,7 +137,7 @@ export const chatStyles = StyleSheet.create({
   charPickSys: { color: '#a78bfa', fontSize: 12, marginTop: 2 },
 
   // ── Roll list ────────────────────────────────────────────
-  rollGroup: { color: '#a78bfa', fontWeight: '700', fontSize: 12, marginBottom: 6 },
+  rollGroup: { color: '#a78bfa', fontWeight: '700', fontSize: 10, marginBottom: 6 },
   rollWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   rollChip: {
     backgroundColor: 'rgba(255,255,255,0.06)',

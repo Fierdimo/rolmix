@@ -35,6 +35,7 @@ ALTER TABLE combat_encounters ENABLE ROW LEVEL SECURITY;
 ALTER TABLE combatants        ENABLE ROW LEVEL SECURITY;
 
 -- Miembros aceptados leen encuentros de su sesión
+DROP POLICY IF EXISTS "members_read_encounters" ON combat_encounters;
 CREATE POLICY "members_read_encounters"
   ON combat_encounters FOR SELECT
   USING (
@@ -47,6 +48,7 @@ CREATE POLICY "members_read_encounters"
   );
 
 -- Solo el DM puede crear/modificar/eliminar encuentros
+DROP POLICY IF EXISTS "dm_manage_encounters" ON combat_encounters;
 CREATE POLICY "dm_manage_encounters"
   ON combat_encounters FOR ALL
   USING (
@@ -60,6 +62,7 @@ CREATE POLICY "dm_manage_encounters"
   );
 
 -- Miembros aceptados leen combatientes
+DROP POLICY IF EXISTS "members_read_combatants" ON combatants;
 CREATE POLICY "members_read_combatants"
   ON combatants FOR SELECT
   USING (
@@ -73,6 +76,7 @@ CREATE POLICY "members_read_combatants"
   );
 
 -- Solo el DM puede crear/modificar/eliminar combatientes
+DROP POLICY IF EXISTS "dm_manage_combatants" ON combatants;
 CREATE POLICY "dm_manage_combatants"
   ON combatants FOR ALL
   USING (
@@ -261,3 +265,91 @@ BEGIN
   RETURN v_new_hp;
 END;
 $$;
+
+-- ── RPC: delay_after ─────────────────────────────────────────────────────────
+-- Reordena la iniciativa: mueve p_mover_id para que actúe justo después de
+-- p_after_id. Si p_after_id es NULL, va al final de la lista.
+-- Devuelve el nuevo active_index (quien actúa ahora).
+
+CREATE OR REPLACE FUNCTION delay_after(
+  p_encounter_id UUID,
+  p_mover_id     UUID,
+  p_after_id     UUID   -- puede ser NULL → va al final
+) RETURNS TABLE(new_index INT, new_round INT)
+LANGUAGE plpgsql SECURITY DEFINER
+AS $$
+DECLARE
+  v_all_ids    UUID[];
+  v_new_ids    UUID[];
+  v_next_id    UUID;
+  v_new_active INT;
+  v_mover_pos  INT;
+  i            INT;
+  v_round      INT;
+BEGIN
+  -- Auth: DM o dueño del personaje
+  IF NOT EXISTS (
+    SELECT 1 FROM combat_encounters ce
+    JOIN session_members sm ON sm.session_id = ce.session_id
+    WHERE ce.id = p_encounter_id
+      AND sm.user_id = auth.uid()
+      AND (sm.role = 'dm' OR EXISTS (
+        SELECT 1 FROM combatants c2
+        JOIN characters ch ON ch.id = c2.character_id
+        WHERE c2.id = p_mover_id AND ch.owner_id = auth.uid()
+      ))
+  ) THEN
+    RAISE EXCEPTION 'Not authorized';
+  END IF;
+
+  -- Orden actual de IDs
+  SELECT ARRAY_AGG(id ORDER BY turn_order) INTO v_all_ids
+  FROM combatants WHERE encounter_id = p_encounter_id;
+
+  -- Posición del mover (1-based)
+  v_mover_pos := array_position(v_all_ids, p_mover_id);
+
+  -- Quién actuará después del mover (pasa a ser el nuevo activo)
+  IF v_mover_pos < array_length(v_all_ids, 1) THEN
+    v_next_id := v_all_ids[v_mover_pos + 1];
+  ELSE
+    v_next_id := v_all_ids[1];
+  END IF;
+
+  -- Construir nuevo orden: sacar al mover e insertarlo después del target
+  v_new_ids := ARRAY[]::UUID[];
+  FOR i IN 1..array_length(v_all_ids, 1) LOOP
+    IF v_all_ids[i] != p_mover_id THEN
+      v_new_ids := v_new_ids || v_all_ids[i];
+      IF p_after_id IS NOT NULL AND v_all_ids[i] = p_after_id THEN
+        v_new_ids := v_new_ids || p_mover_id;
+      END IF;
+    END IF;
+  END LOOP;
+
+  -- Si p_after_id era NULL o no se encontró, añadir al final
+  IF NOT (p_mover_id = ANY(v_new_ids)) THEN
+    v_new_ids := v_new_ids || p_mover_id;
+  END IF;
+
+  -- Actualizar turn_order
+  FOR i IN 1..array_length(v_new_ids, 1) LOOP
+    UPDATE combatants SET turn_order = i - 1 WHERE id = v_new_ids[i];
+  END LOOP;
+
+  -- Encontrar nueva posición de v_next_id
+  v_new_active := 0;
+  FOR i IN 1..array_length(v_new_ids, 1) LOOP
+    IF v_new_ids[i] = v_next_id THEN
+      v_new_active := i - 1;
+    END IF;
+  END LOOP;
+
+  SELECT round INTO v_round FROM combat_encounters WHERE id = p_encounter_id;
+
+  UPDATE combat_encounters SET active_index = v_new_active WHERE id = p_encounter_id;
+
+  RETURN QUERY SELECT v_new_active, v_round;
+END;
+$$;
+

@@ -55,12 +55,6 @@ export default function MessageBubble({ message, isOwn, currentUserId }: Props) 
           return (
             <View>
               <Text style={[styles.content, { color: cfg.color }]}>{message.content}</Text>
-              {(meta.character_name || meta.action_label) ? (
-                <Text style={styles.diceTag}>
-                  {meta.action_label ?? ''}{meta.character_name ? ` · ${meta.character_name}` : ''}
-                  {meta.target_name ? ` → ${meta.target_name}` : ''}
-                </Text>
-              ) : null}
               {meta.combat_rolls.map((r, i) => {
                 const isCrit   = r.d20 === 20;
                 const isFumble = r.d20 === 1;
@@ -85,14 +79,7 @@ export default function MessageBubble({ message, isOwn, currentUserId }: Props) 
             <Text style={[styles.content, { color: cfg.color }]}>
               {message.content}
             </Text>
-            {(meta.character_name || meta.action_label) ? (
-              <Text style={styles.diceTag}>
-                {meta.directed ? '🎯 Tirada dirigida · ' : ''}
-                {isSecretRoll ? '🔒 Secreta · ' : ''}
-                {meta.action_label ?? ''}{meta.character_name ? ` · ${meta.character_name}` : ''}
-                {meta.target_name ? ` → ${meta.target_name}` : ''}
-              </Text>
-            ) : null}
+           
             <View style={[styles.diceResult, meta.result === 20 && styles.diceResultCrit, meta.result === 1 && styles.diceResultFumble]}>
               <Text style={styles.diceResultText}>
                 {meta.die}: {meta.result}
@@ -121,9 +108,9 @@ export default function MessageBubble({ message, isOwn, currentUserId }: Props) 
     return (
       <View style={[styles.fullWidthWrapper, { backgroundColor: cfg.bg }]}>
         {renderContent()}
-        <Text style={styles.fullWidthMeta}>
+        {/* <Text style={styles.fullWidthMeta}>
           — {message.profiles?.username ?? 'Anon'}
-        </Text>
+        </Text> */}
       </View>
     );
   }
@@ -174,7 +161,7 @@ const styles = StyleSheet.create({
   },
   bubbleOwn: { borderBottomRightRadius: 4 },
   username: { fontSize: 11, fontWeight: '700', marginBottom: 3 },
-  content: { fontSize: 15, lineHeight: 21 },
+  content: { fontSize: 12 },
   time: { fontSize: 10, color: '#64748b', marginTop: 4, textAlign: 'right' },
   fullWidthWrapper: {
     marginVertical: 6,
@@ -204,7 +191,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(239,68,68,0.3)',
   },
-  diceResultText: { color: '#34d399', fontSize: 14, fontWeight: '600' },
-  diceTotal: { fontSize: 18, fontWeight: '800' },
+  diceResultText: { color: '#34d399', fontSize: 10, fontWeight: '600' },
+  diceTotal: { fontSize: 12, fontWeight: '800' },
   diceTag: { color: '#fbbf24', fontSize: 11, marginTop: 4, fontWeight: '600' },
 });

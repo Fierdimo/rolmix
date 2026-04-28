@@ -9,6 +9,8 @@ import {
   BonusEffect,
   BonusType,
   STACKING_BONUS_TYPES,
+  MonsterAttack,
+  SpellEntry,
 } from './types';
 
 /**
@@ -158,6 +160,29 @@ export function computeFinalStats(
   const merged: Record<string, number> = { ...base };
   for (const k of Object.keys(cls)) merged[k] = (merged[k] ?? 0) + cls[k];
   for (const k of Object.keys(resolved)) merged[k] = (merged[k] ?? 0) + resolved[k];
+
+  // Calcular CA de toque y desprevenido para PJs (los monstruos las traen precalculadas
+  // en data y ya están en `merged` vía computeStats).
+  if (!('touch_ac' in merged) || !('flat_footed_ac' in merged)) {
+    // Bonos del equipo/dotes tipados que van a 'ac'
+    const acBonusList: BonusEffect[] = stackMap['ac'] ?? [];
+    // No-toque: armadura, escudo y armadura natural no aplican a CA de toque
+    const NON_TOUCH: ReadonlySet<string> = new Set(['armor', 'shield', 'natural']);
+    const nonTouchTotal = resolveBonusStack(acBonusList.filter((b) => NON_TOUCH.has(b.type ?? '')));
+    // Esquiva no aplica a desprevenido
+    const dodgeTotal = resolveBonusStack(acBonusList.filter((b) => b.type === 'dodge'));
+    const finalAc = merged['ac'] ?? 10;
+    const dexMod  = merged['mod_dex'] ?? 0;
+    if (!('touch_ac' in merged)) {
+      // Toque = CA total - bonos de armadura/escudo/natural + DEX (que no está en ac base del PJ)
+      merged['touch_ac'] = finalAc - nonTouchTotal + dexMod;
+    }
+    if (!('flat_footed_ac' in merged)) {
+      // Desprevenido = CA total - bonos de esquiva (DEX tampoco está en ac base, no hay que restarla)
+      merged['flat_footed_ac'] = finalAc - dodgeTotal;
+    }
+  }
+
   return merged;
 }
 
@@ -207,8 +232,16 @@ export function computeFinalActions(
     const bonuses = weapon.bonuses ?? [];
     const meleeBon  = resolveBonusStack(bonuses.filter((b) => b.target === 'attack_melee'));
     const rangedBon = resolveBonusStack(bonuses.filter((b) => b.target === 'attack_ranged'));
+    const damageBon = resolveBonusStack(bonuses.filter((b) => b.target === 'damage'));
     const isRanged  = rangedBon > 0 && meleeBon === 0;
     const modifier  = isRanged ? rangedMod + rangedBon : meleeMod + meleeBon;
+    const strMod = isRanged ? 0 : (actions.find((a) => a.id === 'attack_melee')?.modifier ?? 0) - bab;
+    const damageMod = strMod + damageBon;
+
+    // damageDie: campo explícito o extracción del campo notes (fallback para armas ya guardadas)
+    const damageDie: string | undefined =
+      weapon.damageDie ||
+      (String(weapon.notes ?? '').match(/(\d+d\d+)/i)?.[1] ?? undefined);
 
     const extra: number[] = [];
     for (let p = 5; bab - p > 0; p += 5) extra.push(modifier - p);
@@ -220,6 +253,7 @@ export function computeFinalActions(
       die: 'd20',
       modifier,
       ...(extra.length > 0 ? { extraAttacks: extra } : {}),
+      ...(damageDie ? { damageDie, damageMod } : {}),
     });
   }
 
@@ -230,6 +264,75 @@ export function computeFinalActions(
     }
     return 0;
   });
+
+  // Paso 4: ataques de monstruo (monster_attacks) → acciones directas con bonos absolutos
+  // Se añaden ANTES de devolver para que aparezcan en la sección Combate.
+  const monsterAttacks: MonsterAttack[] = Array.isArray(data.monster_attacks)
+    ? (data.monster_attacks as MonsterAttack[])
+    : [];
+  for (let i = 0; i < monsterAttacks.length; i++) {
+    const atk = monsterAttacks[i];
+    if (!atk || typeof atk.bonus !== 'number') continue;
+    const extra: number[] = Array.isArray(atk.extra_attacks) ? atk.extra_attacks : [];
+    actions.unshift({
+      id: `monster_atk_${i}`,
+      label: atk.name,
+      group: 'Combate',
+      die: 'd20',
+      modifier: atk.bonus,
+      ...(extra.length > 0 ? { extraAttacks: extra } : {}),
+      damageDie: atk.damage_die,
+      damageMod: atk.damage_mod ?? 0,
+    });
+  }
+
+  // Paso 5: conjuros/habilidades sortilegas con tirada de ataque o salvación.
+  // Solo se generan acciones para conjuros que tengan attack_type o save_type.
+  const spells: SpellEntry[] = Array.isArray(data.spells)
+    ? (data.spells as SpellEntry[])
+    : [];
+  const spellSaveDCMod = system.spellSaveDCMod ? system.spellSaveDCMod(data) : 0;
+
+  for (const sp of spells) {
+    const hasAttack = sp.attack_type && sp.attack_type !== 'none';
+    const hasSave = !!sp.save_type;
+    if (!hasAttack && !hasSave) continue;
+
+    let modifier = 0;
+    let attackTarget: RollableAction['attackTarget'] = undefined;
+
+    if (hasAttack) {
+      if (sp.attack_type === 'melee_touch') {
+        modifier = meleeMod;    // BAB + STR (ya calculado con bonos de clase/equipo)
+        attackTarget = 'touch_ac';
+      } else if (sp.attack_type === 'ranged_touch') {
+        modifier = rangedMod;   // BAB + DEX
+        attackTarget = 'touch_ac';
+      } else if (sp.attack_type === 'ranged') {
+        modifier = rangedMod;
+        attackTarget = 'ac';
+      }
+    }
+
+    const saveDC = sp.save_dc_override != null
+      ? sp.save_dc_override
+      : hasSave
+        ? 10 + sp.level + spellSaveDCMod
+        : undefined;
+
+    actions.push({
+      id: `spell_${sp.id}`,
+      label: sp.name,
+      group: 'Conjuros',
+      die: 'd20',
+      modifier,
+      ...(sp.damage_die ? { damageDie: sp.damage_die, damageMod: 0 } : {}),
+      ...(attackTarget ? { attackTarget } : {}),
+      ...(saveDC != null ? { saveDC } : {}),
+      ...(sp.save_type ? { saveType: sp.save_type } : {}),
+      ...(sp.effect_label ? { effectLabel: sp.effect_label } : {}),
+    });
+  }
 
   return actions;
 }
