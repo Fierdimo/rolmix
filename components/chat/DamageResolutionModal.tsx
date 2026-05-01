@@ -20,7 +20,7 @@ import {
   View, Text, TouchableOpacity, Modal, StyleSheet, ScrollView,
 } from 'react-native';
 import { Combatant, Character } from '../../lib/types';
-import { rollDie } from '../../lib/systems';
+import { rollDie, getSystem, computeFinalStats } from '../../lib/systems';
 
 // ── Tipos ──────────────────────────────────────────────────────────────────────
 
@@ -54,11 +54,20 @@ function getAcValues(
   if (!target?.character_id) return { ac: 10, touchAc: 10, ffAc: 10 };
   const ch = characterMap[target.character_id];
   if (!ch) return { ac: 10, touchAc: 10, ffAc: 10 };
+  const system = getSystem(ch.system_id);
+  if (system) {
+    const stats = computeFinalStats(system, ch.data as Record<string, unknown>);
+    return {
+      ac:      stats.ac      ?? 10,
+      touchAc: stats.touch_ac ?? stats.ac ?? 10,
+      ffAc:    stats.flat_footed_ac ?? stats.ac ?? 10,
+    };
+  }
+  // Fallback para sistemas desconocidos
   const d = ch.data as Record<string, unknown>;
   const ac = Number(d.ac ?? 10);
-  // touch_ac y flat_footed_ac opcionales (el personaje puede no tenerlos calculados)
-  const touchAc = Number(d.touch_ac ?? d.touchAc ?? Math.max(10, ac - Number(d.armor_bonus ?? 0) - Number(d.shield_bonus ?? 0) - Number(d.natural_armor ?? 0)));
-  const ffAc    = Number(d.flat_footed_ac ?? d.ffAc ?? Math.max(10, ac - Number(d.dex_mod ?? 0)));
+  const touchAc = Number(d.touch_ac ?? d.touchAc ?? ac);
+  const ffAc    = Number(d.flat_footed_ac ?? d.ffAc ?? ac);
   return { ac, touchAc, ffAc };
 }
 
@@ -93,10 +102,10 @@ function hitLabel(ht: HitType): string {
 
 function hitColor(ht: HitType): string {
   switch (ht) {
-    case 'hit':      return '#34d399';
-    case 'touch':    return '#a78bfa';
-    case 'flatfoot': return '#fbbf24';
-    case 'miss':     return '#f87171';
+    case 'hit':      return '#059669';
+    case 'touch':    return '#6d28d9';
+    case 'flatfoot': return '#d97706';
+    case 'miss':     return '#dc2626';
   }
 }
 
@@ -302,15 +311,20 @@ export default function DamageResolutionModal({
 // ── Estilos ────────────────────────────────────────────────────────────────────
 
 const s = StyleSheet.create({
-  backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.65)', justifyContent: 'flex-end' },
+  backdrop: { flex: 1, backgroundColor: 'rgba(15,12,41,0.50)', justifyContent: 'flex-end' },
   backdropTap: { flex: 1 },
   sheet: {
-    backgroundColor: '#1a1535',
+    backgroundColor: '#ffffff',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     maxHeight: '80%',
     borderWidth: 1,
-    borderColor: 'rgba(124,58,237,0.4)',
+    borderColor: 'rgba(109,40,217,0.15)',
+    shadowColor: '#6d28d9',
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.10,
+    shadowRadius: 16,
+    elevation: 12,
   },
   header: {
     flexDirection: 'row',
@@ -320,29 +334,29 @@ const s = StyleSheet.create({
     paddingTop: 16,
     paddingBottom: 10,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(124,58,237,0.2)',
+    borderBottomColor: 'rgba(109,40,217,0.12)',
   },
-  headerTitle: { color: '#e2e8f0', fontSize: 16, fontWeight: '700' },
-  closeBtn: { color: '#64748b', fontSize: 20, paddingHorizontal: 4 },
+  headerTitle: { color: '#1e1b3a', fontSize: 16, fontWeight: '700' },
+  closeBtn: { color: '#9ca3af', fontSize: 20, paddingHorizontal: 4 },
   body: { paddingHorizontal: 14, paddingTop: 10 },
 
   attackCard: {
-    backgroundColor: 'rgba(30,27,60,0.8)',
+    backgroundColor: '#faf9ff',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: 'rgba(124,58,237,0.2)',
+    borderColor: 'rgba(109,40,217,0.15)',
     padding: 12,
     marginBottom: 10,
     gap: 6,
   },
   attackHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  attackIdx: { color: '#94a3b8', fontSize: 12, fontWeight: '700' },
-  attackRoll: { color: '#94a3b8', fontSize: 13 },
-  attackTotal: { color: '#e2e8f0', fontWeight: '800' },
+  attackIdx: { color: '#6b7280', fontSize: 12, fontWeight: '700' },
+  attackRoll: { color: '#6b7280', fontSize: 13 },
+  attackTotal: { color: '#1e1b3a', fontWeight: '800' },
 
   acRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap' },
-  targetLabel: { color: '#a78bfa', fontSize: 13, fontWeight: '600' },
-  acLabel: { color: '#64748b', fontSize: 11 },
+  targetLabel: { color: '#6d28d9', fontSize: 13, fontWeight: '600' },
+  acLabel: { color: '#9ca3af', fontSize: 11 },
 
   hitBadge: {
     alignSelf: 'flex-start',
@@ -353,46 +367,52 @@ const s = StyleSheet.create({
   },
   hitText: { fontSize: 13, fontWeight: '700' },
 
-  noTarget: { color: '#475569', fontSize: 12, fontStyle: 'italic' },
+  noTarget: { color: '#6b7280', fontSize: 12, fontStyle: 'italic' },
 
   damageRow: { marginTop: 4 },
   dmgBtn: {
-    backgroundColor: 'rgba(239,68,68,0.2)',
+    backgroundColor: '#dc2626',
     borderRadius: 8,
     paddingVertical: 8,
     paddingHorizontal: 14,
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#f87171',
+    shadowColor: '#dc2626',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 3,
   },
-  dmgBtnText: { color: '#fca5a5', fontSize: 13, fontWeight: '600' },
+  dmgBtnText: { color: '#ffffff', fontSize: 13, fontWeight: '700' },
 
   dmgResult: { gap: 8 },
-  dmgResultText: { color: '#94a3b8', fontSize: 13 },
-  dmgTotal: { color: '#f87171', fontWeight: '800', fontSize: 16 },
+  dmgResultText: { color: '#6b7280', fontSize: 13 },
+  dmgTotal: { color: '#dc2626', fontWeight: '800', fontSize: 16 },
 
   dmgActions: { flexDirection: 'row', gap: 8, alignItems: 'center' },
   applyBtn: {
-    backgroundColor: 'rgba(52,211,153,0.2)',
+    backgroundColor: '#059669',
     borderRadius: 8,
     paddingVertical: 7,
     paddingHorizontal: 14,
-    borderWidth: 1,
-    borderColor: '#34d399',
+    shadowColor: '#059669',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 3,
   },
-  applyBtnText: { color: '#34d399', fontSize: 12, fontWeight: '700' },
+  applyBtnText: { color: '#ffffff', fontSize: 12, fontWeight: '700' },
   skipBtn: {
-    backgroundColor: 'rgba(100,116,139,0.2)',
+    backgroundColor: '#f3f4f6',
     borderRadius: 8,
     paddingVertical: 7,
     paddingHorizontal: 14,
     borderWidth: 1,
-    borderColor: '#475569',
+    borderColor: 'rgba(107,114,128,0.30)',
   },
-  skipBtnText: { color: '#94a3b8', fontSize: 12, fontWeight: '600' },
-  noDie: { color: '#64748b', fontSize: 12 },
+  skipBtnText: { color: '#6b7280', fontSize: 12, fontWeight: '600' },
+  noDie: { color: '#9ca3af', fontSize: 12 },
 
-  appliedBadge: { color: '#34d399', fontSize: 12, fontStyle: 'italic' },
+  appliedBadge: { color: '#059669', fontSize: 12, fontStyle: 'italic' },
 
   spellInfoCard: {
     backgroundColor: 'rgba(139,92,246,0.12)',
@@ -403,17 +423,20 @@ const s = StyleSheet.create({
     marginBottom: 10,
     gap: 4,
   },
-  spellInfoText: { color: '#c4b5fd', fontSize: 13, fontWeight: '600' },
-  spellEffectText: { color: '#94a3b8', fontSize: 12, fontStyle: 'italic' },
+  spellInfoText: { color: '#5b21b6', fontSize: 13, fontWeight: '600' },
+  spellEffectText: { color: '#6b7280', fontSize: 12, fontStyle: 'italic' },
 
   closeFooterBtn: {
     margin: 14,
-    backgroundColor: 'rgba(124,58,237,0.2)',
+    backgroundColor: '#6d28d9',
     borderRadius: 12,
     paddingVertical: 12,
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(124,58,237,0.4)',
+    shadowColor: '#6d28d9',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.25,
+    shadowRadius: 6,
+    elevation: 4,
   },
-  closeFooterText: { color: '#a78bfa', fontSize: 15, fontWeight: '600' },
+  closeFooterText: { color: '#ffffff', fontSize: 15, fontWeight: '600' },
 });

@@ -32,6 +32,9 @@ import { resolveAction } from '../lib/systems';
 import { RollableAction } from '../lib/systems/types';
 import { chatStyles as s } from '../components/chat/chatStyles';
 import { RootStackParamList } from '../App';
+import { useSessionRoster } from '../hooks/useSessionRoster';
+import { useSessionEncounters } from '../hooks/useSessionEncounters';
+import EncounterBuilderModal from '../components/chat/EncounterBuilderModal';
 
 type Props = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'Chat'>;
@@ -49,10 +52,14 @@ export default function ChatScreen({ navigation, route }: Props) {
   const [directedCharacter, setDirectedCharacter] = useState<Character | null>(null);
   const [groupRollVisible, setGroupRollVisible] = useState(false);
   const [drawerVisible, setDrawerVisible] = useState(false);
-  const [npcPickerMode, setNpcPickerMode] = useState(false);
+  // 'active' = cambiar personaje activo, 'session_npc' = añadir NPC a sesión, 'roster' = añadir personaje al bestiario
+  const [charPickerTarget, setCharPickerTarget] = useState<'active' | 'session_npc' | 'roster'>('active');
   const [monsterPickerVisible, setMonsterPickerVisible] = useState(false);
   const [monsterPickerLoading, setMonsterPickerLoading] = useState(false);
+  // Modo del picker de monstruos: 'session' = añadir al combate / 'roster' = añadir al bestiario
+  const [monsterPickerTarget, setMonsterPickerTarget] = useState<'session' | 'roster'>('session');
   const [pendingMonster, setPendingMonster] = useState<MonsterEntry | null>(null);
+  const [encounterBuilderVisible, setEncounterBuilderVisible] = useState(false);
   const [pendingMonsterName, setPendingMonsterName] = useState('');
   const [combatActingFor, setCombatActingFor] = useState<Combatant | null>(null);
   // Damage resolution
@@ -108,6 +115,12 @@ export default function ChatScreen({ navigation, route }: Props) {
     encounter, combatants, activeCombatant, characterMap,
     startCombat, endCombat, nextTurn, updateHp, delayAfter, consumeSpell,
   } = useCombat(sessionId, isDm);
+
+  // ── Bestiario de sesión ───────────────────────────────────────────────────
+  const { roster, addToRoster, removeFromRoster } = useSessionRoster(sessionId);
+
+  // ── Encuentros preparados ─────────────────────────────────────────────────
+  const { encounters, saveEncounter, deleteEncounter } = useSessionEncounters(sessionId);
 
   // ── Scroll to bottom on new message ──────────────────────────────────────
   const handleContentSizeChange = useCallback(() => {
@@ -166,7 +179,36 @@ export default function ChatScreen({ navigation, route }: Props) {
     setTimeout(() => openDirectedRollFor(member), 260);
   }
   function drawerThenGroupRoll() { closeDrawer(); setTimeout(() => setGroupRollVisible(true), 260); }
-  function drawerThenAddNpc() { closeDrawer(); setTimeout(() => setMonsterPickerVisible(true), 260); }
+  function drawerThenAddNpc() { closeDrawer(); setTimeout(() => { setMonsterPickerTarget('session'); setMonsterPickerVisible(true); }, 260); }
+  function drawerThenAddToRoster() { closeDrawer(); setTimeout(() => { setMonsterPickerTarget('roster'); setMonsterPickerVisible(true); }, 260); }
+  function handleAddToSessionFromRoster(monster: MonsterEntry) {
+    closeDrawer();
+    setTimeout(() => { setPendingMonster(monster); setPendingMonsterName(monster.name); }, 260);
+  }
+  function drawerThenManageEncounters() { closeDrawer(); setTimeout(() => setEncounterBuilderVisible(true), 260); }
+  function drawerThenCharToRoster() {
+    closeDrawer();
+    setTimeout(() => { setCharPickerTarget('roster'); setPickerVisible(true); }, 260);
+  }
+
+  /** Despliega un encuentro completo: crea cada instancia como personaje y la añade a la sesión. */
+  async function handleDeployEncounter(enc: import('../hooks/useSessionEncounters').PreparedEncounter) {
+    const { supabase: sb } = await import('../lib/supabase');
+    for (const entry of enc.monsters) {
+      const instances = Array.from({ length: entry.count }, (_, i) =>
+        entry.count > 1 ? `${entry.customName} ${i + 1}` : entry.customName,
+      );
+      for (const instanceName of instances) {
+        const { data: newChar, error } = await sb
+          .from('characters')
+          .insert({ owner_id: user?.id, system_id: entry.monster.system_id, name: instanceName, data: entry.monster.data })
+          .select()
+          .single();
+        if (!error && newChar) await addDmNpc(newChar.id);
+      }
+    }
+    await sendMessage(`⚔️ Encuentro desplegado: **${enc.name}** (${enc.monsters.reduce((a, m) => a + m.count, 0)} figuras)`, 'narration');
+  }
   function drawerThenNpcRoll(character: Character) {
     closeDrawer();
     setTimeout(() => { setDirectedCharacter(character); setDirectedFor(null); }, 260);
@@ -347,19 +389,19 @@ export default function ChatScreen({ navigation, route }: Props) {
   // ── Render ────────────────────────────────────────────────────────────────
   return (
     <View style={s.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#0f0c29" />
+      <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
 
       {/* Header */}
       <View style={s.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={s.backBtn}>
-          <Text style={s.backText}>❎</Text>
+          <Text style={s.backText}>‹</Text>
         </TouchableOpacity>
         <View style={s.headerCenter}>
           <Text style={s.headerTitle} numberOfLines={1}>{sessionName}</Text>
           <View style={s.onlineDot} />
         </View>
         <TouchableOpacity onPress={openDrawer} style={s.menuBtn}>
-          <Text style={s.menuBtnText}>🟰</Text>
+          <Text style={s.menuBtnText}>☰</Text>
         </TouchableOpacity>
       </View>
 
@@ -446,6 +488,14 @@ export default function ChatScreen({ navigation, route }: Props) {
         onRenameNpc={renameDmNpc}
         onNpcRoll={drawerThenNpcRoll}
         onNpcSheet={drawerThenSheet}
+        roster={roster}
+        onAddToRoster={drawerThenAddToRoster}
+        onAddCharacterToRoster={drawerThenCharToRoster}
+        onRemoveFromRoster={removeFromRoster}
+        onAddToSessionFromRoster={handleAddToSessionFromRoster}
+        encounters={encounters}
+        onManageEncounters={drawerThenManageEncounters}
+        onDeployEncounter={handleDeployEncounter}
         drawerAnim={drawerAnim}
         onClose={closeDrawer}
       />
@@ -453,13 +503,22 @@ export default function ChatScreen({ navigation, route }: Props) {
       <CharacterPickerModal
         visible={pickerVisible}
         characters={myCharacters}
-        activeCharacter={npcPickerMode ? null : activeCharacter}
+        activeCharacter={charPickerTarget !== 'active' ? null : activeCharacter}
         onPick={(id) => {
           setPickerVisible(false);
-          if (npcPickerMode) { setNpcPickerMode(false); if (id) addDmNpc(id); }
-          else pickActiveCharacter(id);
+          if (charPickerTarget === 'session_npc') {
+            if (id) addDmNpc(id);
+          } else if (charPickerTarget === 'roster') {
+            if (id) {
+              const char = myCharacters.find((c) => c.id === id);
+              if (char) addToRoster({ id: char.id, name: char.name, system_id: char.system_id, data: char.data as Record<string, unknown> });
+            }
+          } else {
+            pickActiveCharacter(id);
+          }
+          setCharPickerTarget('active');
         }}
-        onClose={() => { setPickerVisible(false); setNpcPickerMode(false); }}
+        onClose={() => { setPickerVisible(false); setCharPickerTarget('active'); }}
       />
 
       <MonsterPickerModal
@@ -467,9 +526,13 @@ export default function ChatScreen({ navigation, route }: Props) {
         loading={monsterPickerLoading}
         onPick={async (monster: MonsterEntry) => {
           setMonsterPickerVisible(false);
-          // Pedir nombre personalizado antes de crear
-          setPendingMonster(monster);
-          setPendingMonsterName(monster.name);
+          if (monsterPickerTarget === 'roster') {
+            addToRoster(monster);
+          } else {
+            // Pedir nombre personalizado antes de crear
+            setPendingMonster(monster);
+            setPendingMonsterName(monster.name);
+          }
         }}
         onClose={() => setMonsterPickerVisible(false)}
       />
@@ -477,25 +540,25 @@ export default function ChatScreen({ navigation, route }: Props) {
       {/* ── Modal nombre de monstruo ─────────────────────────── */}
       {pendingMonster && (
         <Modal transparent animationType="fade" visible onRequestClose={() => setPendingMonster(null)}>
-          <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'center', alignItems: 'center', padding: 24 }}>
-            <View style={{ backgroundColor: '#1e1b4b', borderRadius: 12, padding: 20, width: '100%', maxWidth: 380, borderWidth: 1, borderColor: 'rgba(167,139,250,0.3)' }}>
-              <Text style={{ color: '#e2d9ff', fontSize: 16, fontWeight: '700', marginBottom: 4 }}>Añadir monstruo</Text>
-              <Text style={{ color: '#94a3b8', fontSize: 13, marginBottom: 14 }}>Elige un nombre para esta instancia (puede ser diferente al tipo base).</Text>
+          <View style={{ flex: 1, backgroundColor: 'rgba(15,12,41,0.50)', justifyContent: 'center', alignItems: 'center', padding: 24 }}>
+            <View style={{ backgroundColor: '#ffffff', borderRadius: 12, padding: 20, width: '100%', maxWidth: 380, borderWidth: 1, borderColor: 'rgba(109,40,217,0.18)' }}>
+              <Text style={{ color: '#1e1b3a', fontSize: 16, fontWeight: '700', marginBottom: 4 }}>Añadir monstruo</Text>
+              <Text style={{ color: '#6b7280', fontSize: 13, marginBottom: 14 }}>Elige un nombre para esta instancia (puede ser diferente al tipo base).</Text>
               <TextInput
                 value={pendingMonsterName}
                 onChangeText={setPendingMonsterName}
                 placeholder={pendingMonster.name}
-                placeholderTextColor="#475569"
-                style={{ backgroundColor: '#0f0d2e', borderWidth: 1, borderColor: 'rgba(167,139,250,0.3)', borderRadius: 8, color: '#e2d9ff', paddingHorizontal: 12, paddingVertical: 10, fontSize: 15, marginBottom: 16 }}
+                placeholderTextColor="#9ca3af"
+                style={{ backgroundColor: '#f5f3ff', borderWidth: 1, borderColor: 'rgba(109,40,217,0.18)', borderRadius: 8, color: '#1e1b3a', paddingHorizontal: 12, paddingVertical: 10, fontSize: 15, marginBottom: 16 }}
                 autoFocus
                 selectTextOnFocus
               />
               <View style={{ flexDirection: 'row', gap: 10 }}>
                 <TouchableOpacity
                   onPress={() => setPendingMonster(null)}
-                  style={{ flex: 1, paddingVertical: 10, borderRadius: 8, borderWidth: 1, borderColor: '#475569', alignItems: 'center' }}
+                  style={{ flex: 1, paddingVertical: 10, borderRadius: 8, borderWidth: 1, borderColor: 'rgba(109,40,217,0.20)', alignItems: 'center' }}
                 >
-                  <Text style={{ color: '#94a3b8', fontWeight: '600' }}>Cancelar</Text>
+                  <Text style={{ color: '#6b7280', fontWeight: '600' }}>Cancelar</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={async () => {
@@ -516,7 +579,7 @@ export default function ChatScreen({ navigation, route }: Props) {
                       setMonsterPickerLoading(false);
                     }
                   }}
-                  style={{ flex: 1, paddingVertical: 10, borderRadius: 8, backgroundColor: '#7c3aed', alignItems: 'center' }}
+                  style={{ flex: 1, paddingVertical: 10, borderRadius: 8, backgroundColor: '#6d28d9', alignItems: 'center' }}
                 >
                   <Text style={{ color: '#fff', fontWeight: '700' }}>Añadir</Text>
                 </TouchableOpacity>
@@ -572,6 +635,16 @@ export default function ChatScreen({ navigation, route }: Props) {
         effectLabel={pendingEffectLabel}
         onApplyDamage={(targetId, delta) => updateHp(targetId, delta)}
         onClose={() => setDamageModalVisible(false)}
+      />
+
+      <EncounterBuilderModal
+        visible={encounterBuilderVisible}
+        encounters={encounters}
+        myCharacters={myCharacters}
+        onSave={saveEncounter}
+        onDelete={deleteEncounter}
+        onDeploy={handleDeployEncounter}
+        onClose={() => setEncounterBuilderVisible(false)}
       />
     </View>
   );

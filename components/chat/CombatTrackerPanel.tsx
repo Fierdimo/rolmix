@@ -59,7 +59,7 @@ function HpEditModal({ combatant, displayName, onApply, onClose }: HpEditModalPr
             onChangeText={setValue}
             keyboardType="numbers-and-punctuation"
             placeholder="-5  /  +3"
-            placeholderTextColor="#64748b"
+            placeholderTextColor="#9ca3af"
             autoFocus
             onSubmitEditing={apply}
           />
@@ -112,7 +112,7 @@ export default function CombatTrackerPanel({
   function renderCard({ item: c }: { item: Combatant }) {
     const isActive = c.turn_order === encounter.active_index && !c.is_defeated;
     const hpPct    = c.hp_max > 0 ? Math.max(0, c.hp_current / c.hp_max) : 0;
-    const barColor = hpPct > 0.5 ? '#34d399' : hpPct > 0.25 ? '#fbbf24' : '#f87171';
+    const barColor = hpPct > 0.5 ? '#059669' : hpPct > 0.25 ? '#d97706' : '#dc2626';
 
     return (
       <View style={[s.card, isActive && s.cardActive, c.is_defeated && s.cardDefeated]}>
@@ -204,9 +204,9 @@ export default function CombatTrackerPanel({
 
 const s = StyleSheet.create({
   panel: {
-    backgroundColor: 'rgba(15,12,41,0.97)',
+    backgroundColor: '#ffffff',
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(124,58,237,0.3)',
+    borderBottomColor: 'rgba(109,40,217,0.15)',
     paddingBottom: 6,
     maxHeight: 210,
   },
@@ -219,7 +219,7 @@ const s = StyleSheet.create({
     paddingBottom: 4,
   },
   headerTitle: {
-    color: '#f87171',
+    color: '#b91c1c',
     fontWeight: '700',
     fontSize: 13,
     letterSpacing: 0.5,
@@ -230,29 +230,29 @@ const s = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 4,
   },
-  endBtnText: { color: '#f87171', fontSize: 12, fontWeight: '600' },
+  endBtnText: { color: '#b91c1c', fontSize: 12, fontWeight: '600' },
   listContent: { paddingHorizontal: 8, paddingVertical: 4, gap: 8 },
 
   // Tarjeta de combatiente
   card: {
     width: 120,
-    backgroundColor: 'rgba(30,27,60,0.9)',
+    backgroundColor: '#faf9ff',
     borderRadius: 8,
     padding: 8,
     borderWidth: 1,
-    borderColor: 'rgba(124,58,237,0.25)',
+    borderColor: 'rgba(109,40,217,0.18)',
     gap: 3,
   },
   cardActive: {
     borderColor: '#f87171',
-    backgroundColor: 'rgba(239,68,68,0.12)',
+    backgroundColor: '#fee2e2',
   },
   cardDefeated: {
     borderColor: 'rgba(100,116,139,0.3)',
-    backgroundColor: 'rgba(15,12,41,0.6)',
+    backgroundColor: '#f5f3ff',
     opacity: 0.6,
   },
-  turnArrow: { color: '#f87171', fontSize: 10, fontWeight: '700', marginBottom: -2 },
+  turnArrow: { color: '#b91c1c', fontSize: 10, fontWeight: '700', marginBottom: -2 },
   nameRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -260,13 +260,13 @@ const s = StyleSheet.create({
     gap: 4,
   },
   name: {
-    color: '#e2e8f0',
+    color: '#1e1b3a',
     fontSize: 12,
     fontWeight: '700',
     flex: 1,
   },
-  initiative: { color: '#a78bfa', fontSize: 11, fontWeight: '600' },
-  textDefeated: { color: '#64748b' },
+  initiative: { color: '#6d28d9', fontSize: 11, fontWeight: '600' },
+  textDefeated: { color: '#9ca3af' },
 
   // Barra de PG
   hpBarBg: {
@@ -279,7 +279,7 @@ const s = StyleSheet.create({
   hpBarFill: { height: '100%', borderRadius: 3 },
 
   hpTextRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  hpText: { color: '#94a3b8', fontSize: 11 },
+  hpText: { color: '#6b7280', fontSize: 11 },
   editHint: { fontSize: 10, opacity: 0.6 },
 
   actBtn: {
@@ -289,24 +289,24 @@ const s = StyleSheet.create({
     paddingVertical: 4,
     alignItems: 'center',
   },
-  actBtnText: { color: '#fca5a5', fontSize: 12, fontWeight: '700' },
+  actBtnText: { color: '#b91c1c', fontSize: 12, fontWeight: '700' },
 
   nextBtn: {
     marginHorizontal: 12,
     marginTop: 2,
-    backgroundColor: 'rgba(124,58,237,0.2)',
+    backgroundColor: 'rgba(109,40,217,0.14)',
     borderRadius: 8,
     paddingVertical: 6,
     alignItems: 'center',
   },
-  nextBtnText: { color: '#a78bfa', fontSize: 13, fontWeight: '600' },
+  nextBtnText: { color: '#6d28d9', fontSize: 13, fontWeight: '600' },
 });
 
 // Estilos del modal de edición de HP
 const ms = StyleSheet.create({
   backdrop: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.7)',
+    backgroundColor: 'rgba(15,12,41,0.50)',
   },
   container: {
     flex: 1,
@@ -315,23 +315,28 @@ const ms = StyleSheet.create({
     paddingHorizontal: 24,
   },
   card: {
-    backgroundColor: '#1e1b3c',
+    backgroundColor: '#ffffff',
     borderRadius: 14,
     padding: 20,
     width: '100%',
     gap: 10,
     borderWidth: 1,
-    borderColor: 'rgba(124,58,237,0.4)',
+    borderColor: 'rgba(109,40,217,0.18)',
+    shadowColor: '#6d28d9',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.10,
+    shadowRadius: 12,
+    elevation: 4,
   },
-  title: { color: '#e2e8f0', fontSize: 16, fontWeight: '700' },
-  sub:   { color: '#94a3b8', fontSize: 13 },
-  label: { color: '#94a3b8', fontSize: 12 },
+  title: { color: '#1e1b3a', fontSize: 16, fontWeight: '700' },
+  sub:   { color: '#6b7280', fontSize: 13 },
+  label: { color: '#6b7280', fontSize: 12 },
   input: {
-    backgroundColor: 'rgba(255,255,255,0.07)',
+    backgroundColor: '#f5f3ff',
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: 'rgba(124,58,237,0.3)',
-    color: '#e2e8f0',
+    borderColor: 'rgba(109,40,217,0.22)',
+    color: '#1e1b3a',
     fontSize: 18,
     textAlign: 'center',
     paddingVertical: 10,
@@ -344,7 +349,7 @@ const ms = StyleSheet.create({
   },
   quickDmg:  { backgroundColor: 'rgba(239,68,68,0.25)' },
   quickHeal: { backgroundColor: 'rgba(52,211,153,0.2)' },
-  quickBtnText: { color: '#e2e8f0', fontSize: 13, fontWeight: '600' },
+  quickBtnText: { color: '#1e1b3a', fontSize: 13, fontWeight: '600' },
   actions: { flexDirection: 'row', gap: 10, marginTop: 4 },
   cancelBtn: {
     flex: 1,
@@ -353,13 +358,13 @@ const ms = StyleSheet.create({
     paddingVertical: 10,
     alignItems: 'center',
   },
-  cancelBtnText: { color: '#94a3b8', fontSize: 14, fontWeight: '600' },
+  cancelBtnText: { color: '#6b7280', fontSize: 14, fontWeight: '600' },
   applyBtn: {
     flex: 1,
-    backgroundColor: 'rgba(124,58,237,0.4)',
+    backgroundColor: '#6d28d9',
     borderRadius: 8,
     paddingVertical: 10,
     alignItems: 'center',
   },
-  applyBtnText: { color: '#e2e8f0', fontSize: 14, fontWeight: '700' },
+  applyBtnText: { color: '#ffffff', fontSize: 14, fontWeight: '700' },
 });

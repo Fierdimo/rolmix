@@ -55,12 +55,12 @@ function SecretPicker({ secret, onToggle, members, whisperTo, onToggleMember }: 
       {secret ? (
         <View style={rpSecretBox}>
           {members.length === 0 ? (
-            <Text style={{ color: '#64748b', fontSize: 12, fontStyle: 'italic' }}>
+            <Text style={{ color: '#9ca3af', fontSize: 12, fontStyle: 'italic' }}>
               Solo tú verás esta tirada (no hay otros miembros en la partida).
             </Text>
           ) : (
             <>
-              <Text style={{ color: '#fbbf24', fontSize: 11, fontWeight: '700', marginBottom: 8 }}>
+              <Text style={{ color: '#d97706', fontSize: 11, fontWeight: '700', marginBottom: 8 }}>
                 Visible también para:
               </Text>
               <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
@@ -183,7 +183,7 @@ function RollPanel({
 
   if (!character) {
     return (
-      <Text style={{ color: '#64748b', textAlign: 'center', marginTop: 20 }}>
+      <Text style={{ color: '#9ca3af', textAlign: 'center', marginTop: 20 }}>
         Sin personaje activo. Elige uno desde el menú.
       </Text>
     );
@@ -191,7 +191,7 @@ function RollPanel({
 
   const sys = getSystem(character.system_id);
   if (!sys) {
-    return <Text style={{ color: '#64748b' }}>Sistema desconocido: {character.system_id}</Text>;
+    return <Text style={{ color: '#9ca3af' }}>Sistema desconocido: {character.system_id}</Text>;
   }
 
   const actions = computeFinalActions(sys, character.data);
@@ -257,14 +257,14 @@ function RollPanel({
 
 const rpBtn: object = {
   flex: 1, paddingVertical: 10, borderRadius: 12,
-  backgroundColor: 'rgba(255,255,255,0.06)',
-  borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)',
+  backgroundColor: '#f5f3ff',
+  borderWidth: 1, borderColor: 'rgba(109,40,217,0.08)',
   alignItems: 'center',
 };
 const rpBtnPublic: object    = { backgroundColor: 'rgba(52,211,153,0.15)',  borderColor: '#34d399' };
 const rpBtnSecret: object    = { backgroundColor: 'rgba(251,191,36,0.15)',  borderColor: '#fbbf24' };
-const rpBtnTxt: object       = { color: '#64748b', fontWeight: '700' as const, fontSize: 13 };
-const rpBtnTxtActive: object = { color: '#e2e8f0' };
+const rpBtnTxt: object       = { color: '#9ca3af', fontWeight: '700' as const, fontSize: 13 };
+const rpBtnTxtActive: object = { color: '#1e1b3a' };
 
 const rpSecretBox: object = {
   backgroundColor: 'rgba(251,191,36,0.07)',
@@ -274,21 +274,21 @@ const rpSecretBox: object = {
 
 const memberChip: object = {
   paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999,
-  backgroundColor: 'rgba(255,255,255,0.06)',
-  borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)',
+  backgroundColor: '#f5f3ff',
+  borderWidth: 1, borderColor: 'rgba(109,40,217,0.08)',
 };
-const memberChipActive: object    = { backgroundColor: 'rgba(124,58,237,0.3)', borderColor: '#7c3aed' };
-const memberChipTxt: object       = { color: '#94a3b8', fontSize: 12 };
-const memberChipActiveTxt: object = { color: '#c4b5fd', fontWeight: '700' as const };
+const memberChipActive: object    = { backgroundColor: 'rgba(109,40,217,0.22)', borderColor: '#6d28d9' };
+const memberChipTxt: object       = { color: '#6b7280', fontSize: 12 };
+const memberChipActiveTxt: object = { color: '#5b21b6', fontWeight: '700' as const };
 
 const rpTab: object       = {
   paddingHorizontal: 14, paddingVertical: 7, borderRadius: 999,
-  backgroundColor: 'rgba(255,255,255,0.06)',
-  borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)',
+  backgroundColor: '#f5f3ff',
+  borderWidth: 1, borderColor: 'rgba(109,40,217,0.08)',
 };
-const rpTabAll: object       = { backgroundColor: 'rgba(167,139,250,0.18)', borderColor: '#a78bfa' };
-const rpTabTxt: object       = { color: '#64748b', fontWeight: '600' as const, fontSize: 12 };
-const rpTabTxtActive: object = { color: '#e2e8f0' };
+const rpTabAll: object       = { backgroundColor: 'rgba(167,139,250,0.18)', borderColor: '#6d28d9' };
+const rpTabTxt: object       = { color: '#9ca3af', fontWeight: '600' as const, fontSize: 12 };
+const rpTabTxtActive: object = { color: '#1e1b3a' };
 
 const rpGroupHeader: object = {
   flexDirection: 'row' as const,
@@ -302,22 +302,22 @@ const rpGroupTitle: object = {
 };
 
 const rpChip: object = {
-  backgroundColor: 'rgba(255,255,255,0.05)',
+  backgroundColor: '#f5f3ff',
   borderRadius: 10, borderWidth: 1,
   paddingHorizontal: 10, paddingVertical: 8,
   // 3 por fila: (100% - 2 gaps de 8) / 3 ≈ 30.6%
   width: '30.5%',
 };
 const rpChipList: object = {
-  backgroundColor: 'rgba(255,255,255,0.05)',
+  backgroundColor: '#f5f3ff',
   borderRadius: 10, borderWidth: 1,
   paddingHorizontal: 12, paddingVertical: 9,
   flexDirection: 'row' as const,
   alignItems: 'center' as const,
   justifyContent: 'space-between' as const,
 };
-const rpChipListName: object = { color: '#e2e8f0', fontSize: 13, fontWeight: '600' as const, flex: 1, marginRight: 8 };
-const rpChipName: object   = { color: '#e2e8f0', fontSize: 12, fontWeight: '600' as const };
+const rpChipListName: object = { color: '#1e1b3a', fontSize: 13, fontWeight: '600' as const, flex: 1, marginRight: 8 };
+const rpChipName: object   = { color: '#1e1b3a', fontSize: 12, fontWeight: '600' as const };
 const rpChipBottom: object = { flexDirection: 'row' as const, alignItems: 'center' as const, gap: 5, marginTop: 4 };
 const rpDieBadge: object   = { borderRadius: 4, paddingHorizontal: 5, paddingVertical: 1 };
 const rpDieText: object    = { fontSize: 10, fontWeight: '700' as const };
@@ -329,14 +329,14 @@ const rpHeader: object = {
   justifyContent: 'space-between' as const,
   marginBottom: 16,
 };
-const rpHeaderTitle: object = { color: '#e2e8f0', fontSize: 17, fontWeight: '800' as const };
-const rpHeaderSub: object   = { color: '#a78bfa', fontSize: 13, marginTop: 2 };
+const rpHeaderTitle: object = { color: '#1e1b3a', fontSize: 17, fontWeight: '800' as const };
+const rpHeaderSub: object   = { color: '#6d28d9', fontSize: 13, marginTop: 2 };
 const rpCloseBtn: object    = {
   width: 32, height: 32, borderRadius: 16,
-  backgroundColor: 'rgba(255,255,255,0.08)',
+  backgroundColor: '#ede9fe',
   justifyContent: 'center' as const, alignItems: 'center' as const,
 };
-const rpCloseTxt: object = { color: '#64748b', fontSize: 16, fontWeight: '700' as const };
+const rpCloseTxt: object = { color: '#9ca3af', fontSize: 16, fontWeight: '700' as const };
 
 // ── Exports ───────────────────────────────────────────────────────────────────
 
@@ -582,7 +582,7 @@ export function GroupRollPanelModal({
           ) : repCharacter ? (
             <RollPanel character={repCharacter} onPick={handlePick} />
           ) : (
-            <Text style={{ color: '#94a3b8', padding: 24, textAlign: 'center' }}>
+            <Text style={{ color: '#6b7280', padding: 24, textAlign: 'center' }}>
               Ningún jugador tiene personaje activo en esta partida.
             </Text>
           )}

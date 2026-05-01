@@ -44,7 +44,7 @@ export default function CharacterPickerModal({
                   key={c.id}
                   style={[
                     s.charPickRow,
-                    activeCharacter?.id === c.id && { borderWidth: 1, borderColor: '#7c3aed' },
+                    activeCharacter?.id === c.id && { borderWidth: 1, borderColor: '#6d28d9' },
                   ]}
                   onPress={() => onPick(c.id)}
                 >
@@ -62,12 +62,12 @@ export default function CharacterPickerModal({
               style={[s.modalAction, { backgroundColor: 'rgba(239,68,68,0.15)' }]}
               onPress={() => onPick(null)}
             >
-              <Text style={{ color: '#fca5a5', fontWeight: '700' }}>Quitar personaje</Text>
+              <Text style={{ color: '#b91c1c', fontWeight: '700' }}>Quitar personaje</Text>
             </TouchableOpacity>
           ) : null}
 
           <TouchableOpacity style={s.modalAction} onPress={onClose}>
-            <Text style={{ color: '#94a3b8', fontWeight: '600' }}>Cerrar</Text>
+            <Text style={{ color: '#6b7280', fontWeight: '600' }}>Cerrar</Text>
           </TouchableOpacity>
         </View>
       </View>

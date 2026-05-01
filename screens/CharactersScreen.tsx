@@ -127,7 +127,7 @@ export default function CharactersScreen({ navigation }: Props) {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#0f0c29" />
+      <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
           <Text style={styles.backText}>‹</Text>
@@ -177,54 +177,59 @@ export default function CharactersScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0f0c29' },
+  container: { flex: 1, backgroundColor: '#f5f3ff' },
   header: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     paddingTop: 48, paddingBottom: 12, paddingHorizontal: 12,
-    borderBottomWidth: 1, borderBottomColor: 'rgba(167,139,250,0.15)',
+    borderBottomWidth: 1, borderBottomColor: 'rgba(109,40,217,0.12)',
+    backgroundColor: '#ffffff',
   },
   backBtn: { width: 36, height: 36, justifyContent: 'center', alignItems: 'center' },
-  backText: { color: '#a78bfa', fontSize: 32, lineHeight: 36 },
-  headerTitle: { color: '#e2e8f0', fontWeight: '700', fontSize: 16 },
+  backText: { color: '#6d28d9', fontSize: 32, lineHeight: 36 },
+  headerTitle: { color: '#1e1b3a', fontWeight: '700', fontSize: 16 },
   list: { padding: 16, paddingBottom: 90 },
   card: {
     flexDirection: 'row', alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 14,
-    padding: 14, marginBottom: 10, borderWidth: 1, borderColor: 'rgba(167,139,250,0.15)',
+    backgroundColor: '#ffffff', borderRadius: 14,
+    padding: 14, marginBottom: 10, borderWidth: 1, borderColor: 'rgba(109,40,217,0.12)',
+    shadowColor: '#6d28d9', shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06, shadowRadius: 6, elevation: 2,
   },
   cardLeft: { flex: 1 },
-  cardName: { color: '#e2e8f0', fontWeight: '700', fontSize: 16 },
-  cardSystem: { color: '#a78bfa', fontSize: 12, marginTop: 2 },
-  cardMeta: { color: '#94a3b8', fontSize: 12, marginTop: 4 },
-  arrow: { color: '#7c3aed', fontSize: 24, fontWeight: '700' },
+  cardName: { color: '#1e1b3a', fontWeight: '700', fontSize: 16 },
+  cardSystem: { color: '#6d28d9', fontSize: 12, marginTop: 2 },
+  cardMeta: { color: '#6b7280', fontSize: 12, marginTop: 4 },
+  arrow: { color: '#6d28d9', fontSize: 24, fontWeight: '700' },
   deleteBtn: {
     width: 36, height: 36, borderRadius: 18,
     justifyContent: 'center', alignItems: 'center',
-    backgroundColor: 'rgba(239,68,68,0.12)',
-    borderWidth: 1, borderColor: 'rgba(239,68,68,0.35)',
+    backgroundColor: '#fee2e2',
+    borderWidth: 1, borderColor: 'rgba(239,68,68,0.30)',
     marginRight: 8,
   },
   deleteText: { fontSize: 16 },
-  empty: { textAlign: 'center', color: '#64748b', marginTop: 60, fontSize: 15, lineHeight: 26 },
+  empty: { textAlign: 'center', color: '#9ca3af', marginTop: 60, fontSize: 15, lineHeight: 26 },
   fab: {
-    position: 'absolute', bottom: 30, right: 24, backgroundColor: '#7c3aed',
+    position: 'absolute', bottom: 30, right: 24, backgroundColor: '#6d28d9',
     width: 58, height: 58, borderRadius: 29, justifyContent: 'center', alignItems: 'center',
-    elevation: 6, shadowColor: '#7c3aed', shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.5, shadowRadius: 8,
+    elevation: 6, shadowColor: '#6d28d9', shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.40, shadowRadius: 10,
   },
   fabText: { color: '#fff', fontSize: 30, lineHeight: 32 },
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'flex-end' },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(15,12,41,0.45)', justifyContent: 'flex-end' },
   modalCard: {
-    backgroundColor: '#1e1b4b', borderTopLeftRadius: 24, borderTopRightRadius: 24,
+    backgroundColor: '#ffffff', borderTopLeftRadius: 24, borderTopRightRadius: 24,
     padding: 24, paddingBottom: 40,
+    shadowColor: '#6d28d9', shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.08, shadowRadius: 16, elevation: 12,
   },
-  modalTitle: { color: '#e2e8f0', fontSize: 18, fontWeight: '700', marginBottom: 16 },
+  modalTitle: { color: '#1e1b3a', fontSize: 18, fontWeight: '700', marginBottom: 16 },
   systemBtn: {
-    backgroundColor: 'rgba(124,58,237,0.18)', borderRadius: 12,
-    padding: 14, marginBottom: 10, borderWidth: 1, borderColor: 'rgba(124,58,237,0.4)',
+    backgroundColor: '#ede9fe', borderRadius: 12,
+    padding: 14, marginBottom: 10, borderWidth: 1, borderColor: 'rgba(109,40,217,0.22)',
   },
-  systemBtnTitle: { color: '#fff', fontWeight: '700', fontSize: 15 },
-  systemBtnSub: { color: '#c4b5fd', fontSize: 12, marginTop: 2 },
+  systemBtnTitle: { color: '#1e1b3a', fontWeight: '700', fontSize: 15 },
+  systemBtnSub: { color: '#6d28d9', fontSize: 12, marginTop: 2 },
   cancelBtn: { marginTop: 6, alignItems: 'center', paddingVertical: 12 },
-  cancelBtnText: { color: '#94a3b8', fontWeight: '600' },
+  cancelBtnText: { color: '#6b7280', fontWeight: '600' },
 });

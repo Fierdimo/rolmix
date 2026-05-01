@@ -11,11 +11,11 @@ interface Props {
 }
 
 const TYPE_STYLES: Record<MessageType, { label: string; color: string; bg: string }> = {
-  message:   { label: '',        color: '#e2e8f0', bg: 'rgba(255,255,255,0.07)' },
-  action:    { label: '* ',      color: '#fbbf24', bg: 'rgba(251,191,36,0.08)'  },
-  narration: { label: '📖 ',    color: '#a78bfa', bg: 'rgba(167,139,250,0.10)' },
-  dice:      { label: '🎲 ',    color: '#34d399', bg: 'rgba(52,211,153,0.10)'  },
-  whisper:   { label: '🔒 ',    color: '#fbbf24', bg: 'rgba(251,191,36,0.08)' },
+  message:   { label: '',        color: '#1e1b3a', bg: '#f1f0ff'               },
+  action:    { label: '* ',      color: '#92400e', bg: '#fef3c7'               },
+  narration: { label: '📖 ',    color: '#5b21b6', bg: '#f5f3ff'               },
+  dice:      { label: '🎲 ',    color: '#065f46', bg: '#d1fae5'               },
+  whisper:   { label: '🔒 ',    color: '#92400e', bg: '#fff7ed'               },
 };
 
 export default function MessageBubble({ message, isOwn, currentUserId }: Props) {
@@ -40,11 +40,11 @@ export default function MessageBubble({ message, isOwn, currentUserId }: Props) 
         // El rol no permite ver este resultado: mostrar aviso
         return (
           <View>
-            <Text style={[styles.content, { color: '#64748b', fontStyle: 'italic' }]}>
+            <Text style={[styles.content, { color: '#9ca3af', fontStyle: 'italic' }]}>
               {message.content}
             </Text>
-            <View style={[styles.diceResult, { backgroundColor: 'rgba(100,116,139,0.15)' }]}>
-              <Text style={{ color: '#64748b', fontSize: 13, fontStyle: 'italic' }}>🔒 Tirada secreta</Text>
+            <View style={[styles.diceResult, { backgroundColor: 'rgba(156,163,175,0.15)' }]}>
+              <Text style={{ color: '#9ca3af', fontSize: 13, fontStyle: 'italic' }}>🔒 Tirada secreta</Text>
             </View>
           </View>
         );
@@ -64,7 +64,7 @@ export default function MessageBubble({ message, isOwn, currentUserId }: Props) 
                     <Text style={styles.diceResultText}>
                       {label}d20 [{r.d20}]
                       {r.modifier !== 0 ? ` ${r.modifier > 0 ? '+' : ''}${r.modifier}` : ''}
-                      {' '}= <Text style={[styles.diceTotal, isCrit && { color: '#fbbf24' }, isFumble && { color: '#f87171' }]}>{r.total}</Text>
+                      {' '}= <Text style={[styles.diceTotal, isCrit && { color: '#d97706' }, isFumble && { color: '#b91c1c' }]}>{r.total}</Text>
                       {isCrit ? ' ✨ ¡Crítico!' : isFumble ? ' 💀 ¡Pifia!' : ''}
                     </Text>
                   </View>
@@ -85,7 +85,7 @@ export default function MessageBubble({ message, isOwn, currentUserId }: Props) 
                 {meta.die}: {meta.result}
                 {meta.modifier !== undefined && meta.modifier !== 0
                   ? ` ${meta.modifier > 0 ? '+' : ''}${meta.modifier}` : ''}
-                {' '}= <Text style={[styles.diceTotal, meta.result === 20 && { color: '#fbbf24' }, meta.result === 1 && { color: '#f87171' }]}>{meta.total}</Text>
+                {' '}= <Text style={[styles.diceTotal, meta.result === 20 && { color: '#d97706' }, meta.result === 1 && { color: '#b91c1c' }]}>{meta.total}</Text>
                 {meta.result === 20 ? ' ✨ ¡Crítico!' : meta.result === 1 ? ' 💀 ¡Pifia!' : ''}
               </Text>
             </View>
@@ -124,7 +124,7 @@ export default function MessageBubble({ message, isOwn, currentUserId }: Props) 
           </Text>
         </View>
       )}
-      <View style={[styles.bubble, { backgroundColor: isOwn ? '#4c1d95' : cfg.bg }, isOwn && styles.bubbleOwn]}>
+      <View style={[styles.bubble, { backgroundColor: isOwn ? '#ede9fe' : cfg.bg }, isOwn && styles.bubbleOwn]}>
         {!isOwn && (
           <Text style={[styles.username, { color: message.profiles?.avatar_color ?? '#a78bfa' }]}>
             {message.profiles?.username ?? 'Anon'}
@@ -158,11 +158,16 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 10,
     paddingHorizontal: 14,
+    shadowColor: '#6d28d9',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    elevation: 1,
   },
   bubbleOwn: { borderBottomRightRadius: 4 },
   username: { fontSize: 11, fontWeight: '700', marginBottom: 3 },
   content: { fontSize: 12 },
-  time: { fontSize: 10, color: '#64748b', marginTop: 4, textAlign: 'right' },
+  time: { fontSize: 10, color: '#9ca3af', marginTop: 4, textAlign: 'right' },
   fullWidthWrapper: {
     marginVertical: 6,
     marginHorizontal: 12,
@@ -170,28 +175,28 @@ const styles = StyleSheet.create({
     padding: 12,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(167,139,250,0.15)',
+    borderColor: 'rgba(109,40,217,0.12)',
   },
-  fullWidthMeta: { color: '#64748b', fontSize: 11, marginTop: 4 },
+  fullWidthMeta: { color: '#9ca3af', fontSize: 11, marginTop: 4 },
   diceResult: {
     marginTop: 6,
-    backgroundColor: 'rgba(52,211,153,0.15)',
+    backgroundColor: '#d1fae5',
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 4,
     alignSelf: 'center',
   },
   diceResultCrit: {
-    backgroundColor: 'rgba(251,191,36,0.2)',
+    backgroundColor: '#fef9c3',
     borderWidth: 1,
-    borderColor: 'rgba(251,191,36,0.4)',
+    borderColor: 'rgba(217,119,6,0.35)',
   },
   diceResultFumble: {
-    backgroundColor: 'rgba(239,68,68,0.15)',
+    backgroundColor: '#fee2e2',
     borderWidth: 1,
-    borderColor: 'rgba(239,68,68,0.3)',
+    borderColor: 'rgba(239,68,68,0.30)',
   },
-  diceResultText: { color: '#34d399', fontSize: 10, fontWeight: '600' },
+  diceResultText: { color: '#065f46', fontSize: 10, fontWeight: '600' },
   diceTotal: { fontSize: 12, fontWeight: '800' },
-  diceTag: { color: '#fbbf24', fontSize: 11, marginTop: 4, fontWeight: '600' },
+  diceTag: { color: '#d97706', fontSize: 11, marginTop: 4, fontWeight: '600' },
 });

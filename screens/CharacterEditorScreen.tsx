@@ -209,7 +209,7 @@ export default function CharacterEditorScreen({ navigation, route }: Props) {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#0f0c29" />
+      <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
           <Text style={styles.backText}>‹</Text>
@@ -439,7 +439,7 @@ function IdentityHeader({
     <View style={styles.identityCard}>
       <Text style={styles.identityFieldLabel}>Nombre</Text>
       <TextInput
-        style={[styles.identityNameInput, !onName && { color: '#94a3b8' }]}
+        style={[styles.identityNameInput, !onName && { color: '#6b7280' }]}
         value={name}
         onChangeText={onName}
         editable={!!onName}
@@ -454,7 +454,7 @@ function IdentityHeader({
             style={styles.identitySelectBtn}
             onPress={() => { setRaceQuery(''); setRacePickerOpen(true); }}
           >
-            <Text style={[styles.identitySelectValue, !currentRace && { color: '#64748b' }]} numberOfLines={1}>
+            <Text style={[styles.identitySelectValue, !currentRace && { color: '#9ca3af' }]} numberOfLines={1}>
               {currentRace || 'Elegir raza…'}
             </Text>
             <Text style={styles.targetSelectChevron}>▾</Text>
@@ -666,14 +666,14 @@ function IdentityHeader({
                   style={[styles.modalAction, { flex: 1 }]}
                   onPress={() => { setField('race', ''); setRacePickerOpen(false); }}
                 >
-                  <Text style={{ color: '#f87171', fontWeight: '600' }}>Quitar</Text>
+                  <Text style={{ color: '#b91c1c', fontWeight: '600' }}>Quitar</Text>
                 </TouchableOpacity>
               ) : null}
               <TouchableOpacity
                 style={[styles.modalAction, { flex: 1 }]}
                 onPress={() => setRacePickerOpen(false)}
               >
-                <Text style={{ color: '#94a3b8', fontWeight: '600' }}>Cerrar</Text>
+                <Text style={{ color: '#6b7280', fontWeight: '600' }}>Cerrar</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -712,10 +712,10 @@ function IdentityHeader({
             </Text>
             <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
               <TouchableOpacity style={[styles.modalAction, { flex: 1 }]} onPress={() => setXpModal(null)}>
-                <Text style={{ color: '#94a3b8', fontWeight: '600' }}>Cancelar</Text>
+                <Text style={{ color: '#6b7280', fontWeight: '600' }}>Cancelar</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.modalAction, { flex: 1, backgroundColor: 'rgba(124,58,237,0.4)' }]}
+                style={[styles.modalAction, { flex: 1, backgroundColor: 'rgba(109,40,217,0.30)' }]}
                 onPress={() => {
                   const n = Number(xpInput);
                   if (!Number.isNaN(n)) {
@@ -1186,10 +1186,10 @@ function SummaryCard({
                 style={[styles.modalAction, { flex: 1 }]}
                 onPress={() => setEdit(null)}
               >
-                <Text style={{ color: '#94a3b8', fontWeight: '600' }}>Cancelar</Text>
+                <Text style={{ color: '#6b7280', fontWeight: '600' }}>Cancelar</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.modalAction, { flex: 1, backgroundColor: 'rgba(124,58,237,0.4)' }]}
+                style={[styles.modalAction, { flex: 1, backgroundColor: 'rgba(109,40,217,0.30)' }]}
                 onPress={commitEdit}
               >
                 <Text style={{ color: '#fff', fontWeight: '700' }}>Guardar</Text>
@@ -1214,12 +1214,12 @@ const CONDITIONS_LIST: Array<{ id: string; label: string; color: string }> = [
   { id: 'stunned',     label: 'Aturdido',     color: '#ef4444' },
   { id: 'paralyzed',   label: 'Paralizado',   color: '#ef4444' },
   { id: 'unconscious', label: 'Inconsciente', color: '#991b1b' },
-  { id: 'prone',       label: 'Tumbado',      color: '#f59e0b' },
-  { id: 'entangled',   label: 'Aprisionado',  color: '#f59e0b' },
+  { id: 'prone',       label: 'Tumbado',      color: '#d97706' },
+  { id: 'entangled',   label: 'Aprisionado',  color: '#d97706' },
   { id: 'frightened',  label: 'Asustado',     color: '#f97316' },
   { id: 'shaken',      label: 'Tembloroso',   color: '#f97316' },
-  { id: 'fatigued',    label: 'Fatigado',     color: '#a78bfa' },
-  { id: 'exhausted',   label: 'Agotado',      color: '#7c3aed' },
+  { id: 'fatigued',    label: 'Fatigado',     color: '#6d28d9' },
+  { id: 'exhausted',   label: 'Agotado',      color: '#6d28d9' },
   { id: 'sickened',    label: 'Enfermo',      color: '#84cc16' },
 ];
 
@@ -1340,8 +1340,8 @@ function AdventureTab({
               <Text style={styles.heroLabel}>PG</Text>
               <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 2 }}>
                 <Text style={[styles.heroValue, { color: hpColor }]}>{hpCur}</Text>
-                {hpTemp > 0 ? <Text style={{ color: '#fbbf24', fontSize: 13, fontWeight: '700' }}>+{hpTemp}</Text> : null}
-                <Text style={{ color: '#64748b', fontSize: 13 }}>/{hp}</Text>
+                {hpTemp > 0 ? <Text style={{ color: '#d97706', fontSize: 13, fontWeight: '700' }}>+{hpTemp}</Text> : null}
+                <Text style={{ color: '#9ca3af', fontSize: 13 }}>/{hp}</Text>
               </View>
             </TouchableOpacity>
             <View style={styles.hpBarTrack}>
@@ -1359,10 +1359,10 @@ function AdventureTab({
                 <Text style={styles.hpBtnText}>−1</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.hpBtn} onPress={() => setSS({ hp_cur: Math.min(hp, hpCur + 1) })}>
-                <Text style={[styles.hpBtnText, { color: '#34d399' }]}>+1</Text>
+                <Text style={[styles.hpBtnText, { color: '#059669' }]}>+1</Text>
               </TouchableOpacity>
               <TouchableOpacity style={[styles.hpBtn, { opacity: 0.7 }]} onPress={() => setSS({ hp_cur: hp })}>
-                <Text style={[styles.hpBtnText, { color: '#a78bfa', fontSize: 9 }]}>Full</Text>
+                <Text style={[styles.hpBtnText, { color: '#6d28d9', fontSize: 9 }]}>Full</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.hpBtn}
                 onPress={() => openEdit('hp_temp', 'PG temporales', 0, 999, hpTemp)}
@@ -1418,8 +1418,8 @@ function AdventureTab({
                   <Text style={styles.deathResetText}>↺</Text>
                 </TouchableOpacity>
               </View>
-              {ds.s >= 3 ? <Text style={{ color: '#34d399', fontSize: 11, marginTop: 4 }}>¡Estabilizado!</Text> : null}
-              {ds.f >= 3 ? <Text style={{ color: '#f87171', fontSize: 11, marginTop: 4 }}>Muerto.</Text> : null}
+              {ds.s >= 3 ? <Text style={{ color: '#059669', fontSize: 11, marginTop: 4 }}>¡Estabilizado!</Text> : null}
+              {ds.f >= 3 ? <Text style={{ color: '#b91c1c', fontSize: 11, marginTop: 4 }}>Muerto.</Text> : null}
             </View>
           );
         })() : null}
@@ -1510,9 +1510,9 @@ function AdventureTab({
             />
             <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
               <TouchableOpacity style={[styles.modalAction, { flex: 1 }]} onPress={() => setEditKey(null)}>
-                <Text style={{ color: '#94a3b8', fontWeight: '600' }}>Cancelar</Text>
+                <Text style={{ color: '#6b7280', fontWeight: '600' }}>Cancelar</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={[styles.modalAction, { flex: 1, backgroundColor: 'rgba(124,58,237,0.4)' }]} onPress={commitEdit}>
+              <TouchableOpacity style={[styles.modalAction, { flex: 1, backgroundColor: 'rgba(109,40,217,0.30)' }]} onPress={commitEdit}>
                 <Text style={{ color: '#fff', fontWeight: '700' }}>Guardar</Text>
               </TouchableOpacity>
             </View>
@@ -1593,7 +1593,7 @@ function ClassesTab({ system, data, setData }: any) {
               ))}
             </ScrollView>
             <TouchableOpacity style={styles.modalAction} onPress={() => setPickerVisible(false)}>
-              <Text style={{ color: '#94a3b8', fontWeight: '600' }}>Cancelar</Text>
+              <Text style={{ color: '#6b7280', fontWeight: '600' }}>Cancelar</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -1680,7 +1680,7 @@ function EquipmentTab({ system, data, setData }: any) {
               <Switch
                 value={it.equipped}
                 onValueChange={(v) => patch(it.id, { equipped: v })}
-                trackColor={{ false: '#1e1b4b', true: '#7c3aed' }}
+                trackColor={{ false: '#e5e7eb', true: '#6d28d9' }}
               />
             </View>
             <TouchableOpacity onPress={() => remove(it.id)} style={styles.delBtn}>
@@ -1888,9 +1888,9 @@ function InventoryTab({ data, setData }: any) {
   const encPct = Math.min(1, totalWeight / heavyLb);
 
   const COINS = [
-    { key: 'coin_pp', label: 'PP', color: '#a78bfa' },
-    { key: 'coin_po', label: 'PO', color: '#fbbf24' },
-    { key: 'coin_pe', label: 'PE', color: '#94a3b8' },
+    { key: 'coin_pp', label: 'PP', color: '#6d28d9' },
+    { key: 'coin_po', label: 'PO', color: '#d97706' },
+    { key: 'coin_pe', label: 'PE', color: '#6b7280' },
     { key: 'coin_pc', label: 'PC', color: '#d97706' },
   ];
   const getCoin = (k: string) => Math.max(0, Number((data as Record<string, unknown>)[k]) || 0);
@@ -1929,7 +1929,7 @@ function InventoryTab({ data, setData }: any) {
                   style={styles.coinBtn}
                   onPress={() => setData({ ...data, [c.key]: val + 1 })}
                 >
-                  <Text style={[styles.coinBtnText, { color: '#34d399' }]}>+</Text>
+                  <Text style={[styles.coinBtnText, { color: '#059669' }]}>+</Text>
                 </TouchableOpacity>
               </View>
             </TouchableOpacity>
@@ -1973,10 +1973,10 @@ function InventoryTab({ data, setData }: any) {
             />
             <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
               <TouchableOpacity style={[styles.modalAction, { flex: 1 }]} onPress={() => setCoinEdit(null)}>
-                <Text style={{ color: '#94a3b8', fontWeight: '600' }}>Cancelar</Text>
+                <Text style={{ color: '#6b7280', fontWeight: '600' }}>Cancelar</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.modalAction, { flex: 1, backgroundColor: 'rgba(124,58,237,0.4)' }]}
+                style={[styles.modalAction, { flex: 1, backgroundColor: 'rgba(109,40,217,0.30)' }]}
                 onPress={() => {
                   const n = Number(coinInput);
                   if (!Number.isNaN(n) && coinEdit) setData({ ...data, [coinEdit.key]: Math.max(0, n) });
@@ -2169,7 +2169,7 @@ function SpellsTab({ system, data, setData }: any) {
               <Switch
                 value={!!(data as any).wizardSpecialty}
                 onValueChange={(v) => setData({ ...data, wizardSpecialty: v })}
-                trackColor={{ false: '#1e1b4b', true: '#7c3aed' }}
+                trackColor={{ false: '#e5e7eb', true: '#6d28d9' }}
               />
             </View>
           )}
@@ -2286,10 +2286,10 @@ function SpellsTab({ system, data, setData }: any) {
         return (
           <View style={[styles.slotSection, { borderColor: 'rgba(251,191,36,0.2)' }]}>
             <View style={styles.slotHeader}>
-              <Text style={[styles.subgroupHero, { color: '#fbbf24' }]}>Preparación del día</Text>
+              <Text style={[styles.subgroupHero, { color: '#d97706' }]}>Preparación del día</Text>
               {anyUsed ? (
                 <TouchableOpacity onPress={longRestPrepared} style={[styles.longRestBtn, { borderColor: 'rgba(251,191,36,0.3)', backgroundColor: 'rgba(251,191,36,0.1)' }]}>
-                  <Text style={[styles.longRestText, { color: '#fbbf24' }]}>Descanso largo</Text>
+                  <Text style={[styles.longRestText, { color: '#d97706' }]}>Descanso largo</Text>
                 </TouchableOpacity>
               ) : null}
             </View>
@@ -2324,8 +2324,8 @@ function SpellsTab({ system, data, setData }: any) {
                           {ps.spellName}
                         </Text>
                         {ps.slotLevel > ps.spellLevel && (
-                          <View style={{ backgroundColor: 'rgba(167,139,250,0.15)', borderRadius: 4, paddingHorizontal: 5, paddingVertical: 2, marginRight: 4 }}>
-                            <Text style={{ color: '#a78bfa', fontSize: 10 }}>en Nv{ps.slotLevel}</Text>
+                          <View style={{ backgroundColor: 'rgba(109,40,217,0.10)', borderRadius: 4, paddingHorizontal: 5, paddingVertical: 2, marginRight: 4 }}>
+                            <Text style={{ color: '#6d28d9', fontSize: 10 }}>en Nv{ps.slotLevel}</Text>
                           </View>
                         )}
                         <TouchableOpacity
@@ -2389,7 +2389,7 @@ function SpellsTab({ system, data, setData }: any) {
                     </Text>
                     {count > 0 && (
                       <View style={[styles.spellLevelBadge, isActive && styles.spellLevelBadgeActive]}>
-                        <Text style={[styles.spellLevelBadgeText, hasUsed && { color: '#fbbf24' }]}>{count}</Text>
+                        <Text style={[styles.spellLevelBadgeText, hasUsed && { color: '#d97706' }]}>{count}</Text>
                       </View>
                     )}
                   </TouchableOpacity>
@@ -2434,7 +2434,7 @@ function SpellsTab({ system, data, setData }: any) {
                 })()
                 }
                 {computedTotal > 0 && !showSlotTracker ? (
-                  <Text style={[styles.help, { margin: 0, color: '#a78bfa', fontSize: 11 }]}>
+                  <Text style={[styles.help, { margin: 0, color: '#6d28d9', fontSize: 11 }]}>
                     {computedTotal} espacios calculados
                   </Text>
                 ) : null}
@@ -2452,16 +2452,16 @@ function SpellsTab({ system, data, setData }: any) {
             {levelSpells.map((sp) => (
               <View key={sp.id} style={styles.spellRow}>
                 <TouchableOpacity style={{ flex: 1 }} onPress={() => setDetailSpell(sp)}>
-                  <Text style={[styles.itemNameInput, { color: '#cbd5e1' }]} numberOfLines={1}>
+                  <Text style={[styles.itemNameInput, { color: '#374151' }]} numberOfLines={1}>
                     {sp.name}
                   </Text>
                 </TouchableOpacity>
                 {hasPreparedCaster && (
                   <TouchableOpacity
                     onPress={() => setPrepPickerSpell({ name: sp.name, level: sp.level })}
-                    style={[styles.castBtn, { backgroundColor: 'rgba(167,139,250,0.15)' }]}
+                    style={[styles.castBtn, { backgroundColor: 'rgba(109,40,217,0.10)' }]}
                   >
-                    <Text style={[styles.castBtnText, { color: '#a78bfa' }]}>📖</Text>
+                    <Text style={[styles.castBtnText, { color: '#6d28d9' }]}>📖</Text>
                   </TouchableOpacity>
                 )}
                 <TouchableOpacity onPress={() => remove(sp.id)} style={styles.delBtn}>
@@ -2541,7 +2541,7 @@ function SpellsTab({ system, data, setData }: any) {
                             style={[styles.modalAction, { marginBottom: 6, flexDirection: 'row', justifyContent: 'space-between', opacity: disabled ? 0.4 : 1 }]}
                             onPress={() => { addPrepSlot(prepPickerSpell.name, prepPickerSpell.level, lvl); setPrepPickerSpell(null); }}
                           >
-                            <Text style={{ color: '#e2e8f0', fontWeight: '600' }}>
+                            <Text style={{ color: '#1e1b3a', fontWeight: '600' }}>
                               {lvl === 0 ? 'Truco' : `Espacio Nv ${lvl}`}{lvl > minLvl ? ' ↑' : ''}
                             </Text>
                             <Text style={{ color: free > 0 ? '#34d399' : '#f87171', fontSize: 12 }}>
@@ -2553,7 +2553,7 @@ function SpellsTab({ system, data, setData }: any) {
                     )}
                   </ScrollView>
                   <TouchableOpacity style={[styles.modalAction, { marginTop: 12 }]} onPress={() => setPrepPickerSpell(null)}>
-                    <Text style={{ color: '#94a3b8', fontWeight: '600' }}>Cancelar</Text>
+                    <Text style={{ color: '#6b7280', fontWeight: '600' }}>Cancelar</Text>
                   </TouchableOpacity>
                 </>
               );
@@ -2619,12 +2619,12 @@ function SpellsTab({ system, data, setData }: any) {
                     <RenderHtml
                       contentWidth={windowWidth - 64}
                       source={{ html: descToHtml(cat?.description ?? detailSpell.notes ?? '') }}
-                      baseStyle={{ color: '#cbd5e1', fontSize: 13, lineHeight: 20 }}
-                      tagsStyles={{ p: { marginTop: 0, marginBottom: 8 }, em: { color: '#e2e8f0', fontStyle: 'italic' } }}
+                      baseStyle={{ color: '#374151', fontSize: 13, lineHeight: 20 }}
+                      tagsStyles={{ p: { marginTop: 0, marginBottom: 8 }, em: { color: '#1e1b3a', fontStyle: 'italic' } }}
                     />
                     {/* ── Mecánicas de combate ── */}
                     <View style={{ borderTopWidth: 1, borderTopColor: 'rgba(124,58,237,0.2)', marginTop: 8, paddingTop: 10, gap: 10 }}>
-                      <Text style={[styles.subgroup, { color: '#a78bfa' }]}>⚔ Mecánicas de combate</Text>
+                      <Text style={[styles.subgroup, { color: '#6d28d9' }]}>⚔ Mecánicas de combate</Text>
 
                       {/* Tipo de ataque */}
                       <View>
@@ -2710,13 +2710,13 @@ function SpellsTab({ system, data, setData }: any) {
                   </ScrollView>
                   <View style={{ flexDirection: 'row', gap: 8, marginTop: 12 }}>
                     <TouchableOpacity style={[styles.modalAction, { flex: 1 }]} onPress={() => setDetailSpell(null)}>
-                      <Text style={{ color: '#94a3b8', fontWeight: '600' }}>Cerrar</Text>
+                      <Text style={{ color: '#6b7280', fontWeight: '600' }}>Cerrar</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={[styles.modalAction, { flex: 1, backgroundColor: 'rgba(239,68,68,0.25)' }]}
                       onPress={() => { remove(detailSpell.id); setDetailSpell(null); }}
                     >
-                      <Text style={{ color: '#f87171', fontWeight: '600' }}>Eliminar</Text>
+                      <Text style={{ color: '#b91c1c', fontWeight: '600' }}>Eliminar</Text>
                     </TouchableOpacity>
                   </View>
                 </>
@@ -2888,19 +2888,19 @@ function FeatsTab({ system, data, setData }: any) {
                     <RenderHtml
                       contentWidth={windowWidth - 64}
                       source={{ html: descToHtml(cat?.description ?? detailFeat.notes ?? '') }}
-                      baseStyle={{ color: '#cbd5e1', fontSize: 13, lineHeight: 20 }}
-                      tagsStyles={{ p: { marginTop: 0, marginBottom: 8 }, em: { color: '#e2e8f0', fontStyle: 'italic' } }}
+                      baseStyle={{ color: '#374151', fontSize: 13, lineHeight: 20 }}
+                      tagsStyles={{ p: { marginTop: 0, marginBottom: 8 }, em: { color: '#1e1b3a', fontStyle: 'italic' } }}
                     />
                   </ScrollView>
                   <View style={{ flexDirection: 'row', gap: 8, marginTop: 12 }}>
                     <TouchableOpacity style={[styles.modalAction, { flex: 1 }]} onPress={() => setDetailFeat(null)}>
-                      <Text style={{ color: '#94a3b8', fontWeight: '600' }}>Cerrar</Text>
+                      <Text style={{ color: '#6b7280', fontWeight: '600' }}>Cerrar</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={[styles.modalAction, { flex: 1, backgroundColor: 'rgba(239,68,68,0.25)' }]}
                       onPress={() => { remove(detailFeat.id); setDetailFeat(null); }}
                     >
-                      <Text style={{ color: '#f87171', fontWeight: '600' }}>Eliminar</Text>
+                      <Text style={{ color: '#b91c1c', fontWeight: '600' }}>Eliminar</Text>
                     </TouchableOpacity>
                   </View>
                 </>
@@ -3029,7 +3029,7 @@ function SkillsTab({ system, data, setData }: any) {
                 <Switch
                   value={!!it.classSkill}
                   onValueChange={(v) => patch(it.id, { classSkill: v })}
-                  trackColor={{ false: '#1e1b4b', true: '#7c3aed' }}
+                  trackColor={{ false: '#e5e7eb', true: '#6d28d9' }}
                 />
               </View>
             </View>
@@ -3117,19 +3117,19 @@ function SkillsTab({ system, data, setData }: any) {
                     <RenderHtml
                       contentWidth={windowWidth - 64}
                       source={{ html: descToHtml(detailSkill.notes ?? '') }}
-                      baseStyle={{ color: '#cbd5e1', fontSize: 13, lineHeight: 20 }}
-                      tagsStyles={{ p: { marginTop: 0, marginBottom: 8 }, em: { color: '#e2e8f0', fontStyle: 'italic' } }}
+                      baseStyle={{ color: '#374151', fontSize: 13, lineHeight: 20 }}
+                      tagsStyles={{ p: { marginTop: 0, marginBottom: 8 }, em: { color: '#1e1b3a', fontStyle: 'italic' } }}
                     />
                   </ScrollView>
                   <View style={{ flexDirection: 'row', gap: 8, marginTop: 12 }}>
                     <TouchableOpacity style={[styles.modalAction, { flex: 1 }]} onPress={() => setDetailSkill(null)}>
-                      <Text style={{ color: '#94a3b8', fontWeight: '600' }}>Cerrar</Text>
+                      <Text style={{ color: '#6b7280', fontWeight: '600' }}>Cerrar</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={[styles.modalAction, { flex: 1, backgroundColor: 'rgba(239,68,68,0.25)' }]}
                       onPress={() => { remove(detailSkill.id); setDetailSkill(null); }}
                     >
-                      <Text style={{ color: '#f87171', fontWeight: '600' }}>Eliminar</Text>
+                      <Text style={{ color: '#b91c1c', fontWeight: '600' }}>Eliminar</Text>
                     </TouchableOpacity>
                   </View>
                 </>
@@ -3303,7 +3303,7 @@ function BonusEditorRow({
               })}
             </ScrollView>
             <TouchableOpacity style={styles.modalAction} onPress={() => setOpen(false)}>
-              <Text style={{ color: '#94a3b8', fontWeight: '600' }}>Cerrar</Text>
+              <Text style={{ color: '#6b7280', fontWeight: '600' }}>Cerrar</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -3336,7 +3336,7 @@ function BonusEditorRow({
               })}
             </ScrollView>
             <TouchableOpacity style={styles.modalAction} onPress={() => setTypeOpen(false)}>
-              <Text style={{ color: '#94a3b8', fontWeight: '600' }}>Cerrar</Text>
+              <Text style={{ color: '#6b7280', fontWeight: '600' }}>Cerrar</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -3440,7 +3440,7 @@ function CatalogPicker({
             removeClippedSubviews
           />
           <TouchableOpacity style={styles.modalAction} onPress={onClose}>
-            <Text style={{ color: '#94a3b8', fontWeight: '600' }}>Cerrar</Text>
+            <Text style={{ color: '#6b7280', fontWeight: '600' }}>Cerrar</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -3494,29 +3494,30 @@ function FieldRow({
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0f0c29' },
+  container: { flex: 1, backgroundColor: '#f5f3ff' },
   header: {
     flexDirection: 'row', alignItems: 'center',
     paddingTop: 48, paddingBottom: 12, paddingHorizontal: 12,
-    borderBottomWidth: 1, borderBottomColor: 'rgba(167,139,250,0.15)',
+    borderBottomWidth: 1, borderBottomColor: 'rgba(109,40,217,0.12)',
+    backgroundColor: '#ffffff',
   },
   backBtn: { width: 36, height: 36, justifyContent: 'center', alignItems: 'center' },
-  backText: { color: '#a78bfa', fontSize: 32, lineHeight: 36 },
+  backText: { color: '#6d28d9', fontSize: 32, lineHeight: 36 },
   headerCenter: { flex: 1, alignItems: 'center' },
-  headerTitle: { color: '#e2e8f0', fontWeight: '700', fontSize: 16, maxWidth: '90%' },
-  headerSub: { color: '#a78bfa', fontSize: 11, marginTop: 2 },
+  headerTitle: { color: '#1e1b3a', fontWeight: '700', fontSize: 16, maxWidth: '90%' },
+  headerSub: { color: '#6d28d9', fontSize: 11, marginTop: 2 },
   saveBtn: { paddingHorizontal: 12, paddingVertical: 8 },
-  saveText: { color: '#7c3aed', fontWeight: '700' },
+  saveText: { color: '#6d28d9', fontWeight: '700' },
 
   sessionBanner: {
-    backgroundColor: 'rgba(124,58,237,0.18)',
+    backgroundColor: 'rgba(109,40,217,0.12)',
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(167,139,250,0.25)',
     paddingVertical: 7,
     paddingHorizontal: 14,
   },
   sessionBannerText: {
-    color: '#c4b5fd',
+    color: '#5b21b6',
     fontSize: 11,
     fontWeight: '600',
     textAlign: 'center',
@@ -3527,139 +3528,139 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1, borderBottomColor: 'rgba(167,139,250,0.1)', flexWrap: 'wrap', gap: 4,
   },
   tab: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999 },
-  tabActive: { backgroundColor: 'rgba(124,58,237,0.25)' },
-  tabText: { color: '#94a3b8', fontSize: 12, fontWeight: '600' },
+  tabActive: { backgroundColor: 'rgba(109,40,217,0.18)' },
+  tabText: { color: '#6b7280', fontSize: 12, fontWeight: '600' },
   tabTextActive: { color: '#fff' },
 
   scroll: { padding: 16, paddingBottom: 60 },
-  sectionTitle: { color: '#e2e8f0', fontWeight: '800', fontSize: 14, marginBottom: 8, marginTop: 4 },
+  sectionTitle: { color: '#1e1b3a', fontWeight: '800', fontSize: 14, marginBottom: 8, marginTop: 4 },
   input: {
-    backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 10,
-    paddingHorizontal: 12, paddingVertical: 10, color: '#fff',
-    borderWidth: 1, borderColor: 'rgba(167,139,250,0.2)', marginBottom: 12,
+    backgroundColor: '#ede9fe', borderRadius: 10,
+    paddingHorizontal: 12, paddingVertical: 10, color: '#1e1b3a',
+    borderWidth: 1, borderColor: 'rgba(109,40,217,0.15)', marginBottom: 12,
   },
   group: { marginBottom: 16 },
   fieldRow: { marginBottom: 10 },
-  fieldLabel: { color: '#cbd5e1', fontSize: 12, marginBottom: 4 },
+  fieldLabel: { color: '#374151', fontSize: 12, marginBottom: 4 },
   fieldInput: {
-    backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 8,
-    paddingHorizontal: 10, paddingVertical: 8, color: '#fff',
-    borderWidth: 1, borderColor: 'rgba(167,139,250,0.15)',
+    backgroundColor: '#f5f3ff', borderRadius: 8,
+    paddingHorizontal: 10, paddingVertical: 8, color: '#1e1b3a',
+    borderWidth: 1, borderColor: 'rgba(109,40,217,0.12)',
   },
   shortInput: {
-    backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 8,
-    paddingHorizontal: 10, paddingVertical: 6, color: '#e2e8f0', fontSize: 13,
-    borderWidth: 1, borderColor: 'rgba(167,139,250,0.2)',
+    backgroundColor: '#f5f3ff', borderRadius: 8,
+    paddingHorizontal: 10, paddingVertical: 6, color: '#1e1b3a', fontSize: 13,
+    borderWidth: 1, borderColor: 'rgba(109,40,217,0.15)',
   },
   selectWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   selectChip: {
     paddingHorizontal: 12, paddingVertical: 6, borderRadius: 999,
-    backgroundColor: 'rgba(255,255,255,0.06)', borderWidth: 1, borderColor: 'rgba(167,139,250,0.2)',
+    backgroundColor: '#f5f3ff', borderWidth: 1, borderColor: 'rgba(109,40,217,0.15)',
   },
-  selectChipActive: { backgroundColor: 'rgba(124,58,237,0.4)', borderColor: '#7c3aed' },
-  selectChipText: { color: '#94a3b8', fontSize: 12 },
+  selectChipActive: { backgroundColor: 'rgba(109,40,217,0.30)', borderColor: '#6d28d9' },
+  selectChipText: { color: '#6b7280', fontSize: 12 },
   selectChipTextActive: { color: '#fff', fontWeight: '700' },
   filterChipRow: { flexDirection: 'row', marginVertical: 6 },
   filterChip: {
     paddingHorizontal: 10, paddingVertical: 5, borderRadius: 999, marginRight: 6,
-    backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1, borderColor: 'rgba(167,139,250,0.2)',
+    backgroundColor: '#f5f3ff', borderWidth: 1, borderColor: 'rgba(109,40,217,0.15)',
   },
-  filterChipActive: { backgroundColor: 'rgba(124,58,237,0.35)', borderColor: '#7c3aed' },
-  filterChipText: { color: '#94a3b8', fontSize: 11 },
-  filterChipTextActive: { color: '#e2d9ff', fontWeight: '700', fontSize: 11 },
+  filterChipActive: { backgroundColor: 'rgba(124,58,237,0.35)', borderColor: '#6d28d9' },
+  filterChipText: { color: '#6b7280', fontSize: 11 },
+  filterChipTextActive: { color: '#1e1b3a', fontWeight: '700', fontSize: 11 },
   // Spell slot tracker
   slotSection: {
-    backgroundColor: 'rgba(30,20,70,0.5)', borderRadius: 12,
-    padding: 12, marginBottom: 12, borderWidth: 1, borderColor: 'rgba(167,139,250,0.18)',
+    backgroundColor: '#f0ecff', borderRadius: 12,
+    padding: 12, marginBottom: 12, borderWidth: 1, borderColor: 'rgba(109,40,217,0.14)',
   },
   slotHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
   longRestBtn: {
     paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8,
-    backgroundColor: 'rgba(52,211,153,0.12)', borderWidth: 1, borderColor: 'rgba(52,211,153,0.3)',
+    backgroundColor: '#d1fae5', borderWidth: 1, borderColor: 'rgba(5,150,105,0.30)',
   },
-  longRestText: { color: '#34d399', fontSize: 10, fontWeight: '700' },
+  longRestText: { color: '#059669', fontSize: 10, fontWeight: '700' },
   slotRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 6 },
-  slotLevelLabel: { color: '#a78bfa', fontSize: 11, fontWeight: '700', width: 36 },
+  slotLevelLabel: { color: '#6d28d9', fontSize: 11, fontWeight: '700', width: 36 },
   slotPips: { flexDirection: 'row', flexWrap: 'wrap', flex: 1, gap: 4 },
   slotPip: {
     width: 16, height: 16, borderRadius: 8,
-    backgroundColor: 'rgba(167,139,250,0.7)', borderWidth: 1, borderColor: '#a78bfa',
+    backgroundColor: '#6d28d9', borderWidth: 1, borderColor: '#6d28d9',
   },
-  slotPipUsed: { backgroundColor: 'rgba(255,255,255,0.08)', borderColor: 'rgba(167,139,250,0.3)' },
+  slotPipUsed: { backgroundColor: '#ede9fe', borderColor: 'rgba(109,40,217,0.22)' },
   slotMaxEdit: { flexDirection: 'row', alignItems: 'center', gap: 4, marginLeft: 8 },
   slotMaxBtn: {
-    width: 22, height: 22, borderRadius: 6, backgroundColor: 'rgba(255,255,255,0.07)',
-    borderWidth: 1, borderColor: 'rgba(167,139,250,0.25)', alignItems: 'center', justifyContent: 'center',
+    width: 22, height: 22, borderRadius: 6, backgroundColor: '#f5f3ff',
+    borderWidth: 1, borderColor: 'rgba(109,40,217,0.18)', alignItems: 'center', justifyContent: 'center',
   },
-  slotMaxBtnText: { color: '#a78bfa', fontSize: 14, fontWeight: '700', lineHeight: 16 },
-  slotMaxVal: { color: '#e2d9ff', fontSize: 12, fontWeight: '700', minWidth: 18, textAlign: 'center' },
+  slotMaxBtnText: { color: '#6d28d9', fontSize: 14, fontWeight: '700', lineHeight: 16 },
+  slotMaxVal: { color: '#1e1b3a', fontSize: 12, fontWeight: '700', minWidth: 18, textAlign: 'center' },
   // ── Chips del panel calculado
   slotCalcChip: {
-    alignItems: 'center', backgroundColor: 'rgba(124,58,237,0.18)', borderRadius: 8,
-    borderWidth: 1, borderColor: 'rgba(167,139,250,0.25)',
+    alignItems: 'center', backgroundColor: 'rgba(109,40,217,0.12)', borderRadius: 8,
+    borderWidth: 1, borderColor: 'rgba(109,40,217,0.18)',
     paddingHorizontal: 7, paddingVertical: 3, marginRight: 5, marginBottom: 4,
   },
-  slotCalcLevel: { color: '#94a3b8', fontSize: 9, fontWeight: '700', letterSpacing: 0.5 },
-  slotCalcTotal: { color: '#c4b5fd', fontSize: 15, fontWeight: '800', lineHeight: 18 },
-  slotCalcDetail: { color: '#64748b', fontSize: 8 },
+  slotCalcLevel: { color: '#6b7280', fontSize: 9, fontWeight: '700', letterSpacing: 0.5 },
+  slotCalcTotal: { color: '#5b21b6', fontSize: 15, fontWeight: '800', lineHeight: 18 },
+  slotCalcDetail: { color: '#9ca3af', fontSize: 8 },
   // ── Barra de preparados
   prepBarBg: {
     flex: 1, height: 8, borderRadius: 4, overflow: 'hidden',
-    backgroundColor: 'rgba(255,255,255,0.06)', flexDirection: 'row', marginHorizontal: 8,
+    backgroundColor: '#f5f3ff', flexDirection: 'row', marginHorizontal: 8,
   },
   prepBarFill: { borderRadius: 4 },
   prepCount: { fontSize: 11, fontWeight: '700', minWidth: 28, textAlign: 'right' },
   // ── Botón lanzar (toggle used en conjuro preparado)
   castBtn: {
     width: 24, height: 24, borderRadius: 6, alignItems: 'center', justifyContent: 'center',
-    backgroundColor: 'rgba(251,191,36,0.12)', borderWidth: 1, borderColor: 'rgba(251,191,36,0.35)',
+    backgroundColor: '#fef9c3', borderWidth: 1, borderColor: 'rgba(251,191,36,0.35)',
     marginLeft: 2,
   },
-  castBtnUsed: { backgroundColor: 'rgba(255,255,255,0.05)', borderColor: 'rgba(255,255,255,0.1)' },
-  castBtnText: { color: '#fbbf24', fontSize: 13, fontWeight: '700', lineHeight: 16 },
+  castBtnUsed: { backgroundColor: '#f5f3ff', borderColor: 'rgba(109,40,217,0.08)' },
+  castBtnText: { color: '#d97706', fontSize: 13, fontWeight: '700', lineHeight: 16 },
   // ── Tabs de nivel de conjuro
   spellLevelTabBar: { flexDirection: 'row', marginVertical: 8, marginHorizontal: -4 },
   spellLevelTab: {
     alignItems: 'center', paddingHorizontal: 10, paddingVertical: 7, marginHorizontal: 3,
-    borderRadius: 10, borderWidth: 1, borderColor: 'rgba(167,139,250,0.15)',
-    backgroundColor: 'rgba(255,255,255,0.04)', minWidth: 54,
+    borderRadius: 10, borderWidth: 1, borderColor: 'rgba(109,40,217,0.12)',
+    backgroundColor: '#faf9ff', minWidth: 54,
   },
   spellLevelTabActive: {
-    backgroundColor: 'rgba(124,58,237,0.28)', borderColor: '#7c3aed',
+    backgroundColor: 'rgba(109,40,217,0.22)', borderColor: '#6d28d9',
   },
-  spellLevelTabLabel: { color: '#94a3b8', fontSize: 11, fontWeight: '600' },
-  spellLevelTabLabelActive: { color: '#e2d9ff' },
+  spellLevelTabLabel: { color: '#6b7280', fontSize: 11, fontWeight: '600' },
+  spellLevelTabLabelActive: { color: '#1e1b3a' },
   spellLevelBadge: {
     marginTop: 2, minWidth: 18, height: 16, borderRadius: 8,
-    backgroundColor: 'rgba(167,139,250,0.15)', alignItems: 'center', justifyContent: 'center',
+    backgroundColor: 'rgba(109,40,217,0.10)', alignItems: 'center', justifyContent: 'center',
     paddingHorizontal: 4,
   },
-  spellLevelBadgeActive: { backgroundColor: 'rgba(167,139,250,0.35)' },
-  spellLevelBadgeText: { color: '#c4b5fd', fontSize: 9, fontWeight: '700' },
+  spellLevelBadgeActive: { backgroundColor: 'rgba(109,40,217,0.25)' },
+  spellLevelBadgeText: { color: '#5b21b6', fontSize: 9, fontWeight: '700' },
   spellLevelSlotRow: {
     flexDirection: 'row', alignItems: 'center', gap: 6,
     paddingVertical: 5, borderTopWidth: 1, borderTopColor: 'rgba(167,139,250,0.1)',
     marginBottom: 6,
   },
-  help: { color: '#64748b', fontSize: 11, marginTop: 4, marginBottom: 4 },
-  muted: { color: '#64748b', fontSize: 12, marginVertical: 8 },
+  help: { color: '#9ca3af', fontSize: 11, marginTop: 4, marginBottom: 4 },
+  muted: { color: '#9ca3af', fontSize: 12, marginVertical: 8 },
   statsCard: {
-    backgroundColor: 'rgba(124,58,237,0.08)', borderRadius: 14,
-    padding: 14, marginBottom: 16, borderWidth: 1, borderColor: 'rgba(124,58,237,0.25)',
+    backgroundColor: '#ede9fe', borderRadius: 14,
+    padding: 14, marginBottom: 16, borderWidth: 1, borderColor: 'rgba(109,40,217,0.18)',
   },
   statsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
-  statPill: { backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6 },
-  statKey: { color: '#94a3b8', fontSize: 10 },
-  statVal: { color: '#34d399', fontWeight: '700', fontSize: 13 },
-  featureLine: { color: '#cbd5e1', fontSize: 12, marginVertical: 2 },
-  subgroup: { color: '#a78bfa', fontSize: 12, fontWeight: '700', marginTop: 6, marginBottom: 6 },
+  statPill: { backgroundColor: '#f5f3ff', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6 },
+  statKey: { color: '#6b7280', fontSize: 10 },
+  statVal: { color: '#059669', fontWeight: '700', fontSize: 13 },
+  featureLine: { color: '#374151', fontSize: 12, marginVertical: 2 },
+  subgroup: { color: '#6d28d9', fontSize: 12, fontWeight: '700', marginTop: 6, marginBottom: 6 },
   subgroupHero: {
-    color: '#a78bfa', fontSize: 11, fontWeight: '800',
+    color: '#6d28d9', fontSize: 11, fontWeight: '800',
     letterSpacing: 1.2, textTransform: 'uppercase',
     marginTop: 14, marginBottom: 8,
   },
   subgroupHint: {
-    color: '#64748b', fontSize: 10, fontWeight: '500',
+    color: '#9ca3af', fontSize: 10, fontWeight: '500',
     letterSpacing: 0, textTransform: 'none',
   },
 
@@ -3667,10 +3668,10 @@ const styles = StyleSheet.create({
   identityCard: {
     backgroundColor: 'rgba(124,58,237,0.10)',
     borderRadius: 14, padding: 14, marginBottom: 12,
-    borderWidth: 1, borderColor: 'rgba(124,58,237,0.3)',
+    borderWidth: 1, borderColor: 'rgba(109,40,217,0.22)',
   },
   identityFieldLabel: {
-    color: '#a78bfa', fontSize: 10, fontWeight: '800',
+    color: '#6d28d9', fontSize: 10, fontWeight: '800',
     letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 4,
   },
   identityNameInput: {
@@ -3682,33 +3683,33 @@ const styles = StyleSheet.create({
   identityRow: { flexDirection: 'row', alignItems: 'flex-end', gap: 12 },
   identitySelectBtn: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    backgroundColor: 'rgba(255,255,255,0.06)',
-    borderWidth: 1, borderColor: 'rgba(167,139,250,0.25)',
+    backgroundColor: '#f5f3ff',
+    borderWidth: 1, borderColor: 'rgba(109,40,217,0.18)',
     borderRadius: 10, paddingHorizontal: 12, paddingVertical: 10,
   },
-  identitySelectValue: { color: '#e2e8f0', fontSize: 14, fontWeight: '600', flex: 1, marginRight: 6 },
+  identitySelectValue: { color: '#1e1b3a', fontSize: 14, fontWeight: '600', flex: 1, marginRight: 6 },
   identityLevelBox: {
     width: 78, alignItems: 'center',
-    backgroundColor: 'rgba(15,12,41,0.6)',
+    backgroundColor: '#f5f3ff',
     borderRadius: 10, paddingVertical: 6, paddingHorizontal: 8,
-    borderWidth: 1, borderColor: 'rgba(167,139,250,0.3)',
+    borderWidth: 1, borderColor: 'rgba(109,40,217,0.22)',
   },
   identityLevelValue: {
-    color: '#fbbf24', fontSize: 28, fontWeight: '900', lineHeight: 32,
+    color: '#d97706', fontSize: 28, fontWeight: '900', lineHeight: 32,
   },
   identityClassRow: {
     flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 10,
   },
   identityClassChip: {
     flexDirection: 'row', alignItems: 'center', gap: 6,
-    backgroundColor: 'rgba(255,255,255,0.06)',
-    borderWidth: 1, borderColor: 'rgba(167,139,250,0.2)',
+    backgroundColor: '#f5f3ff',
+    borderWidth: 1, borderColor: 'rgba(109,40,217,0.15)',
     borderRadius: 999, paddingHorizontal: 10, paddingVertical: 4,
   },
-  identityClassName: { color: '#cbd5e1', fontSize: 12, fontWeight: '600' },
+  identityClassName: { color: '#374151', fontSize: 12, fontWeight: '600' },
   identityClassLevel: {
     color: '#fff', fontSize: 12, fontWeight: '800',
-    backgroundColor: 'rgba(124,58,237,0.5)',
+    backgroundColor: '#6d28d9',
     minWidth: 20, textAlign: 'center',
     paddingHorizontal: 6, borderRadius: 999,
   },
@@ -3717,94 +3718,94 @@ const styles = StyleSheet.create({
   racialTraitsBox: {
     marginTop: 10,
     padding: 8,
-    backgroundColor: 'rgba(255,255,255,0.04)',
+    backgroundColor: '#faf9ff',
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: 'rgba(167,139,250,0.15)',
+    borderColor: 'rgba(109,40,217,0.12)',
   },
   racialBonusRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 5, marginBottom: 4 },
   racialBonusChip: {
-    backgroundColor: 'rgba(124,58,237,0.2)',
+    backgroundColor: 'rgba(109,40,217,0.14)',
     borderRadius: 999,
     paddingHorizontal: 8, paddingVertical: 3,
   },
-  racialBonusText: { color: '#c4b5fd', fontSize: 11, fontWeight: '700' },
-  racialTraitsList: { color: '#64748b', fontSize: 11, lineHeight: 16 },
+  racialBonusText: { color: '#5b21b6', fontSize: 11, fontWeight: '700' },
+  racialTraitsList: { color: '#9ca3af', fontSize: 11, lineHeight: 16 },
 
   // XP tracker
   xpRow: {
     flexDirection: 'row', alignItems: 'center', marginTop: 12,
-    backgroundColor: 'rgba(15,12,41,0.4)', borderRadius: 10,
+    backgroundColor: '#f5f3ff', borderRadius: 10,
     paddingHorizontal: 10, paddingVertical: 8,
-    borderWidth: 1, borderColor: 'rgba(167,139,250,0.15)',
+    borderWidth: 1, borderColor: 'rgba(109,40,217,0.12)',
   },
-  xpLabel: { color: '#a78bfa', fontSize: 11, fontWeight: '800', width: 24 },
-  xpBarTrack: { height: 6, backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 3, overflow: 'hidden', marginBottom: 2 },
+  xpLabel: { color: '#6d28d9', fontSize: 11, fontWeight: '800', width: 24 },
+  xpBarTrack: { height: 6, backgroundColor: '#ede9fe', borderRadius: 3, overflow: 'hidden', marginBottom: 2 },
   xpBarFill: { height: 6, backgroundColor: '#a78bfa', borderRadius: 3 },
-  xpNums: { color: '#64748b', fontSize: 10 },
+  xpNums: { color: '#9ca3af', fontSize: 10 },
   xpEditBtn: {
     paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8,
-    backgroundColor: 'rgba(124,58,237,0.2)', borderWidth: 1, borderColor: 'rgba(124,58,237,0.4)',
+    backgroundColor: 'rgba(109,40,217,0.14)', borderWidth: 1, borderColor: 'rgba(109,40,217,0.30)',
   },
-  xpEditText: { color: '#c4b5fd', fontSize: 11, fontWeight: '700' },
+  xpEditText: { color: '#5b21b6', fontSize: 11, fontWeight: '700' },
 
   // Condiciones
   conditionsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 4 },
   conditionChip: {
     paddingHorizontal: 10, paddingVertical: 5, borderRadius: 999,
-    backgroundColor: 'rgba(255,255,255,0.04)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: '#faf9ff', borderWidth: 1, borderColor: 'rgba(109,40,217,0.08)',
   },
-  conditionText: { color: '#475569', fontSize: 11 },
+  conditionText: { color: '#6b7280', fontSize: 11 },
 
   // Alineamiento
   alignSection: { marginTop: 10 },
   alignGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 4 },
   alignCell: {
     width: '31%', paddingVertical: 8, borderRadius: 8, alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.04)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
+    backgroundColor: '#faf9ff', borderWidth: 1, borderColor: 'rgba(109,40,217,0.08)',
   },
-  alignCellActive: { backgroundColor: 'rgba(124,58,237,0.3)', borderColor: '#7c3aed' },
-  alignCellText: { color: '#475569', fontSize: 11, fontWeight: '700', textAlign: 'center' },
-  alignCellTextActive: { color: '#e2d9ff' },
-  alignLabel: { color: '#a78bfa', fontSize: 11, marginTop: 4 },
+  alignCellActive: { backgroundColor: 'rgba(109,40,217,0.22)', borderColor: '#6d28d9' },
+  alignCellText: { color: '#6b7280', fontSize: 11, fontWeight: '700', textAlign: 'center' },
+  alignCellTextActive: { color: '#1e1b3a' },
+  alignLabel: { color: '#6d28d9', fontSize: 11, marginTop: 4 },
 
   // Idiomas
   langsSection: { marginTop: 10 },
   langsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 4, marginBottom: 6 },
   langChip: {
     paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999,
-    backgroundColor: 'rgba(148,163,184,0.12)', borderWidth: 1, borderColor: 'rgba(148,163,184,0.25)',
+    backgroundColor: '#f1f5f9', borderWidth: 1, borderColor: 'rgba(107,114,128,0.25)',
   },
-  langChipText: { color: '#94a3b8', fontSize: 12 },
+  langChipText: { color: '#6b7280', fontSize: 12 },
   langInputRow: { flexDirection: 'row', gap: 8, alignItems: 'center' },
   langAddBtn: {
-    width: 36, height: 36, borderRadius: 10, backgroundColor: 'rgba(124,58,237,0.25)',
+    width: 36, height: 36, borderRadius: 10, backgroundColor: 'rgba(109,40,217,0.18)',
     alignItems: 'center', justifyContent: 'center',
   },
-  langAddBtnText: { color: '#a78bfa', fontWeight: '800', fontSize: 20 },
+  langAddBtnText: { color: '#6d28d9', fontWeight: '800', fontSize: 20 },
 
   // Encumbrance
   encBox: {
-    backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 12, padding: 12, marginTop: 8, marginBottom: 4,
-    borderWidth: 1, borderColor: 'rgba(167,139,250,0.15)',
+    backgroundColor: '#faf9ff', borderRadius: 12, padding: 12, marginTop: 8, marginBottom: 4,
+    borderWidth: 1, borderColor: 'rgba(109,40,217,0.12)',
   },
   encLevel: { fontSize: 16, fontWeight: '800' },
-  encWeight: { color: '#94a3b8', fontSize: 13 },
+  encWeight: { color: '#6b7280', fontSize: 13 },
   encBarTrack: {
-    height: 6, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 3,
+    height: 6, backgroundColor: 'rgba(109,40,217,0.06)', borderRadius: 3,
     marginTop: 8, overflow: 'hidden',
   },
   encBarFill: { height: 6, borderRadius: 3 },
-  encThreshold: { color: '#64748b', fontSize: 10 },
+  encThreshold: { color: '#9ca3af', fontSize: 10 },
 
   // Tiradas de muerte
   deathSavesBox: {
-    backgroundColor: 'rgba(239,68,68,0.1)', borderRadius: 12, padding: 12, marginBottom: 12,
-    borderWidth: 1, borderColor: 'rgba(239,68,68,0.35)',
+    backgroundColor: '#fee2e2', borderRadius: 12, padding: 12, marginBottom: 12,
+    borderWidth: 1, borderColor: 'rgba(239,68,68,0.30)',
   },
-  deathSavesTitle: { color: '#f87171', fontWeight: '800', fontSize: 13, marginBottom: 8 },
+  deathSavesTitle: { color: '#b91c1c', fontWeight: '800', fontSize: 13, marginBottom: 8 },
   deathSavesRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  deathSavesLabel: { color: '#94a3b8', fontSize: 11, fontWeight: '700', minWidth: 44 },
+  deathSavesLabel: { color: '#6b7280', fontSize: 11, fontWeight: '700', minWidth: 44 },
   deathPips: { flexDirection: 'row', gap: 6 },
   deathPip: { width: 20, height: 20, borderRadius: 10, borderWidth: 2 },
   deathPipSuccess: { borderColor: '#34d399', backgroundColor: 'rgba(52,211,153,0.1)' },
@@ -3812,48 +3813,48 @@ const styles = StyleSheet.create({
   deathPipFail: { borderColor: '#f87171', backgroundColor: 'rgba(248,113,113,0.1)' },
   deathPipFailOn: { backgroundColor: '#f87171' },
   deathResetBtn: { marginLeft: 'auto' as any, padding: 4 },
-  deathResetText: { color: '#64748b', fontSize: 16 },
+  deathResetText: { color: '#9ca3af', fontSize: 16 },
 
   // Monedas
   coinsRow: { flexDirection: 'row', gap: 8, marginBottom: 6 },
   coinCard: {
-    flex: 1, backgroundColor: 'rgba(15,12,41,0.5)', borderRadius: 12,
-    padding: 10, alignItems: 'center', borderWidth: 1, borderColor: 'rgba(167,139,250,0.15)',
+    flex: 1, backgroundColor: '#f9f8ff', borderRadius: 12,
+    padding: 10, alignItems: 'center', borderWidth: 1, borderColor: 'rgba(109,40,217,0.12)',
   },
   coinLabel: { fontSize: 10, fontWeight: '800', letterSpacing: 1 },
-  coinValue: { color: '#f1f5f9', fontSize: 20, fontWeight: '800', marginVertical: 2 },
+  coinValue: { color: '#1e1b3a', fontSize: 20, fontWeight: '800', marginVertical: 2 },
   coinBtns: { flexDirection: 'row', gap: 4 },
   coinBtn: {
     paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6,
-    backgroundColor: 'rgba(255,255,255,0.06)', borderWidth: 1, borderColor: 'rgba(167,139,250,0.2)',
+    backgroundColor: '#f5f3ff', borderWidth: 1, borderColor: 'rgba(109,40,217,0.15)',
   },
-  coinBtnText: { color: '#f87171', fontWeight: '700', fontSize: 12 },
+  coinBtnText: { color: '#b91c1c', fontWeight: '700', fontSize: 12 },
 
   // Detalle conjuro/dote
   detailMeta: { flexDirection: 'column', gap: 6, marginTop: 6 },
   detailMetaItem: {
-    color: '#a78bfa', fontSize: 11, paddingHorizontal: 8, paddingVertical: 3,
-    backgroundColor: 'rgba(124,58,237,0.15)', borderRadius: 999,
+    color: '#6d28d9', fontSize: 11, paddingHorizontal: 8, paddingVertical: 3,
+    backgroundColor: 'rgba(109,40,217,0.10)', borderRadius: 999,
   },
-  detailDesc: { color: '#cbd5e1', fontSize: 13, lineHeight: 20 },
+  detailDesc: { color: '#374151', fontSize: 13, lineHeight: 20 },
 
   // Armas equipadas
   weaponList: { gap: 8, marginBottom: 6 },
   weaponRow: {
     flexDirection: 'row', alignItems: 'center', gap: 10,
-    backgroundColor: 'rgba(15,12,41,0.55)',
-    borderWidth: 1, borderColor: 'rgba(248,113,113,0.25)',
+    backgroundColor: '#fff4f4',
+    borderWidth: 1, borderColor: 'rgba(239,68,68,0.30)',
     borderRadius: 12, paddingVertical: 8, paddingHorizontal: 10,
   },
-  weaponName: { color: '#fef2f2', fontSize: 14, fontWeight: '700' },
-  weaponNotes: { color: '#94a3b8', fontSize: 11, marginTop: 2 },
+  weaponName: { color: '#1e1b3a', fontSize: 14, fontWeight: '700' },
+  weaponNotes: { color: '#6b7280', fontSize: 11, marginTop: 2 },
   weaponStat: { alignItems: 'center', minWidth: 60 },
   weaponStatLabel: {
-    color: '#64748b', fontSize: 9, fontWeight: '700',
+    color: '#9ca3af', fontSize: 9, fontWeight: '700',
     letterSpacing: 1, textTransform: 'uppercase',
   },
-  weaponAtk: { color: '#fbbf24', fontSize: 18, fontWeight: '900', marginTop: 2 },
-  weaponDmg: { color: '#f87171', fontSize: 14, fontWeight: '800', marginTop: 2 },
+  weaponAtk: { color: '#d97706', fontSize: 18, fontWeight: '900', marginTop: 2 },
+  weaponDmg: { color: '#b91c1c', fontSize: 14, fontWeight: '800', marginTop: 2 },
 
   // Hero (CA + PG + Iniciativa/BAB)
   heroRow: { flexDirection: 'row', gap: 10, alignItems: 'stretch' },
@@ -3863,60 +3864,60 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   heroAc: {
-    backgroundColor: 'rgba(56,189,248,0.10)', borderColor: 'rgba(56,189,248,0.45)',
+    backgroundColor: '#e0f2fe', borderColor: 'rgba(14,165,233,0.45)',
   },
   heroHp: {
-    backgroundColor: 'rgba(248,113,113,0.10)', borderColor: 'rgba(248,113,113,0.45)',
+    backgroundColor: '#fee2e2', borderColor: 'rgba(239,68,68,0.45)',
   },
   heroLabel: {
-    color: '#cbd5e1', fontSize: 11, fontWeight: '800',
+    color: '#374151', fontSize: 11, fontWeight: '800',
     letterSpacing: 2, textTransform: 'uppercase',
   },
   heroValue: {
     color: '#fff', fontSize: 36, fontWeight: '900', lineHeight: 40, marginTop: 2,
   },
-  heroSub: { color: '#94a3b8', fontSize: 10, marginTop: 2 },
+  heroSub: { color: '#6b7280', fontSize: 10, marginTop: 2 },
   heroSideCol: { width: 96, justifyContent: 'space-between' },
   heroSmall: {
-    backgroundColor: 'rgba(255,255,255,0.05)',
-    borderWidth: 1, borderColor: 'rgba(167,139,250,0.2)',
+    backgroundColor: '#f5f3ff',
+    borderWidth: 1, borderColor: 'rgba(109,40,217,0.15)',
     borderRadius: 10, paddingVertical: 8, paddingHorizontal: 10,
     alignItems: 'center',
   },
-  heroSmallLabel: { color: '#94a3b8', fontSize: 9, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase' },
-  heroSmallValue: { color: '#34d399', fontSize: 18, fontWeight: '800', marginTop: 2 },
+  heroSmallLabel: { color: '#6b7280', fontSize: 9, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase' },
+  heroSmallValue: { color: '#059669', fontSize: 18, fontWeight: '800', marginTop: 2 },
   hpBarTrack: {
-    height: 4, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 2,
+    height: 4, backgroundColor: 'rgba(109,40,217,0.06)', borderRadius: 2,
     marginTop: 4, marginBottom: 4, overflow: 'hidden', width: '100%',
   },
   hpBarFill: { height: 4, borderRadius: 2 },
   hpBtnRow: { flexDirection: 'row', gap: 4, justifyContent: 'center' },
   hpBtn: {
     paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6,
-    backgroundColor: 'rgba(255,255,255,0.07)', borderWidth: 1, borderColor: 'rgba(167,139,250,0.2)',
+    backgroundColor: '#f5f3ff', borderWidth: 1, borderColor: 'rgba(109,40,217,0.15)',
   },
-  hpBtnText: { color: '#f87171', fontWeight: '700', fontSize: 11 },
+  hpBtnText: { color: '#b91c1c', fontWeight: '700', fontSize: 11 },
 
   // Atributos en grid 3x2 estilo "stat block"
   abilGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   abilCard: {
     width: '31%',
-    backgroundColor: 'rgba(15,12,41,0.6)',
+    backgroundColor: '#f5f3ff',
     borderRadius: 12, paddingVertical: 10, paddingHorizontal: 6,
     alignItems: 'center',
-    borderWidth: 1, borderColor: 'rgba(167,139,250,0.25)',
+    borderWidth: 1, borderColor: 'rgba(109,40,217,0.18)',
   },
   abilLabel: {
-    color: '#a78bfa', fontSize: 11, fontWeight: '800',
+    color: '#6d28d9', fontSize: 11, fontWeight: '800',
     letterSpacing: 1.5,
   },
   abilMod: {
-    color: '#fbbf24', fontSize: 22, fontWeight: '900', lineHeight: 26, marginTop: 2,
+    color: '#d97706', fontSize: 22, fontWeight: '900', lineHeight: 26, marginTop: 2,
   },
   abilDivider: {
     width: 28, height: 1, backgroundColor: 'rgba(167,139,250,0.3)', marginVertical: 6,
   },
-  abilScore: { color: '#cbd5e1', fontSize: 13, fontWeight: '600' },
+  abilScore: { color: '#374151', fontSize: 13, fontWeight: '600' },
   abilScoreRow: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'center', gap: 2 },
   abilRacialBadge: { fontSize: 9, fontWeight: '700', lineHeight: 14 },
 
@@ -3924,57 +3925,57 @@ const styles = StyleSheet.create({
   twoColRow: { flexDirection: 'row', gap: 10, marginTop: 4 },
   colBlock: {
     flex: 1,
-    backgroundColor: 'rgba(255,255,255,0.04)',
+    backgroundColor: '#faf9ff',
     borderRadius: 12, paddingHorizontal: 12, paddingBottom: 10,
-    borderWidth: 1, borderColor: 'rgba(167,139,250,0.15)',
+    borderWidth: 1, borderColor: 'rgba(109,40,217,0.12)',
   },
   lineRow: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
     paddingVertical: 6,
     borderTopWidth: 1, borderTopColor: 'rgba(167,139,250,0.08)',
   },
-  lineLabel: { color: '#cbd5e1', fontSize: 12 },
-  lineValue: { color: '#34d399', fontSize: 16, fontWeight: '800' },
+  lineLabel: { color: '#374151', fontSize: 12 },
+  lineValue: { color: '#059669', fontSize: 16, fontWeight: '800' },
 
   // Class rows
   itemCard: {
     flexDirection: 'row', alignItems: 'center', gap: 8,
-    backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 10, padding: 12, marginBottom: 8,
-    borderWidth: 1, borderColor: 'rgba(167,139,250,0.15)',
+    backgroundColor: '#f5f3ff', borderRadius: 10, padding: 12, marginBottom: 8,
+    borderWidth: 1, borderColor: 'rgba(109,40,217,0.12)',
   },
-  itemTitle: { color: '#e2e8f0', fontWeight: '700' },
-  itemSub: { color: '#94a3b8', fontSize: 11, marginTop: 2 },
+  itemTitle: { color: '#1e1b3a', fontWeight: '700' },
+  itemSub: { color: '#6b7280', fontSize: 11, marginTop: 2 },
   levelRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   levelBtn: {
     width: 28, height: 28, borderRadius: 14, alignItems: 'center', justifyContent: 'center',
-    backgroundColor: 'rgba(124,58,237,0.25)',
+    backgroundColor: 'rgba(109,40,217,0.18)',
   },
   levelBtnText: { color: '#fff', fontWeight: '800', fontSize: 16 },
   levelValue: { color: '#fff', fontWeight: '800', minWidth: 20, textAlign: 'center' },
   delBtn: {
     width: 28, height: 28, borderRadius: 14, alignItems: 'center', justifyContent: 'center',
-    backgroundColor: 'rgba(239,68,68,0.18)',
+    backgroundColor: '#fee2e2',
   },
   delBtnText: { color: '#fca5a5', fontWeight: '800', fontSize: 18, lineHeight: 18 },
   infoBtn: {
     width: 26, height: 26, borderRadius: 13, alignItems: 'center', justifyContent: 'center',
-    backgroundColor: 'rgba(124,58,237,0.18)', marginRight: 2,
+    backgroundColor: 'rgba(109,40,217,0.12)', marginRight: 2,
   },
-  infoBtnText: { color: '#a78bfa', fontWeight: '700', fontSize: 14 },
+  infoBtnText: { color: '#6d28d9', fontWeight: '700', fontSize: 14 },
 
   addBtn: {
     marginTop: 6, alignItems: 'center', paddingVertical: 12, borderRadius: 10,
-    backgroundColor: 'rgba(124,58,237,0.2)', borderWidth: 1, borderColor: 'rgba(124,58,237,0.45)',
+    backgroundColor: 'rgba(109,40,217,0.14)', borderWidth: 1, borderColor: 'rgba(124,58,237,0.45)',
   },
   addBtnSecondary: {
-    marginTop: 8, backgroundColor: 'rgba(34,197,94,0.12)', borderColor: 'rgba(34,197,94,0.45)',
+    marginTop: 8, backgroundColor: '#d1fae5', borderColor: 'rgba(5,150,105,0.40)',
   },
-  addBtnText: { color: '#c4b5fd', fontWeight: '700' },
+  addBtnText: { color: '#5b21b6', fontWeight: '700' },
 
   // Equipment
   equipCard: {
-    backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 12, padding: 12, marginBottom: 12,
-    borderWidth: 1, borderColor: 'rgba(167,139,250,0.15)',
+    backgroundColor: '#faf9ff', borderRadius: 12, padding: 12, marginBottom: 12,
+    borderWidth: 1, borderColor: 'rgba(109,40,217,0.12)',
   },
   equipHeader: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 },
   itemNameInput: {
@@ -3982,168 +3983,170 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1, borderBottomColor: 'rgba(167,139,250,0.2)',
   },
   equipToggle: { alignItems: 'center' },
-  equipToggleLabel: { color: '#94a3b8', fontSize: 10, marginBottom: 2 },
+  equipToggleLabel: { color: '#6b7280', fontSize: 10, marginBottom: 2 },
   slotFilterRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginVertical: 6 },
   slotChip: {
     paddingHorizontal: 8, paddingVertical: 4, borderRadius: 999,
-    backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1, borderColor: 'rgba(167,139,250,0.15)',
+    backgroundColor: '#f5f3ff', borderWidth: 1, borderColor: 'rgba(109,40,217,0.12)',
   },
-  slotChipActive: { backgroundColor: 'rgba(124,58,237,0.3)', borderColor: '#7c3aed' },
-  slotChipText: { color: '#94a3b8', fontSize: 10 },
+  slotChipActive: { backgroundColor: 'rgba(109,40,217,0.22)', borderColor: '#6d28d9' },
+  slotChipText: { color: '#6b7280', fontSize: 10 },
   slotChipTextActive: { color: '#fff', fontWeight: '700' },
   bonusRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 6, marginVertical: 6 },
   targetChip: {
     paddingHorizontal: 8, paddingVertical: 4, borderRadius: 999, marginRight: 4,
-    backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1, borderColor: 'rgba(167,139,250,0.15)',
+    backgroundColor: '#f5f3ff', borderWidth: 1, borderColor: 'rgba(109,40,217,0.12)',
   },
-  targetChipActive: { backgroundColor: 'rgba(34,197,94,0.25)', borderColor: '#22c55e' },
-  targetChipText: { color: '#94a3b8', fontSize: 10 },
+  targetChipActive: { backgroundColor: '#d1fae5', borderColor: '#059669' },
+  targetChipText: { color: '#6b7280', fontSize: 10 },
   targetChipTextActive: { color: '#fff', fontWeight: '700' },
 
   // Selector de target (bottom sheet)
   targetSelectBtn: {
     flex: 1,
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    backgroundColor: 'rgba(255,255,255,0.06)',
-    borderWidth: 1, borderColor: 'rgba(167,139,250,0.25)',
+    backgroundColor: '#f5f3ff',
+    borderWidth: 1, borderColor: 'rgba(109,40,217,0.18)',
     borderRadius: 8, paddingHorizontal: 10, paddingVertical: 8,
   },
-  targetSelectLabel: { color: '#e2e8f0', fontSize: 12, flex: 1, marginRight: 6 },
-  targetSelectChevron: { color: '#a78bfa', fontSize: 12 },
+  targetSelectLabel: { color: '#1e1b3a', fontSize: 12, flex: 1, marginRight: 6 },
+  targetSelectChevron: { color: '#6d28d9', fontSize: 12 },
   bonusTypeBtn: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     backgroundColor: 'rgba(167,139,250,0.08)',
-    borderWidth: 1, borderColor: 'rgba(167,139,250,0.2)',
+    borderWidth: 1, borderColor: 'rgba(109,40,217,0.15)',
     borderRadius: 8, paddingHorizontal: 10, paddingVertical: 5,
   },
-  bonusTypeLabel: { color: '#a78bfa', fontSize: 11, fontWeight: '600', flex: 1, marginRight: 6 },
+  bonusTypeLabel: { color: '#6d28d9', fontSize: 11, fontWeight: '600', flex: 1, marginRight: 6 },
   targetPickRow: {
     paddingVertical: 10, paddingHorizontal: 12, borderRadius: 8, marginBottom: 4,
-    backgroundColor: 'rgba(255,255,255,0.04)',
+    backgroundColor: '#faf9ff',
     borderWidth: 1, borderColor: 'transparent',
   },
   targetPickRowActive: {
-    backgroundColor: 'rgba(124,58,237,0.25)', borderColor: '#7c3aed',
+    backgroundColor: 'rgba(109,40,217,0.18)', borderColor: '#6d28d9',
   },
-  targetPickName: { color: '#e2e8f0', fontSize: 14 },
-  targetPickId: { color: '#64748b', fontSize: 10, marginTop: 2 },
+  targetPickName: { color: '#1e1b3a', fontSize: 14 },
+  targetPickId: { color: '#9ca3af', fontSize: 10, marginTop: 2 },
   bonusInput: {
-    width: 50, color: '#34d399', fontWeight: '800', textAlign: 'center',
-    borderWidth: 1, borderColor: 'rgba(167,139,250,0.2)', borderRadius: 8, paddingVertical: 4,
+    width: 50, color: '#059669', fontWeight: '800', textAlign: 'center',
+    borderWidth: 1, borderColor: 'rgba(109,40,217,0.15)', borderRadius: 8, paddingVertical: 4,
   },
   addBonusBtn: { marginTop: 6, paddingVertical: 6, alignItems: 'center' },
 
   // Weapon quick-edit panel
   weaponStatBox: {
     marginTop: 10, marginBottom: 4,
-    backgroundColor: 'rgba(124,58,237,0.08)',
-    borderRadius: 10, borderWidth: 1, borderColor: 'rgba(124,58,237,0.2)',
+    backgroundColor: '#ede9fe',
+    borderRadius: 10, borderWidth: 1, borderColor: 'rgba(109,40,217,0.15)',
     padding: 10,
   },
   weaponStatRow: { flexDirection: 'row', gap: 12 },
   weaponStatCell: { flex: 1, alignItems: 'center', gap: 4 },
-  weaponStatHint: { color: '#475569', fontSize: 10, textAlign: 'center', marginTop: 2 },
+  weaponStatHint: { color: '#6b7280', fontSize: 10, textAlign: 'center', marginTop: 2 },
   weaponStatStepper: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   stepBtn: {
     width: 30, height: 30, borderRadius: 15,
-    backgroundColor: 'rgba(124,58,237,0.25)',
+    backgroundColor: 'rgba(109,40,217,0.18)',
     justifyContent: 'center', alignItems: 'center',
   },
-  stepBtnText: { color: '#c4b5fd', fontSize: 18, lineHeight: 20, fontWeight: '700' },
+  stepBtnText: { color: '#5b21b6', fontSize: 18, lineHeight: 20, fontWeight: '700' },
   stepValue: { color: '#fff', fontSize: 18, fontWeight: '900', minWidth: 36, textAlign: 'center' },
   rangedToggle: {
     marginTop: 8, paddingVertical: 4, paddingHorizontal: 8,
-    backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 8,
+    backgroundColor: '#f5f3ff', borderRadius: 8,
     alignSelf: 'flex-start',
   },
-  rangedToggleText: { color: '#94a3b8', fontSize: 11 },
-  addBonusText: { color: '#a78bfa', fontSize: 12, fontWeight: '600' },
+  rangedToggleText: { color: '#6b7280', fontSize: 11 },
+  addBonusText: { color: '#6d28d9', fontSize: 12, fontWeight: '600' },
 
   // Skills
   skillRow: { flexDirection: 'row', alignItems: 'flex-end', gap: 12, marginVertical: 6 },
   skillField: { alignItems: 'center', gap: 4 },
-  skillFieldLabel: { color: '#94a3b8', fontSize: 10, fontWeight: '600' },
+  skillFieldLabel: { color: '#6b7280', fontSize: 10, fontWeight: '600' },
   skillTotalBox: {
     alignItems: 'center', justifyContent: 'center',
     paddingHorizontal: 10, paddingVertical: 6, marginRight: 6,
-    backgroundColor: 'rgba(124,58,237,0.15)', borderRadius: 10,
-    borderWidth: 1, borderColor: 'rgba(167,139,250,0.3)',
+    backgroundColor: 'rgba(109,40,217,0.10)', borderRadius: 10,
+    borderWidth: 1, borderColor: 'rgba(109,40,217,0.22)',
   },
-  skillTotalLabel: { color: '#94a3b8', fontSize: 9 },
-  skillTotalValue: { color: '#34d399', fontSize: 16, fontWeight: '800' },
-  warn: { color: '#f59e0b', fontSize: 11, marginTop: 4 },
+  skillTotalLabel: { color: '#6b7280', fontSize: 9 },
+  skillTotalValue: { color: '#059669', fontSize: 16, fontWeight: '800' },
+  warn: { color: '#d97706', fontSize: 11, marginTop: 4 },
   skillSummaryRow: {
     flexDirection: 'row', alignItems: 'center', gap: 8,
     paddingVertical: 6, paddingHorizontal: 10,
-    backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 8, marginBottom: 4,
+    backgroundColor: '#faf9ff', borderRadius: 8, marginBottom: 4,
   },
-  skillSummaryName: { color: '#e2e8f0', fontSize: 13, flex: 1 },
-  skillSummaryTC: { color: '#f59e0b', fontSize: 11 },
-  skillSummaryAbil: { color: '#94a3b8', fontSize: 11, width: 80, textAlign: 'right' },
-  skillSummaryTotal: { color: '#34d399', fontSize: 14, fontWeight: '800', width: 50, textAlign: 'right' },
+  skillSummaryName: { color: '#1e1b3a', fontSize: 13, flex: 1 },
+  skillSummaryTC: { color: '#d97706', fontSize: 11 },
+  skillSummaryAbil: { color: '#6b7280', fontSize: 11, width: 80, textAlign: 'right' },
+  skillSummaryTotal: { color: '#059669', fontSize: 14, fontWeight: '800', width: 50, textAlign: 'right' },
 
   // Tabla de habilidades en Hoja
   skillTableHeader: {
     flexDirection: 'row', alignItems: 'center', gap: 8,
     paddingVertical: 6, paddingHorizontal: 10,
-    borderBottomWidth: 1, borderColor: 'rgba(167,139,250,0.3)', marginBottom: 4,
+    borderBottomWidth: 1, borderColor: 'rgba(109,40,217,0.22)', marginBottom: 4,
   },
-  skillTableHName: { color: '#a78bfa', fontSize: 11, fontWeight: '700' },
-  skillTableHKey: { color: '#a78bfa', fontSize: 11, fontWeight: '700', width: 44, textAlign: 'center' },
-  skillTableHRanks: { color: '#a78bfa', fontSize: 11, fontWeight: '700', width: 56, textAlign: 'center' },
-  skillTableHTotal: { color: '#a78bfa', fontSize: 11, fontWeight: '700', width: 56, textAlign: 'right' },
+  skillTableHName: { color: '#6d28d9', fontSize: 11, fontWeight: '700' },
+  skillTableHKey: { color: '#6d28d9', fontSize: 11, fontWeight: '700', width: 44, textAlign: 'center' },
+  skillTableHRanks: { color: '#6d28d9', fontSize: 11, fontWeight: '700', width: 56, textAlign: 'center' },
+  skillTableHTotal: { color: '#6d28d9', fontSize: 11, fontWeight: '700', width: 56, textAlign: 'right' },
   skillTableRow: {
     flexDirection: 'row', alignItems: 'center', gap: 8,
     paddingVertical: 4, paddingHorizontal: 10,
-    backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 6, marginBottom: 3,
+    backgroundColor: '#faf9ff', borderRadius: 6, marginBottom: 3,
   },
-  skillTableName: { color: '#e2e8f0', fontSize: 13 },
+  skillTableName: { color: '#1e1b3a', fontSize: 13 },
   skillTableKey: {
-    color: '#94a3b8', fontSize: 11, fontWeight: '700',
+    color: '#6b7280', fontSize: 11, fontWeight: '700',
     width: 44, textAlign: 'center',
   },
   skillTableInput: {
     width: 56, color: '#fff', textAlign: 'center', fontSize: 13,
-    borderWidth: 1, borderColor: 'rgba(167,139,250,0.2)', borderRadius: 6, paddingVertical: 3,
+    borderWidth: 1, borderColor: 'rgba(109,40,217,0.15)', borderRadius: 6, paddingVertical: 3,
   },
   skillTableTotal: {
-    color: '#34d399', fontSize: 14, fontWeight: '800', width: 56, textAlign: 'right',
+    color: '#059669', fontSize: 14, fontWeight: '800', width: 56, textAlign: 'right',
   },
   skillTableMisc: {
-    width: 56, color: '#64748b', textAlign: 'center', fontSize: 13, fontWeight: '600',
+    width: 56, color: '#9ca3af', textAlign: 'center', fontSize: 13, fontWeight: '600',
   },
-  skillTableMiscOn: { color: '#fbbf24' },
+  skillTableMiscOn: { color: '#d97706' },
 
   // Inventory + spells row
   invRow: {
     flexDirection: 'row', alignItems: 'center', gap: 8,
-    backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 10, padding: 10, marginBottom: 6,
+    backgroundColor: '#faf9ff', borderRadius: 10, padding: 10, marginBottom: 6,
   },
   spellRow: {
     flexDirection: 'row', alignItems: 'center', gap: 8,
-    backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 10, padding: 10, marginBottom: 6,
+    backgroundColor: '#faf9ff', borderRadius: 10, padding: 10, marginBottom: 6,
   },
   qtyInput: {
     width: 48, color: '#fff', textAlign: 'center',
-    borderWidth: 1, borderColor: 'rgba(167,139,250,0.2)', borderRadius: 8, paddingVertical: 4,
+    borderWidth: 1, borderColor: 'rgba(109,40,217,0.15)', borderRadius: 8, paddingVertical: 4,
   },
 
   // Rolls
   actionsWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   actionChip: {
-    backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 10,
+    backgroundColor: '#f5f3ff', borderRadius: 10,
     paddingHorizontal: 10, paddingVertical: 8,
-    borderWidth: 1, borderColor: 'rgba(167,139,250,0.2)',
+    borderWidth: 1, borderColor: 'rgba(109,40,217,0.15)',
   },
-  actionLabel: { color: '#e2e8f0', fontSize: 12, fontWeight: '600' },
-  actionMod: { color: '#34d399', fontSize: 11, marginTop: 2 },
+  actionLabel: { color: '#1e1b3a', fontSize: 12, fontWeight: '600' },
+  actionMod: { color: '#059669', fontSize: 11, marginTop: 2 },
 
   // Modal (class picker)
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'flex-end' },
-  modalCard: { backgroundColor: '#1e1b4b', borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 20, paddingBottom: 30, maxHeight: '85%' },
-  modalTitle: { color: '#e2e8f0', fontSize: 16, fontWeight: '700', marginBottom: 12 },
-  modalAction: { marginTop: 10, alignItems: 'center', paddingVertical: 12, backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 10 },
-  charPickRow: { paddingVertical: 12, paddingHorizontal: 12, borderRadius: 10, backgroundColor: 'rgba(255,255,255,0.05)', marginBottom: 6 },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(15,12,41,0.50)', justifyContent: 'flex-end' },
+  modalCard: { backgroundColor: '#ffffff', borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 20, paddingBottom: 30, maxHeight: '85%' },
+  modalTitle: { color: '#1e1b3a', fontSize: 16, fontWeight: '700', marginBottom: 12 },
+  modalAction: { marginTop: 10, alignItems: 'center', paddingVertical: 12, backgroundColor: '#f5f3ff', borderRadius: 10 },
+  charPickRow: { paddingVertical: 12, paddingHorizontal: 12, borderRadius: 10, backgroundColor: '#f5f3ff', marginBottom: 6 },
   charPickName: { color: '#fff', fontWeight: '700' },
-  charPickSys: { color: '#a78bfa', fontSize: 11, marginTop: 2 },
+  charPickSys: { color: '#6d28d9', fontSize: 11, marginTop: 2 },
 });
+
+

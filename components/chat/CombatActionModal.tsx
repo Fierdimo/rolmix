@@ -398,7 +398,7 @@ export default function CombatActionModal({
                               </View>
                             ) : action?.saveType ? (
                               <View style={[s.spellBadge, { backgroundColor: 'rgba(251,191,36,0.15)' }]}>
-                                <Text style={[s.spellBadgeText, { color: '#fbbf24' }]}>🛡 Salvación</Text>
+                                <Text style={[s.spellBadgeText, { color: '#d97706' }]}>🛡 Salvación</Text>
                               </View>
                             ) : null}
                           </View>
@@ -419,7 +419,7 @@ export default function CombatActionModal({
                           {action?.attackTarget ? (
                             <Text style={s.weaponMod}>{action.modifier >= 0 ? '+' : ''}{action.modifier}</Text>
                           ) : (
-                            <Text style={[s.weaponMod, { color: '#c4b5fd', backgroundColor: 'rgba(139,92,246,0.1)', fontSize: 16 }]}>🔮</Text>
+                            <Text style={[s.weaponMod, { color: '#5b21b6', backgroundColor: 'rgba(139,92,246,0.1)', fontSize: 16 }]}>🔮</Text>
                           )}
                         </View>
                       </TouchableOpacity>
@@ -441,7 +441,7 @@ export default function CombatActionModal({
                   contentContainerStyle={s.targetList}
                   renderItem={({ item: c }) => {
                     const hpPct = c.hp_max > 0 ? c.hp_current / c.hp_max : 0;
-                    const barColor = hpPct > 0.5 ? '#34d399' : hpPct > 0.25 ? '#fbbf24' : '#f87171';
+                    const barColor = hpPct > 0.5 ? '#059669' : hpPct > 0.25 ? '#d97706' : '#dc2626';
                     const selected = targetsByAttack[0] ?? null;
                     return (
                       <TouchableOpacity
@@ -490,7 +490,7 @@ export default function CombatActionModal({
                           )}
                           {isSpell && !a.attackTarget && a.saveType && (
                             <View style={[s.spellBadge, { backgroundColor: 'rgba(251,191,36,0.15)' }]}>
-                              <Text style={[s.spellBadgeText, { color: '#fbbf24' }]}>Solo salvación</Text>
+                              <Text style={[s.spellBadgeText, { color: '#d97706' }]}>Solo salvación</Text>
                             </View>
                           )}
                         </View>
@@ -517,7 +517,7 @@ export default function CombatActionModal({
                             ))}
                           </>
                         ) : isSpell ? (
-                          <Text style={[s.weaponMod, { color: '#fbbf24', fontSize: 11 }]}>🔮</Text>
+                          <Text style={[s.weaponMod, { color: '#d97706', fontSize: 11 }]}>🔮</Text>
                         ) : (
                           <>
                             <Text style={s.weaponMod}>
@@ -547,7 +547,7 @@ export default function CombatActionModal({
                     value={manualDamageDie}
                     onChangeText={setManualDamageDie}
                     placeholder="ej. 1d6, 2d8, 1d4+2…"
-                    placeholderTextColor="#475569"
+                    placeholderTextColor="#9ca3af"
                     autoCapitalize="none"
                     autoCorrect={false}
                   />
@@ -570,7 +570,7 @@ export default function CombatActionModal({
                       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={s.perAttackTargets}>
                         {availableTargets.map((c) => {
                           const hpPct = c.hp_max > 0 ? c.hp_current / c.hp_max : 0;
-                          const barColor = hpPct > 0.5 ? '#34d399' : hpPct > 0.25 ? '#fbbf24' : '#f87171';
+                          const barColor = hpPct > 0.5 ? '#059669' : hpPct > 0.25 ? '#d97706' : '#dc2626';
                           return (
                             <TouchableOpacity
                               key={c.id}
@@ -606,7 +606,7 @@ export default function CombatActionModal({
                   contentContainerStyle={s.targetList}
                   renderItem={({ item: c }) => {
                     const hpPct = c.hp_max > 0 ? c.hp_current / c.hp_max : 0;
-                    const barColor = hpPct > 0.5 ? '#34d399' : hpPct > 0.25 ? '#fbbf24' : '#f87171';
+                    const barColor = hpPct > 0.5 ? '#059669' : hpPct > 0.25 ? '#d97706' : '#dc2626';
                     const selected = targetsByAttack[0] ?? null;
                     return (
                       <TouchableOpacity
@@ -658,17 +658,22 @@ export default function CombatActionModal({
 const s = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.6)',
+    backgroundColor: 'rgba(15,12,41,0.45)',
     justifyContent: 'flex-end',
   },
   backdropTap: { flex: 1 },
   sheet: {
-    backgroundColor: '#1a1535',
+    backgroundColor: '#ffffff',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     maxHeight: '85%',
     borderWidth: 1,
-    borderColor: 'rgba(124,58,237,0.4)',
+    borderColor: 'rgba(109,40,217,0.15)',
+    shadowColor: '#6d28d9',
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.10,
+    shadowRadius: 16,
+    elevation: 12,
   },
   header: {
     flexDirection: 'row',
@@ -678,13 +683,13 @@ const s = StyleSheet.create({
     paddingTop: 16,
     paddingBottom: 10,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(124,58,237,0.2)',
+    borderBottomColor: 'rgba(109,40,217,0.12)',
   },
-  headerTitle: { color: '#e2e8f0', fontSize: 17, fontWeight: '700' },
-  closeBtn:   { color: '#64748b', fontSize: 20, paddingHorizontal: 4 },
+  headerTitle: { color: '#1e1b3a', fontSize: 17, fontWeight: '700' },
+  closeBtn:   { color: '#9ca3af', fontSize: 20, paddingHorizontal: 4 },
   body:       { paddingHorizontal: 16, paddingTop: 12 },
   sectionLabel: {
-    color: '#64748b',
+    color: '#9ca3af',
     fontSize: 11,
     fontWeight: '700',
     letterSpacing: 1,
@@ -696,43 +701,43 @@ const s = StyleSheet.create({
   actionRow: { marginBottom: 4 },
   actionChip: {
     alignItems: 'center',
-    backgroundColor: 'rgba(30,27,60,0.8)',
+    backgroundColor: '#faf9ff',
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: 'rgba(124,58,237,0.25)',
+    borderColor: 'rgba(109,40,217,0.15)',
     paddingHorizontal: 12,
     paddingVertical: 8,
     marginRight: 8,
     minWidth: 80,
   },
   actionChipActive: {
-    backgroundColor: 'rgba(239,68,68,0.2)',
-    borderColor: '#f87171',
+    backgroundColor: '#fee2e2',
+    borderColor: '#dc2626',
   },
   actionChipIcon:  { fontSize: 20, marginBottom: 4 },
-  actionChipLabel: { color: '#94a3b8', fontSize: 11, fontWeight: '600', textAlign: 'center' },
-  actionChipLabelActive: { color: '#fca5a5' },
-  actionDesc:  { color: '#64748b', fontSize: 12, fontStyle: 'italic', marginBottom: 4 },
+  actionChipLabel: { color: '#6b7280', fontSize: 11, fontWeight: '600', textAlign: 'center' },
+  actionChipLabelActive: { color: '#dc2626' },
+  actionDesc:  { color: '#9ca3af', fontSize: 12, fontStyle: 'italic', marginBottom: 4 },
 
   // Arma
   weaponRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: 'rgba(30,27,60,0.8)',
+    backgroundColor: '#faf9ff',
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: 'rgba(124,58,237,0.2)',
+    borderColor: 'rgba(109,40,217,0.15)',
     paddingHorizontal: 14,
     paddingVertical: 10,
     marginBottom: 6,
   },
   weaponRowActive: {
-    borderColor: '#a78bfa',
-    backgroundColor: 'rgba(124,58,237,0.15)',
+    borderColor: '#6d28d9',
+    backgroundColor: 'rgba(109,40,217,0.10)',
   },
-  weaponName: { color: '#e2e8f0', fontSize: 14, fontWeight: '600', flex: 1 },
-  weaponDamage: { color: '#94a3b8', fontSize: 11, marginTop: 2 },
+  weaponName: { color: '#1e1b3a', fontSize: 14, fontWeight: '600', flex: 1 },
+  weaponDamage: { color: '#6b7280', fontSize: 11, marginTop: 2 },
   weaponMods: { flexDirection: 'row', gap: 6, alignItems: 'center' },
 
   // Badges de conjuro
@@ -742,40 +747,40 @@ const s = StyleSheet.create({
     paddingHorizontal: 5,
     paddingVertical: 2,
   },
-  spellBadgeText: { color: '#a78bfa', fontSize: 10, fontWeight: '700' },
-  spellSaveInfo: { color: '#fbbf24', fontSize: 11, marginTop: 2 },
+  spellBadgeText: { color: '#6d28d9', fontSize: 10, fontWeight: '700' },
+  spellSaveInfo: { color: '#d97706', fontSize: 11, marginTop: 2 },
 
   // Dado de daño manual
   manualDieRow: {
-    backgroundColor: 'rgba(30,27,60,0.8)',
+    backgroundColor: '#fffbeb',
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: 'rgba(251,191,36,0.3)',
+    borderColor: 'rgba(217,119,6,0.25)',
     paddingHorizontal: 14,
     paddingVertical: 10,
     marginBottom: 6,
     gap: 4,
   },
   manualDieInput: {
-    color: '#fbbf24',
+    color: '#92400e',
     fontSize: 16,
     fontWeight: '700',
     paddingVertical: 0,
   },
   manualDieHint: {
-    color: '#475569',
+    color: '#6b7280',
     fontSize: 11,
   },
   weaponMod:  {
-    color: '#34d399',
+    color: '#059669',
     fontSize: 14,
     fontWeight: '700',
-    backgroundColor: 'rgba(52,211,153,0.1)',
+    backgroundColor: '#d1fae5',
     borderRadius: 6,
     paddingHorizontal: 8,
     paddingVertical: 3,
   },
-  weaponModExtra: { color: '#a78bfa', backgroundColor: 'rgba(124,58,237,0.1)' },
+  weaponModExtra: { color: '#6d28d9', backgroundColor: '#ede9fe' },
 
   // Objetivo
   targetList: { paddingBottom: 6 },
@@ -785,7 +790,7 @@ const s = StyleSheet.create({
     marginBottom: 10,
   },
   perAttackLabel: {
-    color: '#94a3b8',
+    color: '#6b7280',
     fontSize: 12,
     fontWeight: '600',
     marginBottom: 6,
@@ -793,20 +798,20 @@ const s = StyleSheet.create({
   perAttackTargets: { marginBottom: 2 },
 
   targetChip: {
-    backgroundColor: 'rgba(30,27,60,0.8)',
+    backgroundColor: '#faf9ff',
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: 'rgba(124,58,237,0.2)',
+    borderColor: 'rgba(109,40,217,0.15)',
     padding: 10,
     marginRight: 8,
     width: 110,
     gap: 4,
   },
   targetChipActive: {
-    borderColor: '#f87171',
-    backgroundColor: 'rgba(239,68,68,0.15)',
+    borderColor: '#dc2626',
+    backgroundColor: '#fee2e2',
   },
-  targetName:  { color: '#e2e8f0', fontSize: 12, fontWeight: '600' },
+  targetName:  { color: '#1e1b3a', fontSize: 12, fontWeight: '600' },
   targetHpBar: {
     height: 4,
     backgroundColor: 'rgba(100,116,139,0.3)',
@@ -814,37 +819,41 @@ const s = StyleSheet.create({
     overflow: 'hidden',
   },
   targetHpFill: { height: '100%', borderRadius: 2 },
-  targetHp:     { color: '#94a3b8', fontSize: 11 },
+  targetHp:     { color: '#6b7280', fontSize: 11 },
 
   // Botón de tirada
   rollBtn: {
     margin: 16,
-    backgroundColor: 'rgba(239,68,68,0.3)',
+    backgroundColor: '#dc2626',
     borderRadius: 12,
     paddingVertical: 14,
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#f87171',
+    shadowColor: '#dc2626',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.30,
+    shadowRadius: 6,
+    elevation: 4,
   },
   rollBtnAlt: {
-    backgroundColor: 'rgba(124,58,237,0.3)',
-    borderColor: '#a78bfa',
+    backgroundColor: '#6d28d9',
+    shadowColor: '#6d28d9',
   },
   rollBtnDelay: {
-    backgroundColor: 'rgba(251,191,36,0.2)',
-    borderColor: '#fbbf24',
+    backgroundColor: '#d97706',
+    shadowColor: '#d97706',
   },
   rollBtnDisabled: {
-    backgroundColor: 'rgba(100,116,139,0.15)',
-    borderColor: '#475569',
+    backgroundColor: '#e5e7eb',
+    shadowOpacity: 0,
+    elevation: 0,
   },
-  emptyHint: { color: '#64748b', fontSize: 13, fontStyle: 'italic', marginBottom: 8 },
+  emptyHint: { color: '#9ca3af', fontSize: 13, fontStyle: 'italic', marginBottom: 8 },
   spellLvlBadge: {
-    backgroundColor: 'rgba(124,58,237,0.2)',
+    backgroundColor: 'rgba(109,40,217,0.12)',
     borderRadius: 4,
     paddingHorizontal: 5,
     paddingVertical: 2,
   },
-  spellLvlBadgeText: { color: '#a78bfa', fontSize: 10, fontWeight: '700' },
-  rollBtnText: { color: '#e2e8f0', fontSize: 16, fontWeight: '700' },
+  spellLvlBadgeText: { color: '#6d28d9', fontSize: 10, fontWeight: '700' },
+  rollBtnText: { color: '#ffffff', fontSize: 16, fontWeight: '700' },
 });

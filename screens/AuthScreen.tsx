@@ -47,7 +47,7 @@ export default function AuthScreen() {
   }
 
   return (
-    <LinearGradient colors={['#0f0c29', '#302b63', '#24243e']} style={styles.gradient}>
+    <LinearGradient colors={['#f5f3ff', '#ede9fe', '#f5f3ff']} style={styles.gradient}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.flex}
@@ -65,7 +65,7 @@ export default function AuthScreen() {
               <TextInput
                 style={styles.input}
                 placeholder="Nombre de aventurero"
-                placeholderTextColor="#888"
+                placeholderTextColor="#9ca3af"
                 value={username}
                 onChangeText={setUsername}
                 autoCapitalize="none"
@@ -75,7 +75,7 @@ export default function AuthScreen() {
             <TextInput
               style={styles.input}
               placeholder="Correo electrónico"
-              placeholderTextColor="#888"
+              placeholderTextColor="#9ca3af"
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
@@ -85,7 +85,7 @@ export default function AuthScreen() {
             <TextInput
               style={styles.input}
               placeholder="Contraseña"
-              placeholderTextColor="#888"
+              placeholderTextColor="#9ca3af"
               value={password}
               onChangeText={setPassword}
               secureTextEntry
@@ -129,48 +129,58 @@ const styles = StyleSheet.create({
   },
   logo: {
     fontSize: 42,
-    color: '#fff',
+    color: '#1e1b3a',
     fontWeight: 'bold',
     marginBottom: 4,
   },
   subtitle: {
     fontSize: 14,
-    color: '#a78bfa',
+    color: '#6d28d9',
     marginBottom: 36,
     letterSpacing: 1,
   },
   card: {
     width: '100%',
-    backgroundColor: 'rgba(255,255,255,0.06)',
-    borderRadius: 16,
+    backgroundColor: '#ffffff',
+    borderRadius: 20,
     padding: 24,
     borderWidth: 1,
-    borderColor: 'rgba(167,139,250,0.2)',
+    borderColor: 'rgba(109,40,217,0.14)',
+    shadowColor: '#6d28d9',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.10,
+    shadowRadius: 16,
+    elevation: 6,
   },
   title: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#e2e8f0',
+    color: '#1e1b3a',
     marginBottom: 20,
     textAlign: 'center',
   },
   input: {
-    backgroundColor: 'rgba(255,255,255,0.08)',
+    backgroundColor: '#f5f3ff',
     borderRadius: 10,
     paddingHorizontal: 14,
     paddingVertical: 12,
-    color: '#fff',
+    color: '#1e1b3a',
     fontSize: 15,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: 'rgba(167,139,250,0.25)',
+    borderColor: 'rgba(109,40,217,0.18)',
   },
   button: {
-    backgroundColor: '#7c3aed',
+    backgroundColor: '#6d28d9',
     borderRadius: 10,
     paddingVertical: 14,
     alignItems: 'center',
     marginTop: 4,
+    shadowColor: '#6d28d9',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.30,
+    shadowRadius: 8,
+    elevation: 4,
   },
   buttonText: {
     color: '#fff',
@@ -178,5 +188,5 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
   switchBtn: { marginTop: 16, alignItems: 'center' },
-  switchText: { color: '#a78bfa', fontSize: 13 },
+  switchText: { color: '#6d28d9', fontSize: 13 },
 });

@@ -171,15 +171,16 @@ export function computeFinalStats(
     const nonTouchTotal = resolveBonusStack(acBonusList.filter((b) => NON_TOUCH.has(b.type ?? '')));
     // Esquiva no aplica a desprevenido
     const dodgeTotal = resolveBonusStack(acBonusList.filter((b) => b.type === 'dodge'));
-    const finalAc = merged['ac'] ?? 10;
-    const dexMod  = merged['mod_dex'] ?? 0;
+    const baseAc = merged['ac'] ?? 10;
+    const dexMod = merged['mod_dex'] ?? 0;
     if (!('touch_ac' in merged)) {
-      // Toque = CA total - bonos de armadura/escudo/natural + DEX (que no está en ac base del PJ)
-      merged['touch_ac'] = finalAc - nonTouchTotal + dexMod;
+      // Para PJs el campo 'ac' es la base sin DEX; la CA normal y la de toque suman el modificador de DES.
+      merged['ac'] = baseAc + dexMod;
+      merged['touch_ac'] = baseAc - nonTouchTotal + dexMod;
     }
     if (!('flat_footed_ac' in merged)) {
-      // Desprevenido = CA total - bonos de esquiva (DEX tampoco está en ac base, no hay que restarla)
-      merged['flat_footed_ac'] = finalAc - dodgeTotal;
+      // Desprevenido = base + equipo - esquiva (DEX no se aplica al desprevenido)
+      merged['flat_footed_ac'] = baseAc - dodgeTotal;
     }
   }
 

@@ -60,7 +60,7 @@ export default function MonsterPickerModal({ visible, loading, onPick, onClose }
             <TextInput
               style={[localS.input, { flex: 2 }]}
               placeholder="Buscar por nombre…"
-              placeholderTextColor="#64748b"
+              placeholderTextColor="#9ca3af"
               value={query}
               onChangeText={setQuery}
               autoCapitalize="none"
@@ -69,7 +69,7 @@ export default function MonsterPickerModal({ visible, loading, onPick, onClose }
             <TextInput
               style={[localS.input, { flex: 1, marginLeft: 6 }]}
               placeholder="CR máx"
-              placeholderTextColor="#64748b"
+              placeholderTextColor="#9ca3af"
               value={maxCr}
               onChangeText={setMaxCr}
               keyboardType="decimal-pad"
@@ -113,7 +113,7 @@ export default function MonsterPickerModal({ visible, loading, onPick, onClose }
           )}
 
           <TouchableOpacity style={s.modalAction} onPress={() => { reset(); onClose(); }}>
-            <Text style={{ color: '#94a3b8', fontWeight: '600' }}>Cerrar</Text>
+            <Text style={{ color: '#6b7280', fontWeight: '600' }}>Cerrar</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -127,17 +127,17 @@ const localS = StyleSheet.create({
     marginBottom: 8,
   },
   input: {
-    backgroundColor: 'rgba(255,255,255,0.07)',
+    backgroundColor: '#f5f3ff',
     borderRadius: 8,
     paddingHorizontal: 10,
     paddingVertical: 8,
-    color: '#e2e8f0',
+    color: '#1e1b3a',
     fontSize: 14,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: 'rgba(109,40,217,0.08)',
   },
   count: {
-    color: '#64748b',
+    color: '#9ca3af',
     fontSize: 11,
     marginBottom: 6,
   },
@@ -150,24 +150,24 @@ const localS = StyleSheet.create({
     borderBottomColor: 'rgba(255,255,255,0.06)',
   },
   rowName: {
-    color: '#e2e8f0',
+    color: '#1e1b3a',
     fontSize: 14,
     fontWeight: '600',
   },
   rowMeta: {
-    color: '#94a3b8',
+    color: '#6b7280',
     fontSize: 12,
     marginTop: 1,
   },
   crBadge: {
-    backgroundColor: 'rgba(124,58,237,0.25)',
+    backgroundColor: 'rgba(109,40,217,0.18)',
     borderRadius: 6,
     paddingHorizontal: 8,
     paddingVertical: 3,
     marginLeft: 8,
   },
   crText: {
-    color: '#a78bfa',
+    color: '#6d28d9',
     fontSize: 12,
     fontWeight: '700',
   },

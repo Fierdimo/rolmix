@@ -36,6 +36,7 @@ export default function MessageInput({ onSend, disabled = false }: Props) {
   const [selectedType, setSelectedType] = useState<MessageType>('message');
   const [showDice, setShowDice] = useState(false);
   const [modifier, setModifier] = useState('');
+  const [selectedDie, setSelectedDie] = useState('d20');
 
   function handleSend() {
     if (disabled) return;
@@ -45,9 +46,10 @@ export default function MessageInput({ onSend, disabled = false }: Props) {
     setText('');
   }
 
-  function handleDiceRoll(die: string) {
+  function handleDiceRoll(die?: string) {
     if (disabled) return;
-    const meta = rollDice(die);
+    const target = die ?? selectedDie;
+    const meta = rollDice(target);
     const mod = parseInt(modifier, 10);
     if (!isNaN(mod) && mod !== 0) {
       meta.modifier = mod;
@@ -55,8 +57,8 @@ export default function MessageInput({ onSend, disabled = false }: Props) {
     }
     const label =
       mod && !isNaN(mod) && mod !== 0
-        ? `Tirada ${die}${mod > 0 ? '+' : ''}${mod}`
-        : `Tirada ${die}`;
+        ? `Tirada ${target}${mod > 0 ? '+' : ''}${mod}`
+        : `Tirada ${target}`;
     onSend(label, 'dice', meta as unknown as Record<string, unknown>);
     setShowDice(false);
     setModifier('');
@@ -88,23 +90,42 @@ export default function MessageInput({ onSend, disabled = false }: Props) {
       {/* Dice panel */}
       {selectedType === 'dice' && (
         <View style={styles.dicePanel}>
-          <View style={styles.diceRow}>
+          {/* Die selector chips */}
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.dieChipsRow}
+          >
             {DICE.map((die) => (
-              <TouchableOpacity key={die} style={styles.dieBtn} onPress={() => handleDiceRoll(die)}>
-                <Text style={styles.dieBtnText}>{die}</Text>
+              <TouchableOpacity
+                key={die}
+                style={[styles.dieChip, selectedDie === die && styles.dieChipActive]}
+                onPress={() => setSelectedDie(die)}
+              >
+                <Text style={[styles.dieChipText, selectedDie === die && styles.dieChipTextActive]}>
+                  {die}
+                </Text>
               </TouchableOpacity>
             ))}
-          </View>
-          <View style={styles.modifierRow}>
-            <Text style={styles.modLabel}>Modificador:</Text>
+          </ScrollView>
+
+          {/* Modifier + Roll row */}
+          <View style={styles.diceInputRow}>
+            <Text style={styles.modLabel}>Mod</Text>
             <TextInput
               style={styles.modInput}
               value={modifier}
               onChangeText={setModifier}
-              keyboardType="numeric"
+              keyboardType="numbers-and-punctuation"
               placeholder="+0"
-              placeholderTextColor="#64748b"
+              placeholderTextColor="#9ca3af"
             />
+            <TouchableOpacity
+              style={[styles.rollBtn, disabled && styles.sendBtnDisabled]}
+              onPress={() => handleDiceRoll()}
+            >
+              <Text style={styles.rollBtnText}>🎲 Tirar {selectedDie}</Text>
+            </TouchableOpacity>
           </View>
         </View>
       )}
@@ -122,9 +143,7 @@ export default function MessageInput({ onSend, disabled = false }: Props) {
               selectedType === 'whisper'   ? 'Susurro privado...' :
               'Escribe un mensaje...'
             }
-            placeholderTextColor="#64748b"
-            multiline
-            returnKeyType="send"
+            placeholderTextColor="#9ca3af"
             onSubmitEditing={handleSend}
             blurOnSubmit
             editable={!disabled}
@@ -140,9 +159,9 @@ export default function MessageInput({ onSend, disabled = false }: Props) {
 
 const styles = StyleSheet.create({
   wrapper: {
-    backgroundColor: '#1e1b4b',
+    backgroundColor: '#ffffff',
     borderTopWidth: 1,
-    borderTopColor: 'rgba(167,139,250,0.15)',
+    borderTopColor: 'rgba(109,40,217,0.12)',
   },
   typeRow: { maxHeight: 60 },
   typeRowContent: { flexDirection: 'row', paddingHorizontal: 10, paddingVertical: 8, gap: 6 },
@@ -155,9 +174,9 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 1,
     borderColor: 'transparent',
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: '#f5f3ff',
   },
-  typeBtnActive: { backgroundColor: 'rgba(167,139,250,0.1)' },
+  typeBtnActive: { backgroundColor: '#ede9fe', borderColor: 'rgba(109,40,217,0.25)' },
   typeName: { fontSize: 11 },
   inputRow: {
     flexDirection: 'row',
@@ -167,55 +186,97 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    backgroundColor: 'rgba(255,255,255,0.08)',
+    backgroundColor: '#f5f3ff',
     borderRadius: 20,
     paddingHorizontal: 16,
     paddingVertical: 10,
-    color: '#e2e8f0',
+    color: '#1e1b3a',
     fontSize: 15,
     maxHeight: 100,
     borderWidth: 1,
-    borderColor: 'rgba(167,139,250,0.2)',
+    borderColor: 'rgba(109,40,217,0.18)',
   },
   sendBtn: {
-    backgroundColor: '#7c3aed',
+    backgroundColor: '#6d28d9',
     width: 42,
     height: 42,
     borderRadius: 21,
     justifyContent: 'center',
     alignItems: 'center',
+    shadowColor: '#6d28d9',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.35,
+    shadowRadius: 6,
+    elevation: 4,
   },
   sendBtnDisabled: { opacity: 0.4 },
   sendBtnText: { color: '#fff', fontSize: 28, lineHeight: 30 },
-  dicePanel: { padding: 12 },
-  diceRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, justifyContent: 'center' },
-  dieBtn: {
-    backgroundColor: 'rgba(52,211,153,0.15)',
-    borderRadius: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    borderWidth: 1,
-    borderColor: 'rgba(52,211,153,0.3)',
+  dicePanel: {
+    paddingHorizontal: 10,
+    paddingTop: 8,
+    paddingBottom: 4,
+    gap: 8,
   },
-  dieBtnText: { color: '#34d399', fontWeight: '700', fontSize: 14 },
-  modifierRow: {
+  dieChipsRow: {
+    flexDirection: 'row',
+    gap: 6,
+    paddingVertical: 2,
+  },
+  dieChip: {
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(5,150,105,0.25)',
+    backgroundColor: '#f0fdf4',
+  },
+  dieChipActive: {
+    backgroundColor: '#059669',
+    borderColor: '#059669',
+  },
+  dieChipText: {
+    color: '#065f46',
+    fontWeight: '700',
+    fontSize: 13,
+  },
+  dieChipTextActive: {
+    color: '#ffffff',
+  },
+  diceInputRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 10,
-    gap: 10,
-    justifyContent: 'center',
+    gap: 8,
+    paddingBottom: 6,
   },
-  modLabel: { color: '#94a3b8', fontSize: 13 },
+  modLabel: { color: '#6b7280', fontSize: 13, flexShrink: 0 },
   modInput: {
-    backgroundColor: 'rgba(255,255,255,0.08)',
-    borderRadius: 8,
+    backgroundColor: '#f5f3ff',
+    borderRadius: 10,
     paddingHorizontal: 12,
-    paddingVertical: 6,
-    color: '#fff',
+    paddingVertical: 8,
+    color: '#1e1b3a',
     fontSize: 14,
-    width: 70,
+    width: 64,
     textAlign: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(167,139,250,0.2)',
+    borderColor: 'rgba(109,40,217,0.18)',
+  },
+  rollBtn: {
+    flex: 1,
+    backgroundColor: '#059669',
+    borderRadius: 20,
+    paddingVertical: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#059669',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  rollBtnText: {
+    color: '#ffffff',
+    fontWeight: '700',
+    fontSize: 14,
   },
 });

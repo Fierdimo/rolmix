@@ -177,7 +177,7 @@ export default function RoomsScreen({ navigation }: Props) {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#0f0c29" />
+      <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
 
       <View style={styles.header}>
         <View>
@@ -223,21 +223,21 @@ export default function RoomsScreen({ navigation }: Props) {
             <TextInput
               style={styles.input}
               placeholder="Nombre de la partida"
-              placeholderTextColor="#888"
+              placeholderTextColor="#9ca3af"
               value={sessionName}
               onChangeText={setSessionName}
             />
             <TextInput
               style={styles.input}
               placeholder="Sistema: D&D 5e, Pathfinder..."
-              placeholderTextColor="#888"
+              placeholderTextColor="#9ca3af"
               value={systemName}
               onChangeText={setSystemName}
             />
             <TextInput
               style={[styles.input, { height: 72 }]}
               placeholder="Descripción (opcional)"
-              placeholderTextColor="#888"
+              placeholderTextColor="#9ca3af"
               value={sessionDesc}
               onChangeText={setSessionDesc}
               multiline
@@ -283,7 +283,7 @@ export default function RoomsScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0f0c29' },
+  container: { flex: 1, backgroundColor: '#f5f3ff' },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -292,31 +292,40 @@ const styles = StyleSheet.create({
     paddingTop: 52,
     paddingBottom: 16,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(167,139,250,0.15)',
+    borderBottomColor: 'rgba(109,40,217,0.12)',
+    backgroundColor: '#ffffff',
   },
-  headerTitle: { fontSize: 22, fontWeight: '800', color: '#fff' },
-  headerSub: { fontSize: 12, color: '#a78bfa', marginTop: 2 },
+  headerTitle: { fontSize: 22, fontWeight: '800', color: '#1e1b3a' },
+  headerSub: { fontSize: 12, color: '#6d28d9', marginTop: 2 },
   logoutBtn: { color: '#ef4444', fontSize: 14, fontWeight: '600' },
   subBar: {
     paddingHorizontal: 16, paddingTop: 12, paddingBottom: 4,
     flexDirection: 'row', gap: 10,
+    backgroundColor: '#ffffff',
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(109,40,217,0.07)',
   },
   subBtn: {
-    backgroundColor: 'rgba(124,58,237,0.18)',
-    borderColor: 'rgba(124,58,237,0.45)', borderWidth: 1,
+    backgroundColor: '#ede9fe',
+    borderColor: 'rgba(109,40,217,0.30)', borderWidth: 1,
     borderRadius: 999, paddingHorizontal: 14, paddingVertical: 8,
   },
-  subBtnText: { color: '#c4b5fd', fontWeight: '700', fontSize: 13 },
+  subBtnText: { color: '#5b21b6', fontWeight: '700', fontSize: 13 },
   list: { padding: 16, paddingBottom: 90 },
   roomCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: '#ffffff',
     borderRadius: 14,
     padding: 14,
     marginBottom: 10,
     borderWidth: 1,
-    borderColor: 'rgba(167,139,250,0.15)',
+    borderColor: 'rgba(109,40,217,0.12)',
+    shadowColor: '#6d28d9',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 6,
+    elevation: 2,
   },
   roomIcon: {
     width: 46,
@@ -328,60 +337,67 @@ const styles = StyleSheet.create({
   },
   roomIconText: { fontSize: 22 },
   roomInfo: { flex: 1 },
-  roomName: { color: '#e2e8f0', fontWeight: '700', fontSize: 15 },
-  roomDesc: { color: '#94a3b8', fontSize: 12, marginTop: 2 },
-  roomMeta: { color: '#64748b', fontSize: 11, marginTop: 4 },
-  badge: { color: '#fbbf24', fontSize: 11, fontWeight: '700', marginTop: 6 },
+  roomName: { color: '#1e1b3a', fontWeight: '700', fontSize: 15 },
+  roomDesc: { color: '#6b7280', fontSize: 12, marginTop: 2 },
+  roomMeta: { color: '#9ca3af', fontSize: 11, marginTop: 4 },
+  badge: { color: '#d97706', fontSize: 11, fontWeight: '700', marginTop: 6 },
   joinButton: {
-    backgroundColor: 'rgba(124,58,237,0.18)',
+    backgroundColor: '#ede9fe',
     borderRadius: 999,
     paddingHorizontal: 10,
     paddingVertical: 8,
     marginRight: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(109,40,217,0.20)',
   },
-  joinButtonText: { color: '#c4b5fd', fontSize: 12, fontWeight: '700' },
-  arrow: { color: '#7c3aed', fontSize: 24, fontWeight: '700' },
-  empty: { textAlign: 'center', color: '#64748b', marginTop: 60, fontSize: 15, lineHeight: 26 },
+  joinButtonText: { color: '#5b21b6', fontSize: 12, fontWeight: '700' },
+  arrow: { color: '#6d28d9', fontSize: 24, fontWeight: '700' },
+  empty: { textAlign: 'center', color: '#9ca3af', marginTop: 60, fontSize: 15, lineHeight: 26 },
   fab: {
     position: 'absolute',
     bottom: 30,
     right: 24,
-    backgroundColor: '#7c3aed',
+    backgroundColor: '#6d28d9',
     width: 58,
     height: 58,
     borderRadius: 29,
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 6,
-    shadowColor: '#7c3aed',
+    shadowColor: '#6d28d9',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.5,
-    shadowRadius: 8,
+    shadowOpacity: 0.40,
+    shadowRadius: 10,
   },
   fabText: { color: '#fff', fontSize: 30, lineHeight: 32 },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.7)',
+    backgroundColor: 'rgba(15,12,41,0.45)',
     justifyContent: 'flex-end',
   },
   modalCard: {
-    backgroundColor: '#1e1b4b',
+    backgroundColor: '#ffffff',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: 24,
     paddingBottom: 40,
+    shadowColor: '#6d28d9',
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 16,
+    elevation: 12,
   },
-  modalTitle: { color: '#e2e8f0', fontSize: 18, fontWeight: '700', marginBottom: 20 },
+  modalTitle: { color: '#1e1b3a', fontSize: 18, fontWeight: '700', marginBottom: 20 },
   input: {
-    backgroundColor: 'rgba(255,255,255,0.08)',
+    backgroundColor: '#f5f3ff',
     borderRadius: 10,
     paddingHorizontal: 14,
     paddingVertical: 12,
-    color: '#fff',
+    color: '#1e1b3a',
     fontSize: 15,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: 'rgba(167,139,250,0.25)',
+    borderColor: 'rgba(109,40,217,0.18)',
   },
   accessRow: { flexDirection: 'row', gap: 10, marginBottom: 12 },
   accessChip: {
@@ -390,16 +406,16 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(167,139,250,0.25)',
-    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderColor: 'rgba(109,40,217,0.18)',
+    backgroundColor: '#f5f3ff',
   },
-  accessChipActive: { backgroundColor: 'rgba(124,58,237,0.24)', borderColor: '#7c3aed' },
-  accessChipText: { color: '#94a3b8', fontWeight: '600' },
-  accessChipTextActive: { color: '#fff' },
+  accessChipActive: { backgroundColor: '#ede9fe', borderColor: '#6d28d9' },
+  accessChipText: { color: '#6b7280', fontWeight: '600' },
+  accessChipTextActive: { color: '#1e1b3a' },
   modalActions: { flexDirection: 'row', gap: 10, marginTop: 4 },
   modalBtn: { flex: 1, borderRadius: 10, paddingVertical: 14, alignItems: 'center' },
-  cancelBtn: { backgroundColor: 'rgba(255,255,255,0.08)' },
-  cancelBtnText: { color: '#94a3b8', fontWeight: '600' },
-  createBtn: { backgroundColor: '#7c3aed' },
+  cancelBtn: { backgroundColor: '#f5f3ff', borderWidth: 1, borderColor: 'rgba(109,40,217,0.14)' },
+  cancelBtnText: { color: '#6b7280', fontWeight: '600' },
+  createBtn: { backgroundColor: '#6d28d9' },
   createBtnText: { color: '#fff', fontWeight: '700' },
 });
