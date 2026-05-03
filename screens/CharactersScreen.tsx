@@ -26,6 +26,7 @@ export default function CharactersScreen({ navigation }: Props) {
       .from('characters')
       .select('*')
       .eq('owner_id', profile.id)
+      .eq('is_npc', false)
       .order('updated_at', { ascending: false });
     if (!error && data) setCharacters(data);
     setLoading(false);

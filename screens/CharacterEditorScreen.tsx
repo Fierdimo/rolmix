@@ -715,7 +715,7 @@ function IdentityHeader({
                 <Text style={{ color: '#6b7280', fontWeight: '600' }}>Cancelar</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.modalAction, { flex: 1, backgroundColor: 'rgba(109,40,217,0.30)' }]}
+                style={[styles.modalAction, { flex: 1, backgroundColor: '#6d28d9' }]}
                 onPress={() => {
                   const n = Number(xpInput);
                   if (!Number.isNaN(n)) {
@@ -1189,7 +1189,7 @@ function SummaryCard({
                 <Text style={{ color: '#6b7280', fontWeight: '600' }}>Cancelar</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.modalAction, { flex: 1, backgroundColor: 'rgba(109,40,217,0.30)' }]}
+                style={[styles.modalAction, { flex: 1, backgroundColor: '#6d28d9' }]}
                 onPress={commitEdit}
               >
                 <Text style={{ color: '#fff', fontWeight: '700' }}>Guardar</Text>
@@ -1512,7 +1512,7 @@ function AdventureTab({
               <TouchableOpacity style={[styles.modalAction, { flex: 1 }]} onPress={() => setEditKey(null)}>
                 <Text style={{ color: '#6b7280', fontWeight: '600' }}>Cancelar</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={[styles.modalAction, { flex: 1, backgroundColor: 'rgba(109,40,217,0.30)' }]} onPress={commitEdit}>
+              <TouchableOpacity style={[styles.modalAction, { flex: 1, backgroundColor: '#6d28d9' }]} onPress={commitEdit}>
                 <Text style={{ color: '#fff', fontWeight: '700' }}>Guardar</Text>
               </TouchableOpacity>
             </View>
@@ -1976,7 +1976,7 @@ function InventoryTab({ data, setData }: any) {
                 <Text style={{ color: '#6b7280', fontWeight: '600' }}>Cancelar</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.modalAction, { flex: 1, backgroundColor: 'rgba(109,40,217,0.30)' }]}
+                style={[styles.modalAction, { flex: 1, backgroundColor: '#6d28d9' }]}
                 onPress={() => {
                   const n = Number(coinInput);
                   if (!Number.isNaN(n) && coinEdit) setData({ ...data, [coinEdit.key]: Math.max(0, n) });
@@ -3528,7 +3528,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1, borderBottomColor: 'rgba(167,139,250,0.1)', flexWrap: 'wrap', gap: 4,
   },
   tab: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999 },
-  tabActive: { backgroundColor: 'rgba(109,40,217,0.18)' },
+  tabActive: { backgroundColor: '#6d28d9' },
   tabText: { color: '#6b7280', fontSize: 12, fontWeight: '600' },
   tabTextActive: { color: '#fff' },
 
@@ -3557,7 +3557,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12, paddingVertical: 6, borderRadius: 999,
     backgroundColor: '#f5f3ff', borderWidth: 1, borderColor: 'rgba(109,40,217,0.15)',
   },
-  selectChipActive: { backgroundColor: 'rgba(109,40,217,0.30)', borderColor: '#6d28d9' },
+  selectChipActive: { backgroundColor: '#6d28d9', borderColor: '#6d28d9' },
   selectChipText: { color: '#6b7280', fontSize: 12 },
   selectChipTextActive: { color: '#fff', fontWeight: '700' },
   filterChipRow: { flexDirection: 'row', marginVertical: 6 },
@@ -3675,7 +3675,7 @@ const styles = StyleSheet.create({
     letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 4,
   },
   identityNameInput: {
-    color: '#fff', fontSize: 22, fontWeight: '800',
+    color: '#1e1b3a', fontSize: 22, fontWeight: '800',
     paddingVertical: 4, paddingHorizontal: 0,
     borderBottomWidth: 1, borderBottomColor: 'rgba(167,139,250,0.3)',
     marginBottom: 12,
@@ -3874,7 +3874,7 @@ const styles = StyleSheet.create({
     letterSpacing: 2, textTransform: 'uppercase',
   },
   heroValue: {
-    color: '#fff', fontSize: 36, fontWeight: '900', lineHeight: 40, marginTop: 2,
+    color: '#1e1b3a', fontSize: 36, fontWeight: '900', lineHeight: 40, marginTop: 2,
   },
   heroSub: { color: '#6b7280', fontSize: 10, marginTop: 2 },
   heroSideCol: { width: 96, justifyContent: 'space-between' },
@@ -3948,10 +3948,10 @@ const styles = StyleSheet.create({
   levelRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   levelBtn: {
     width: 28, height: 28, borderRadius: 14, alignItems: 'center', justifyContent: 'center',
-    backgroundColor: 'rgba(109,40,217,0.18)',
+    backgroundColor: '#6d28d9',
   },
   levelBtnText: { color: '#fff', fontWeight: '800', fontSize: 16 },
-  levelValue: { color: '#fff', fontWeight: '800', minWidth: 20, textAlign: 'center' },
+  levelValue: { color: '#1e1b3a', fontWeight: '800', minWidth: 20, textAlign: 'center' },
   delBtn: {
     width: 28, height: 28, borderRadius: 14, alignItems: 'center', justifyContent: 'center',
     backgroundColor: '#fee2e2',
@@ -3979,7 +3979,7 @@ const styles = StyleSheet.create({
   },
   equipHeader: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 },
   itemNameInput: {
-    color: '#fff', fontWeight: '700', fontSize: 14, paddingVertical: 4,
+    color: '#1e1b3a', fontWeight: '700', fontSize: 14, paddingVertical: 4,
     borderBottomWidth: 1, borderBottomColor: 'rgba(167,139,250,0.2)',
   },
   equipToggle: { alignItems: 'center' },
@@ -3989,7 +3989,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8, paddingVertical: 4, borderRadius: 999,
     backgroundColor: '#f5f3ff', borderWidth: 1, borderColor: 'rgba(109,40,217,0.12)',
   },
-  slotChipActive: { backgroundColor: 'rgba(109,40,217,0.22)', borderColor: '#6d28d9' },
+  slotChipActive: { backgroundColor: '#6d28d9', borderColor: '#6d28d9' },
   slotChipText: { color: '#6b7280', fontSize: 10 },
   slotChipTextActive: { color: '#fff', fontWeight: '700' },
   bonusRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 6, marginVertical: 6 },
@@ -3999,7 +3999,7 @@ const styles = StyleSheet.create({
   },
   targetChipActive: { backgroundColor: '#d1fae5', borderColor: '#059669' },
   targetChipText: { color: '#6b7280', fontSize: 10 },
-  targetChipTextActive: { color: '#fff', fontWeight: '700' },
+  targetChipTextActive: { color: '#065f46', fontWeight: '700' },
 
   // Selector de target (bottom sheet)
   targetSelectBtn: {
@@ -4024,7 +4024,7 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: 'transparent',
   },
   targetPickRowActive: {
-    backgroundColor: 'rgba(109,40,217,0.18)', borderColor: '#6d28d9',
+    backgroundColor: '#6d28d9', borderColor: '#6d28d9',
   },
   targetPickName: { color: '#1e1b3a', fontSize: 14 },
   targetPickId: { color: '#9ca3af', fontSize: 10, marginTop: 2 },
@@ -4051,7 +4051,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center', alignItems: 'center',
   },
   stepBtnText: { color: '#5b21b6', fontSize: 18, lineHeight: 20, fontWeight: '700' },
-  stepValue: { color: '#fff', fontSize: 18, fontWeight: '900', minWidth: 36, textAlign: 'center' },
+  stepValue: { color: '#1e1b3a', fontSize: 18, fontWeight: '900', minWidth: 36, textAlign: 'center' },
   rangedToggle: {
     marginTop: 8, paddingVertical: 4, paddingHorizontal: 8,
     backgroundColor: '#f5f3ff', borderRadius: 8,
@@ -4104,7 +4104,7 @@ const styles = StyleSheet.create({
     width: 44, textAlign: 'center',
   },
   skillTableInput: {
-    width: 56, color: '#fff', textAlign: 'center', fontSize: 13,
+    width: 56, color: '#1e1b3a', textAlign: 'center', fontSize: 13,
     borderWidth: 1, borderColor: 'rgba(109,40,217,0.15)', borderRadius: 6, paddingVertical: 3,
   },
   skillTableTotal: {
@@ -4125,7 +4125,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#faf9ff', borderRadius: 10, padding: 10, marginBottom: 6,
   },
   qtyInput: {
-    width: 48, color: '#fff', textAlign: 'center',
+    width: 48, color: '#1e1b3a', textAlign: 'center',
     borderWidth: 1, borderColor: 'rgba(109,40,217,0.15)', borderRadius: 8, paddingVertical: 4,
   },
 
@@ -4145,7 +4145,7 @@ const styles = StyleSheet.create({
   modalTitle: { color: '#1e1b3a', fontSize: 16, fontWeight: '700', marginBottom: 12 },
   modalAction: { marginTop: 10, alignItems: 'center', paddingVertical: 12, backgroundColor: '#f5f3ff', borderRadius: 10 },
   charPickRow: { paddingVertical: 12, paddingHorizontal: 12, borderRadius: 10, backgroundColor: '#f5f3ff', marginBottom: 6 },
-  charPickName: { color: '#fff', fontWeight: '700' },
+  charPickName: { color: '#1e1b3a', fontWeight: '700' },
   charPickSys: { color: '#6d28d9', fontSize: 11, marginTop: 2 },
 });
 

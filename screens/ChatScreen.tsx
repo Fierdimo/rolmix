@@ -12,6 +12,7 @@ import {
   Dimensions,
   Modal,
   TextInput,
+  StyleSheet,
 } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp } from '@react-navigation/native';
@@ -19,6 +20,8 @@ import { Character, Combatant, DiceMetadata, MessageType, SessionMember } from '
 import { useAuth } from '../hooks/useAuth';
 import { useSessionChat } from '../hooks/useSessionChat';
 import { useCombat, CombatParticipant } from '../hooks/useCombat';
+import { useMap } from '../hooks/useMap';
+import MapCanvas from '../components/map/MapCanvas';
 import MessageBubble from '../components/MessageBubble';
 import MessageInput from '../components/MessageInput';
 import SessionDrawer from '../components/chat/SessionDrawer';
@@ -28,6 +31,7 @@ import CombatTrackerPanel from '../components/chat/CombatTrackerPanel';
 import CombatActionModal, { CombatAttackResult } from '../components/chat/CombatActionModal';
 import DamageResolutionModal, { ResolvedAttack } from '../components/chat/DamageResolutionModal';
 import MonsterPickerModal, { MonsterEntry } from '../components/chat/MonsterPickerModal';
+import { pickAndUploadMapBackground } from '../lib/mapStorage';
 import { resolveAction } from '../lib/systems';
 import { RollableAction } from '../lib/systems/types';
 import { chatStyles as s } from '../components/chat/chatStyles';
@@ -46,6 +50,7 @@ export default function ChatScreen({ navigation, route }: Props) {
   const { user, profile } = useAuth();
 
   // ── UI state ─────────────────────────────────────────────────────────────
+  const [activeTab, setActiveTab] = useState<'chat' | 'map'>('chat');
   const [pickerVisible, setPickerVisible] = useState(false);
   const [rollPanelVisible, setRollPanelVisible] = useState(false);
   const [directedFor, setDirectedFor] = useState<SessionMember | null>(null);
@@ -113,8 +118,22 @@ export default function ChatScreen({ navigation, route }: Props) {
   // ── Combat ────────────────────────────────────────────────────────────────
   const {
     encounter, combatants, activeCombatant, characterMap,
-    startCombat, endCombat, nextTurn, updateHp, delayAfter, consumeSpell,
+    startCombat, endCombat, nextTurn, prevTurn, updateHp, delayAfter, consumeSpell,
   } = useCombat(sessionId, isDm);
+
+  // ── Mapa ──────────────────────────────────────────────────────────────────
+  const { map, tokens: mapTokens, mapLoading, moveToken, placeOwnToken, createMap, addTokensForCombatants, updateMapSettings, updateBackground } = useMap({
+    sessionId,
+    isDm,
+    combatants,
+    encounter,
+    characterMap,
+  });
+
+  // combatant ID del personaje activo del jugador (undefined para el DM)
+  const myCombatantId = !isDm && activeCharacter
+    ? combatants.find(c => c.character_id === activeCharacter.id)?.id
+    : undefined;
 
   // ── Bestiario de sesión ───────────────────────────────────────────────────
   const { roster, addToRoster, removeFromRoster } = useSessionRoster(sessionId);
@@ -201,7 +220,7 @@ export default function ChatScreen({ navigation, route }: Props) {
       for (const instanceName of instances) {
         const { data: newChar, error } = await sb
           .from('characters')
-          .insert({ owner_id: user?.id, system_id: entry.monster.system_id, name: instanceName, data: entry.monster.data })
+          .insert({ owner_id: user?.id, system_id: entry.monster.system_id, name: instanceName, data: entry.monster.data, is_npc: true })
           .select()
           .single();
         if (!error && newChar) await addDmNpc(newChar.id);
@@ -405,6 +424,26 @@ export default function ChatScreen({ navigation, route }: Props) {
         </TouchableOpacity>
       </View>
 
+      {/* Tabs Chat / Mapa */}
+      <View style={tabStyles.tabBar}>
+        <TouchableOpacity
+          style={[tabStyles.tab, activeTab === 'chat' && tabStyles.tabActive]}
+          onPress={() => setActiveTab('chat')}
+        >
+          <Text style={[tabStyles.tabText, activeTab === 'chat' && tabStyles.tabTextActive]}>
+            💬 Chat
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[tabStyles.tab, activeTab === 'map' && tabStyles.tabActive]}
+          onPress={() => setActiveTab('map')}
+        >
+          <Text style={[tabStyles.tabText, activeTab === 'map' && tabStyles.tabTextActive]}>
+            🗺️ Mapa
+          </Text>
+        </TouchableOpacity>
+      </View>
+
       {/* Panel de combate (visible a todos mientras haya encuentro activo) */}
       {encounter && (
         <CombatTrackerPanel
@@ -413,6 +452,7 @@ export default function ChatScreen({ navigation, route }: Props) {
           characterMap={characterMap}
           isDm={isDm}
           myCharacterId={activeCharacter?.id}
+          onPrevTurn={prevTurn}
           onNextTurn={nextTurn}
           onEndCombat={endCombat}
           onUpdateHp={updateHp}
@@ -420,9 +460,42 @@ export default function ChatScreen({ navigation, route }: Props) {
         />
       )}
 
-      {/* Chat + input */}
+      {/* Tab: Mapa */}
+      {activeTab === 'map' && (
+        <View style={s.flex}>
+          {mapLoading ? (
+            <ActivityIndicator color="#7c3aed" style={{ marginTop: 40 }} />
+          ) : map ? (
+            <MapCanvas
+              map={map}
+              tokens={mapTokens}
+              isDm={isDm}
+              combatants={combatants}
+              myCombatantId={myCombatantId}
+              onMoveToken={isDm ? moveToken : (_id, col, row) => placeOwnToken(col, row)}
+              onUpdateSettings={isDm ? updateMapSettings : undefined}
+              onUpdateBackground={isDm ? updateBackground : undefined}
+              onPickBackground={isDm && map ? () => pickAndUploadMapBackground(map.id) : undefined}
+              recentMessages={messages}
+            />
+          ) : isDm ? (
+            <View style={tabStyles.mapEmpty}>
+              <Text style={tabStyles.mapEmptyText}>No hay mapa activo</Text>
+              <TouchableOpacity style={tabStyles.createMapBtn} onPress={createMap}>
+                <Text style={tabStyles.createMapBtnText}>+ Crear mapa</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <View style={tabStyles.mapEmpty}>
+              <Text style={tabStyles.mapEmptyText}>El DM aún no ha creado un mapa</Text>
+            </View>
+          )}
+        </View>
+      )}
+
+      {/* Tab: Chat + input */}
       <KeyboardAvoidingView
-        style={s.flex}
+        style={[s.flex, activeTab !== 'chat' && { display: 'none' }]}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={0}
       >
@@ -570,7 +643,7 @@ export default function ChatScreen({ navigation, route }: Props) {
                       const { supabase } = await import('../lib/supabase');
                       const { data: newChar, error } = await supabase
                         .from('characters')
-                        .insert({ owner_id: user?.id, system_id: 'dnd35', name: customName, data: monster.data })
+                        .insert({ owner_id: user?.id, system_id: 'dnd35', name: customName, data: monster.data, is_npc: true })
                         .select()
                         .single();
                       if (error || !newChar) { console.error('Error creando monstruo:', error?.message); }
@@ -649,3 +722,52 @@ export default function ChatScreen({ navigation, route }: Props) {
     </View>
   );
 }
+
+const tabStyles = StyleSheet.create({
+  tabBar: {
+    flexDirection: 'row',
+    backgroundColor: '#ffffff',
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(109,40,217,0.12)',
+  },
+  tab: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: 8,
+    borderBottomWidth: 2,
+    borderBottomColor: 'transparent',
+  },
+  tabActive: {
+    borderBottomColor: '#7c3aed',
+  },
+  tabText: {
+    fontSize: 14,
+    color: '#9ca3af',
+    fontWeight: '500',
+  },
+  tabTextActive: {
+    color: '#7c3aed',
+    fontWeight: '700',
+  },
+  mapEmpty: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 16,
+  },
+  mapEmptyText: {
+    color: '#6b7280',
+    fontSize: 15,
+  },
+  createMapBtn: {
+    backgroundColor: '#7c3aed',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 10,
+  },
+  createMapBtnText: {
+    color: '#ffffff',
+    fontWeight: '700',
+    fontSize: 15,
+  },
+});

@@ -14,7 +14,10 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "Para subir imágenes de fondo del mapa de batalla"
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -22,10 +25,18 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.fierdimo.rolmix",
+      "permissions": ["android.permission.READ_MEDIA_IMAGES", "android.permission.READ_EXTERNAL_STORAGE"]
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "owner": "fierdimo",
+    "extra": {
+      "eas": {
+        "projectId": "cb30d58e-55ed-46e2-bd2a-c6333bd716f5"
+      }
     }
   }
 }

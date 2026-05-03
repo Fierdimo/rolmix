@@ -231,6 +231,68 @@ BEGIN
 END;
 $$;
 
+-- ── RPC: prev_combat_turn ─────────────────────────────────────────────────────
+-- Retrocede al combatiente anterior no derrotado.
+-- Decrementa la ronda si se vuelve al último índice del ciclo anterior.
+
+CREATE OR REPLACE FUNCTION prev_combat_turn(p_encounter_id UUID)
+RETURNS TABLE(new_index INT, new_round INT)
+LANGUAGE plpgsql SECURITY DEFINER
+AS $$
+DECLARE
+  v_cur_idx   INT;
+  v_cur_round INT;
+  v_total     INT;
+  v_new_idx   INT;
+  v_new_round INT;
+  v_loop      INT := 0;
+  v_defeated  BOOLEAN;
+BEGIN
+  SELECT ce.active_index, ce.round
+  INTO v_cur_idx, v_cur_round
+  FROM combat_encounters ce
+  JOIN session_members sm ON sm.session_id = ce.session_id
+  WHERE ce.id      = p_encounter_id
+    AND sm.user_id = auth.uid()
+    AND sm.role    = 'dm';
+
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'Not authorized';
+  END IF;
+
+  SELECT COUNT(*) INTO v_total
+  FROM combatants WHERE encounter_id = p_encounter_id;
+
+  IF v_total = 0 THEN
+    RETURN QUERY SELECT v_cur_idx, v_cur_round;
+    RETURN;
+  END IF;
+
+  v_new_idx   := (v_cur_idx - 1 + v_total) % v_total;
+  v_new_round := v_cur_round - (CASE WHEN v_cur_idx = 0 AND v_cur_round > 1 THEN 1 ELSE 0 END);
+
+  -- Saltar combatientes derrotados hacia atrás
+  LOOP
+    EXIT WHEN v_loop >= v_total;
+    SELECT is_defeated INTO v_defeated
+    FROM combatants
+    WHERE encounter_id = p_encounter_id AND turn_order = v_new_idx;
+    EXIT WHEN NOT COALESCE(v_defeated, false);
+    v_new_idx := (v_new_idx - 1 + v_total) % v_total;
+    IF v_new_idx = v_total - 1 AND v_cur_round > 1 THEN
+      v_new_round := v_new_round - 1;
+    END IF;
+    v_loop := v_loop + 1;
+  END LOOP;
+
+  UPDATE combat_encounters
+  SET active_index = v_new_idx, round = v_new_round
+  WHERE id = p_encounter_id;
+
+  RETURN QUERY SELECT v_new_idx, v_new_round;
+END;
+$$;
+
 -- ── RPC: update_combatant_hp ──────────────────────────────────────────────────
 -- Aplica un delta de PG (positivo = curación, negativo = daño).
 -- Resultado se limita a [0, hp_max]. Marca is_defeated cuando hp = 0.

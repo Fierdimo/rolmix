@@ -114,6 +114,7 @@ export function useSessionChat(
       .from('characters')
       .select('*')
       .eq('owner_id', user.id)
+      .eq('is_npc', false)
       .order('updated_at', { ascending: false });
     setMyCharacters(data ?? []);
   }, [user]);

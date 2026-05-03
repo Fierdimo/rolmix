@@ -34,6 +34,7 @@ export interface CombatActions {
   startCombat: (participants: CombatParticipant[]) => Promise<InitiativeEntry[] | null>;
   endCombat: () => Promise<void>;
   nextTurn: () => Promise<void>;
+  prevTurn: () => Promise<void>;
   /** Aplica un delta a los PG del combatiente (positivo = curación, negativo = daño). */
   updateHp: (combatantId: string, delta: number) => Promise<void>;
   /** Reordena la iniciativa: el combatiente pasa a actuar justo después de afterCombatantId. */
@@ -281,6 +282,18 @@ export function useCombat(sessionId: string, isDm: boolean): CombatState & Comba
     }
   }, [isDm, encounter]);
 
+  const prevTurn = useCallback(async () => {
+    if (!isDm || !encounter) return;
+    const { data } = await supabase.rpc('prev_combat_turn', {
+      p_encounter_id: encounter.id,
+    });
+    if (data?.[0]) {
+      setEncounter((prev) =>
+        prev ? { ...prev, active_index: data[0].new_index, round: data[0].new_round } : null,
+      );
+    }
+  }, [isDm, encounter]);
+
   const updateHp = useCallback(
     async (combatantId: string, delta: number) => {
       if (!isDm) return;
@@ -395,6 +408,7 @@ export function useCombat(sessionId: string, isDm: boolean): CombatState & Comba
     startCombat,
     endCombat,
     nextTurn,
+    prevTurn,
     updateHp,
     delayAfter,
     consumeSpell,

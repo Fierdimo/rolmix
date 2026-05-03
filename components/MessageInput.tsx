@@ -16,7 +16,7 @@ interface Props {
 }
 
 const TYPES: { type: MessageType; label: string; color: string }[] = [
-  { type: 'message',   label: '💬',  color: '#e2e8f0' },
+  { type: 'message',   label: '💬',  color: '#217bf1' },
   { type: 'action',    label: '⚡',  color: '#fbbf24' },
   { type: 'narration', label: '📖', color: '#a78bfa' },
   { type: 'dice',      label: '🎲', color: '#34d399' },
@@ -162,6 +162,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     borderTopWidth: 1,
     borderTopColor: 'rgba(109,40,217,0.12)',
+    paddingBottom:15
   },
   typeRow: { maxHeight: 60 },
   typeRowContent: { flexDirection: 'row', paddingHorizontal: 10, paddingVertical: 8, gap: 6 },

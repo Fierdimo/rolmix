@@ -11,6 +11,7 @@ interface Props {
   characterMap: Record<string, Character>;
   isDm: boolean;
   myCharacterId?: string | null;
+  onPrevTurn: () => void;
   onNextTurn: () => void;
   onEndCombat: () => void;
   onUpdateHp: (combatantId: string, delta: number) => void;
@@ -96,6 +97,7 @@ export default function CombatTrackerPanel({
   characterMap,
   isDm,
   myCharacterId,
+  onPrevTurn,
   onNextTurn,
   onEndCombat,
   onUpdateHp,
@@ -180,11 +182,16 @@ export default function CombatTrackerPanel({
         renderItem={renderCard}
       />
 
-      {/* Siguiente turno (solo DM) */}
+      {/* Controles de turno (solo DM) */}
       {isDm && (
-        <TouchableOpacity style={s.nextBtn} onPress={onNextTurn}>
-          <Text style={s.nextBtnText}>Siguiente turno ▶</Text>
-        </TouchableOpacity>
+        <View style={s.turnControls}>
+          <TouchableOpacity style={s.prevBtn} onPress={onPrevTurn}>
+            <Text style={s.prevBtnText}>◀ Retroceder</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={s.nextBtn} onPress={onNextTurn}>
+            <Text style={s.nextBtnText}>Siguiente ▶</Text>
+          </TouchableOpacity>
+        </View>
       )}
 
       {/* Modal de edición de PG */}
@@ -291,9 +298,24 @@ const s = StyleSheet.create({
   },
   actBtnText: { color: '#b91c1c', fontSize: 12, fontWeight: '700' },
 
-  nextBtn: {
+  turnControls: {
+    flexDirection: 'row',
     marginHorizontal: 12,
     marginTop: 2,
+    gap: 6,
+  },
+  prevBtn: {
+    flex: 1,
+    backgroundColor: 'rgba(109,40,217,0.08)',
+    borderRadius: 8,
+    paddingVertical: 6,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(109,40,217,0.20)',
+  },
+  prevBtnText: { color: '#7c3aed', fontSize: 13, fontWeight: '500' },
+  nextBtn: {
+    flex: 1,
     backgroundColor: 'rgba(109,40,217,0.14)',
     borderRadius: 8,
     paddingVertical: 6,

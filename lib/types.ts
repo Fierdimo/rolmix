@@ -137,6 +137,61 @@ export interface Combatant {
   is_defeated: boolean;
 }
 
+// ── Mapa ──────────────────────────────────────────────────────────────────────
+
+export interface MapData {
+  id: string;
+  session_id: string;
+  name: string;
+  background_url: string | null;
+  bg_offset_x: number;
+  bg_offset_y: number;
+  bg_scale: number;
+  grid_cols: number;
+  grid_rows: number;
+  grid_size_px: number;
+  feet_per_square: number;
+  is_active: boolean;
+  created_at: string;
+}
+
+/** Token de un combatiente en el mapa. Enriquecido con datos del combatiente. */
+export interface MapToken {
+  id: string;
+  map_id: string;
+  combatant_id: string;
+  col: number;
+  row: number;
+  size_squares: number;
+  color: string;
+  is_visible: boolean;
+  updated_at: string;
+  // Denormalizados del combatante para renderizado
+  name: string;
+  hp_current: number;
+  hp_max: number;
+  is_npc: boolean;
+  is_defeated: boolean;
+  is_active_turn: boolean;
+  portrait_url?: string;
+}
+
+export type MapEventType = 'aoe_cast' | 'token_moved' | 'marker';
+
+export interface MapEvent {
+  id: string;
+  map_id: string;
+  session_id: string;
+  type: MapEventType;
+  action_id: string | null;
+  payload: Record<string, unknown>;
+  created_by: string | null;
+  created_at: string;
+  expires_at: string | null;
+}
+
+// ── Hoja de personaje ─────────────────────────────────────────────────────────
+
 /** Hoja de personaje. La forma de `data` la define la SystemDefinition. */
 export interface Character {
   id: string;
@@ -144,6 +199,7 @@ export interface Character {
   system_id: string;
   name: string;
   data: Record<string, string | number>;
+  is_npc: boolean;
   created_at: string;
   updated_at: string;
 }

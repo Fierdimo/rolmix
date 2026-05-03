@@ -10,9 +10,12 @@ create table if not exists characters (
   system_id   text not null,
   name        text not null,
   data        jsonb not null default '{}'::jsonb,
+  is_npc      boolean not null default false,
   created_at  timestamptz not null default now(),
   updated_at  timestamptz not null default now()
 );
+
+alter table characters add column if not exists is_npc boolean not null default false;
 
 create index if not exists characters_owner_idx on characters(owner_id);
 
