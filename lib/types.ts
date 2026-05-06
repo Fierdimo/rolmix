@@ -155,6 +155,20 @@ export interface MapData {
   created_at: string;
 }
 
+/** Marca de área dibujada sobre el mapa (círculo o rectángulo semitransparente). */
+export interface MapShape {
+  id: string;
+  map_id: string;
+  user_id: string;
+  shape_type: 'circle' | 'rect' | 'cone';
+  color: string;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  created_at: string;
+}
+
 /** Token de un combatiente en el mapa. Enriquecido con datos del combatiente. */
 export interface MapToken {
   id: string;

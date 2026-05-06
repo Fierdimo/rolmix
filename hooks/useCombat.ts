@@ -39,6 +39,8 @@ export interface CombatActions {
   updateHp: (combatantId: string, delta: number) => Promise<void>;
   /** Reordena la iniciativa: el combatiente pasa a actuar justo después de afterCombatantId. */
   delayAfter: (combatantId: string, afterCombatantId: string | null) => Promise<boolean>;
+  /** Añade un personaje al encuentro activo mid-combat, tirando iniciativa. */
+  addCombatantMidCombat: (character: Character, isNpc: boolean) => Promise<void>;
   /**
    * Descuenta el recurso de conjuro del personaje:
    * - Lanzadores preparados: marca el primer prepSlot sin usar con ese nombre como `used`.
@@ -338,6 +340,31 @@ export function useCombat(sessionId: string, isDm: boolean): CombatState & Comba
     [encounter, fetchCombatants],
   );
 
+  const addCombatantMidCombat = useCallback(
+    async (character: Character, isNpc: boolean): Promise<void> => {
+      if (!isDm || !encounter) return;
+      const sys    = getSystem(character.system_id);
+      const stats  = sys ? computeFinalStats(sys, character.data as CharacterData) : ({} as Record<string, number>);
+      const dexMod = stats.mod_dex ?? Math.floor((Number(character.data.dex ?? 10) - 10) / 2);
+      const roll   = rollDie('d20');
+      const hpMax  = Number(character.data.hp_max ?? 8);
+      const { error } = await supabase.rpc('add_combatant_to_encounter', {
+        p_encounter_id: encounter.id,
+        p_character_id: character.id,
+        p_name:         character.name,
+        p_initiative:   roll + dexMod,
+        p_dex_mod:      dexMod,
+        p_hp_max:       hpMax,
+        p_hp_current:   hpMax,
+        p_is_npc:       isNpc,
+      });
+      if (error) { console.error('[useCombat] addCombatantMidCombat error:', error); return; }
+      setCharacterMap((prev) => ({ ...prev, [character.id]: character }));
+      // Realtime subscription dispara fetchCombatants automáticamente
+    },
+    [isDm, encounter],
+  );
+
   const consumeSpell = useCallback(
     async (characterId: string, spellName: string, spellLevel: number) => {
       const ch = characterMap[characterId];
@@ -411,6 +438,7 @@ export function useCombat(sessionId: string, isDm: boolean): CombatState & Comba
     prevTurn,
     updateHp,
     delayAfter,
+    addCombatantMidCombat,
     consumeSpell,
   };
 }

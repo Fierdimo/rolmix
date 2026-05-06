@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '../lib/supabase';
-import { MapData, MapToken, Combatant, CombatEncounter, Character } from '../lib/types';
+import { MapData, MapToken, MapShape, Combatant, CombatEncounter, Character } from '../lib/types';
 
 export interface MapSettings {
   grid_cols: number;
@@ -18,6 +18,7 @@ interface UseMapParams {
 interface UseMapReturn {
   map: MapData | null;
   tokens: MapToken[];
+  shapes: MapShape[];
   mapLoading: boolean;
   moveToken: (combatantId: string, col: number, row: number) => Promise<void>;
   placeOwnToken: (col: number, row: number) => Promise<void>;
@@ -25,6 +26,9 @@ interface UseMapReturn {
   addTokensForCombatants: (color?: string) => Promise<void>;
   updateMapSettings: (settings: MapSettings) => Promise<void>;
   updateBackground: (url: string | null, offsetX: number, offsetY: number, scale: number) => Promise<void>;
+  addShape: (shape: Omit<MapShape, 'id' | 'created_at'>) => Promise<void>;
+  removeShape: (shapeId: string) => Promise<void>;
+  clearMyShapes: (mapId: string) => Promise<void>;
 }
 
 const NPC_COLORS = ['#EF4444', '#F97316', '#EAB308', '#84CC16', '#06B6D4', '#8B5CF6', '#EC4899'];
@@ -77,8 +81,10 @@ export function useMap({ sessionId, isDm, combatants, encounter, characterMap }:
     Omit<MapToken, 'name' | 'hp_current' | 'hp_max' | 'is_npc' | 'is_defeated' | 'is_active_turn'>[]
   >([]);
   const [mapLoading, setMapLoading] = useState(true);
+  const [shapes, setShapes] = useState<MapShape[]>([]);
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
   const mapChannelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
+  const shapesChannelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
 
   const tokens: MapToken[] = enrichTokens(rawTokens, combatants, encounter, characterMap);
 
@@ -148,11 +154,54 @@ export function useMap({ sessionId, isDm, combatants, encounter, characterMap }:
     mapChannelRef.current = channel;
   }, []);
 
+  // ── Marcas de área (map_shapes) ────────────────────────────────────────────
+
+  const fetchShapes = useCallback(async (mapId: string) => {
+    const { data } = await supabase.from('map_shapes').select('*').eq('map_id', mapId);
+    if (data) setShapes(data as MapShape[]);
+  }, []);
+
+  const subscribeToShapes = useCallback((mapId: string) => {
+    if (shapesChannelRef.current) supabase.removeChannel(shapesChannelRef.current);
+    const channel = supabase
+      .channel(`map_shapes:${mapId}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'map_shapes', filter: `map_id=eq.${mapId}` },
+        (payload) => {
+          if (payload.eventType === 'INSERT') {
+            setShapes((prev) => [...prev, payload.new as MapShape]);
+          } else if (payload.eventType === 'DELETE') {
+            setShapes((prev) => prev.filter((s) => s.id !== (payload.old as { id: string }).id));
+          }
+        },
+      )
+      .subscribe();
+    shapesChannelRef.current = channel;
+  }, []);
+
+  const addShape = useCallback(async (shape: Omit<MapShape, 'id' | 'created_at'>) => {
+    await supabase.from('map_shapes').insert(shape);
+  }, []);
+
+  const removeShape = useCallback(async (shapeId: string) => {
+    setShapes((prev) => prev.filter((s) => s.id !== shapeId));
+    await supabase.from('map_shapes').delete().eq('id', shapeId);
+  }, []);
+
+  const clearMyShapes = useCallback(async (mapId: string) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    setShapes((prev) => prev.filter((s) => !(s.map_id === mapId && s.user_id === user.id)));
+    await supabase.from('map_shapes').delete().eq('map_id', mapId).eq('user_id', user.id);
+  }, []);
+
   useEffect(() => {
     fetchMap();
     return () => {
       if (channelRef.current) supabase.removeChannel(channelRef.current);
       if (mapChannelRef.current) supabase.removeChannel(mapChannelRef.current);
+      if (shapesChannelRef.current) supabase.removeChannel(shapesChannelRef.current);
     };
   }, [fetchMap]);
 
@@ -160,8 +209,10 @@ export function useMap({ sessionId, isDm, combatants, encounter, characterMap }:
     if (map) {
       subscribeToTokens(map.id);
       subscribeToMap(map.id);
+      fetchShapes(map.id);
+      subscribeToShapes(map.id);
     }
-  }, [map?.id, subscribeToTokens, subscribeToMap]);
+  }, [map?.id, subscribeToTokens, subscribeToMap, fetchShapes, subscribeToShapes]);
 
   const createMap = useCallback(async () => {
     if (!isDm) return;
@@ -172,9 +223,11 @@ export function useMap({ sessionId, isDm, combatants, encounter, characterMap }:
       await fetchTokens(data[0].id);
       subscribeToTokens(data[0].id);
       subscribeToMap(data[0].id);
+      await fetchShapes(data[0].id);
+      subscribeToShapes(data[0].id);
     }
     setMapLoading(false);
-  }, [isDm, sessionId, fetchTokens, subscribeToTokens, subscribeToMap]);
+  }, [isDm, sessionId, fetchTokens, subscribeToTokens, subscribeToMap, fetchShapes, subscribeToShapes]);
 
   const moveToken = useCallback(
     async (combatantId: string, col: number, row: number) => {
@@ -262,5 +315,5 @@ export function useMap({ sessionId, isDm, combatants, encounter, characterMap }:
     [isDm, map],
   );
 
-  return { map, tokens, mapLoading, moveToken, placeOwnToken, createMap, addTokensForCombatants, updateMapSettings, updateBackground };
+  return { map, tokens, shapes, mapLoading, moveToken, placeOwnToken, createMap, addTokensForCombatants, updateMapSettings, updateBackground, addShape, removeShape, clearMyShapes };
 }

@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS combat_encounters (
 CREATE TABLE IF NOT EXISTS combatants (
   id           UUID    PRIMARY KEY DEFAULT gen_random_uuid(),
   encounter_id UUID    NOT NULL REFERENCES combat_encounters(id) ON DELETE CASCADE,
-  character_id UUID    REFERENCES characters(id),
+  character_id UUID    REFERENCES characters(id) ON DELETE SET NULL,
   name         TEXT    NOT NULL,
   initiative   INT     NOT NULL DEFAULT 0,
   dex_mod      INT     NOT NULL DEFAULT 0,
@@ -28,6 +28,12 @@ CREATE TABLE IF NOT EXISTS combatants (
   is_npc       BOOLEAN NOT NULL DEFAULT false,
   is_defeated  BOOLEAN NOT NULL DEFAULT false
 );
+
+-- Reparar FK character_id → SET NULL al borrar personaje
+ALTER TABLE combatants DROP CONSTRAINT IF EXISTS combatants_character_id_fkey;
+ALTER TABLE combatants DROP CONSTRAINT IF EXISTS combatants_characters_id_fkey;
+ALTER TABLE combatants ADD CONSTRAINT combatants_character_id_fkey
+  FOREIGN KEY (character_id) REFERENCES characters(id) ON DELETE SET NULL;
 
 -- ── Row-Level Security ────────────────────────────────────────────────────────
 
@@ -412,6 +418,68 @@ BEGIN
   UPDATE combat_encounters SET active_index = v_new_active WHERE id = p_encounter_id;
 
   RETURN QUERY SELECT v_new_active, v_round;
+END;
+$$;
+
+-- ── RPC: add_combatant_to_encounter ──────────────────────────────────────────
+-- Añade un combatiente a un encuentro activo, insertándolo en orden de iniciativa.
+-- Ajusta turn_order de los combatientes existentes y active_index si es necesario.
+
+CREATE OR REPLACE FUNCTION add_combatant_to_encounter(
+  p_encounter_id UUID,
+  p_character_id UUID,
+  p_name         TEXT,
+  p_initiative   INT,
+  p_dex_mod      INT,
+  p_hp_max       INT,
+  p_hp_current   INT,
+  p_is_npc       BOOLEAN DEFAULT true
+) RETURNS VOID
+LANGUAGE plpgsql SECURITY DEFINER AS $$
+DECLARE
+  v_session_id UUID;
+  v_insert_pos INT;
+BEGIN
+  SELECT session_id INTO v_session_id
+  FROM combat_encounters WHERE id = p_encounter_id AND is_active = true;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM session_members
+    WHERE session_id = v_session_id
+      AND user_id    = auth.uid()
+      AND role       = 'dm'
+      AND status     = 'accepted'
+  ) THEN
+    RAISE EXCEPTION 'Solo el DM puede añadir combatientes al encuentro';
+  END IF;
+
+  -- Insertar después de todos los combatientes con iniciativa mayor
+  SELECT COUNT(*) INTO v_insert_pos
+  FROM combatants
+  WHERE encounter_id = p_encounter_id
+    AND initiative > p_initiative;
+
+  -- Desplazar turn_order de los combatientes en esa posición o después
+  UPDATE combatants
+  SET turn_order = turn_order + 1
+  WHERE encounter_id = p_encounter_id
+    AND turn_order >= v_insert_pos;
+
+  -- Si el turno activo cae en o después del punto de inserción, desplazarlo
+  UPDATE combat_encounters
+  SET active_index = active_index + 1
+  WHERE id = p_encounter_id
+    AND active_index >= v_insert_pos;
+
+  INSERT INTO combatants (
+    encounter_id, character_id, name,
+    initiative, dex_mod, turn_order,
+    hp_max, hp_current, is_npc
+  ) VALUES (
+    p_encounter_id, p_character_id, p_name,
+    p_initiative, p_dex_mod, v_insert_pos,
+    p_hp_max, p_hp_current, p_is_npc
+  );
 END;
 $$;
 

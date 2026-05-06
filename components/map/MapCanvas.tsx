@@ -4,7 +4,7 @@ import {
   Platform, Image as RNImage, ActivityIndicator, Alert,
 } from 'react-native';
 import {
-  Canvas, Group, Line, Circle, RoundedRect,
+  Canvas, Group, Line, Circle, RoundedRect, Path,
   vec, Image as SkImage, rect, Skia,
   Text as SkText, matchFont,
 } from '@shopify/react-native-skia';
@@ -12,13 +12,56 @@ import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   useSharedValue, useAnimatedStyle, runOnJS, withSpring, withTiming, withDelay,
 } from 'react-native-reanimated';
-import { MapData, MapToken, Combatant, Message } from '../../lib/types';
+import { MapData, MapToken, MapShape, Combatant, Message } from '../../lib/types';
 import { MapSettings } from '../../hooks/useMap';
 
-const GRID_COLOR     = 'rgba(255,255,255,0.15)';
+const GRID_COLOR_DARK  = 'rgba(0,0,0,0.22)';
+const GRID_COLOR_LIGHT = 'rgba(255,255,255,0.22)';
 const BG_COLOR       = '#1a1625';
 const ACTIVE_RING    = '#FBBF24';
 const SHADOW_BORDER  = 'rgba(251,191,36,0.6)';
+
+// Paleta de colores para modo dibujo
+const DRAW_COLORS = [
+  'rgba(239,68,68,0.45)',
+  'rgba(251,146,60,0.45)',
+  'rgba(250,204,21,0.45)',
+  'rgba(34,197,94,0.45)',
+  'rgba(59,130,246,0.45)',
+  'rgba(168,85,247,0.45)',
+  'rgba(255,255,255,0.35)',
+];
+
+// Un cuadro pertenece al cono si su CENTRO cae dentro.
+// Esto reproduce la plantilla D&D exacta (escalonada 1+2+3…) para conos diagonales.
+function makeConeSquaresPath(
+  ax: number, ay: number, len: number, angleRad: number,
+  G: number, gridCols: number, gridRows: number,
+) {
+  const cA     = Math.cos(angleRad);
+  const sA     = Math.sin(angleRad);
+  const path   = Skia.Path.Make();
+  const minCol = Math.max(0, Math.floor((ax - len) / G));
+  const maxCol = Math.min(gridCols - 1, Math.ceil((ax + len) / G));
+  const minRow = Math.max(0, Math.floor((ay - len) / G));
+  const maxRow = Math.min(gridRows - 1, Math.ceil((ay + len) / G));
+
+  for (let row = minRow; row <= maxRow; row++) {
+    for (let col = minCol; col <= maxCol; col++) {
+      const cx = col * G + G / 2;
+      const cy = row * G + G / 2;
+      const dx = cx - ax;
+      const dy = cy - ay;
+      const forward = dx * cA + dy * sA;
+      if (forward <= 0 || forward > len) continue;
+      const perp = Math.abs(dx * (-sA) + dy * cA);
+      if (perp <= forward / 2) {
+        path.addRect({ x: col * G, y: row * G, width: G, height: G });
+      }
+    }
+  }
+  return path;
+}
 
 // ── Fuente de etiqueta de tokens ─────────────────────────────────────────────
 const FONT_FAMILY = Platform.select({ ios: 'Helvetica Neue', default: 'sans-serif' }) ?? 'sans-serif';
@@ -132,6 +175,12 @@ interface Props {
   onUpdateBackground?: (url: string | null, offsetX: number, offsetY: number, scale: number) => void;
   onPickBackground?: () => Promise<string | null>;
   recentMessages?: Message[];
+  // Marcas de área
+  shapes: MapShape[];
+  onAddShape: (shape: Omit<MapShape, 'id' | 'created_at'>) => void;
+  onRemoveShape: (shapeId: string) => void;
+  onClearMyShapes: () => void;
+  currentUserId: string;
 }
 
 interface DragState {
@@ -152,6 +201,7 @@ export default function MapCanvas({
   map, tokens, isDm, combatants, myCombatantId,
   onMoveToken, onUpdateSettings, onUpdateBackground, onPickBackground,
   recentMessages,
+  shapes, onAddShape, onRemoveShape, onClearMyShapes, currentUserId,
 }: Props) {
   const { grid_cols, grid_rows, grid_size_px: G } = map;
   const canvasW = grid_cols * G;
@@ -198,6 +248,16 @@ export default function MapCanvas({
   const [containerH, setContainerH]     = useState(0);
   const [trayH, setTrayH]               = useState(0);
 
+  // ── Modo dibujo de marcas de área ──────────────────────────────────────────
+  const [drawMode, setDrawMode]       = useState(false);
+  const [drawShape, setDrawShape]     = useState<'rect' | 'circle'>('rect');
+  const [drawColor, setDrawColor]     = useState(DRAW_COLORS[0]);
+  const [drawPreview, setDrawPreview] = useState<{ x: number; y: number; w: number; h: number } | null>(null);
+  const drawModeOn     = useSharedValue(false);
+  const drawShapeMode  = useSharedValue(0); // 0=rect  1=circle  2=cone
+  const drawStartX     = useSharedValue(0);
+  const drawStartY     = useSharedValue(0);
+
   // ── Chat flash overlay ─────────────────────────────────────────────────────
   const [flashMessages, setFlashMessages] = useState<Message[]>([]);
   const shownMsgIds = useRef(new Set(recentMessages?.map(m => m.id) ?? []));
@@ -226,11 +286,11 @@ export default function MapCanvas({
   }
 
   function fitToScreen() {
-    const availH = Math.max(100, containerH - trayH - (showControls ? 80 : 0));
-    const s = Math.min(containerW / canvasW, availH / canvasH, 1);
-    scale.value      = withSpring(Math.max(0.15, s), { damping: 18 });
-    translateX.value = withSpring(0, { damping: 18 });
-    translateY.value = withSpring(0, { damping: 18 });
+    const availH    = Math.max(100, containerH - trayH - (showControls ? 80 : 0));
+    const s         = Math.max(0.15, Math.min(containerW / canvasW, availH / canvasH, 1));
+    scale.value      = withSpring(s, { damping: 18 });
+    translateX.value = withSpring((containerW - canvasW) / 2, { damping: 18 });
+    translateY.value = withSpring((availH   - canvasH) / 2, { damping: 18 });
   }
 
   function toggleBgMode() {
@@ -274,6 +334,25 @@ export default function MapCanvas({
     if (bgMode) { setBgMode(false); bgModeOn.value = false; }
   }
 
+  // ── Helpers de modo dibujo ──────────────────────────────────────────────────
+
+  /**
+   * Guarda una forma nueva en la BD.
+   * No debe ser useCallback: necesita los valores frescos de drawShape y drawColor
+   * en cada render para que la paleta se refleje inmediatamente.
+   */
+  function saveShape(x: number, y: number, w: number, h: number) {
+    if (!map) return;
+    onAddShape({ map_id: map.id, user_id: currentUserId, shape_type: drawShape, color: drawColor, x, y, w, h });
+  }
+
+  function toggleDrawMode() {
+    const next = !drawMode;
+    setDrawMode(next);
+    drawModeOn.value = next;
+    if (!next) setDrawPreview(null);
+  }
+
   // ── Gestures ────────────────────────────────────────────────────────────────
 
   const isPanActive = useSharedValue(false);
@@ -286,11 +365,55 @@ export default function MapCanvas({
     };
   }
 
-  // Pan unificado: maneja tanto el pan del mapa como el arrastre de token
+  // Snaps to nearest grid intersection OR cell center, whichever is closer (circles).
+  function snapToGridPoint(v: number): number {
+    'worklet';
+    const inter = Math.round(v / G) * G;
+    const cellC = Math.round((v - G / 2) / G) * G + G / 2;
+    return Math.abs(v - inter) <= Math.abs(v - cellC) ? inter : cellC;
+  }
+
+  // Cones: snaps apex to nearest corner OR edge midpoint (midpoint of any square side).
+  // Three candidates: corner, vertical-edge midpoint, horizontal-edge midpoint.
+  function snapToConeOrigin(vx: number, vy: number): { x: number; y: number } {
+    'worklet';
+    const cx1 = Math.round(vx / G) * G;
+    const cy1 = Math.round(vy / G) * G;
+    const d1  = (vx - cx1) * (vx - cx1) + (vy - cy1) * (vy - cy1);
+
+    const cx2 = Math.round(vx / G) * G;
+    const cy2 = Math.round((vy - G / 2) / G) * G + G / 2;
+    const d2  = (vx - cx2) * (vx - cx2) + (vy - cy2) * (vy - cy2);
+
+    const cx3 = Math.round((vx - G / 2) / G) * G + G / 2;
+    const cy3 = Math.round(vy / G) * G;
+    const d3  = (vx - cx3) * (vx - cx3) + (vy - cy3) * (vy - cy3);
+
+    if (d1 <= d2 && d1 <= d3) return { x: cx1, y: cy1 };
+    if (d2 <= d3)              return { x: cx2, y: cy2 };
+    return { x: cx3, y: cy3 };
+  }
+
+  // Pan unificado: maneja tanto el pan del mapa como el arrastre de token y el dibujo de marcas
   const panGesture = Gesture.Pan()
     .minDistance(8)
-    .onStart(() => {
+    .onStart((e) => {
       'worklet';
+      // Modo dibujo: capturar punto inicial y salir
+      if (drawModeOn.value) {
+        if (drawShapeMode.value === 1) {        // circle → intersection or cell center
+          drawStartX.value = snapToGridPoint(e.x);
+          drawStartY.value = snapToGridPoint(e.y);
+        } else if (drawShapeMode.value === 2) { // cone → corner or edge midpoint
+          const snapped    = snapToConeOrigin(e.x, e.y);
+          drawStartX.value = snapped.x;
+          drawStartY.value = snapped.y;
+        } else {                                // rect → no snap
+          drawStartX.value = e.x;
+          drawStartY.value = e.y;
+        }
+        return;
+      }
       // Marca pan activo solo si NO estamos en modo drag (longPress ya disparó)
       if (!isDragging.value) isPanActive.value = true;
       if (bgModeOn.value) {
@@ -303,6 +426,26 @@ export default function MapCanvas({
     })
     .onUpdate((e) => {
       'worklet';
+      // Modo dibujo: actualizar preview en tiempo real
+      if (drawModeOn.value) {
+        const dx = e.x - drawStartX.value;
+        const dy = e.y - drawStartY.value;
+        if (drawShapeMode.value === 1) { // circle
+          const r = Math.sqrt(dx * dx + dy * dy);
+          runOnJS(setDrawPreview)({ x: drawStartX.value - r, y: drawStartY.value - r, w: r * 2, h: r * 2 });
+        } else if (drawShapeMode.value === 2) { // cone
+          const len = Math.sqrt(dx * dx + dy * dy);
+          runOnJS(setDrawPreview)({ x: drawStartX.value, y: drawStartY.value, w: len, h: Math.atan2(dy, dx) });
+        } else { // rect
+          runOnJS(setDrawPreview)({
+            x: Math.min(drawStartX.value, e.x),
+            y: Math.min(drawStartY.value, e.y),
+            w: Math.abs(dx),
+            h: Math.abs(dy),
+          });
+        }
+        return;
+      }
       if (isDragging.value) {
         const { col, row } = screenToGrid(e.x, e.y);
         dragCol.value = col;
@@ -316,8 +459,28 @@ export default function MapCanvas({
         translateY.value = savedTY.value + e.translationY;
       }
     })
-    .onFinalize(() => {
+    .onFinalize((e) => {
       'worklet';
+      // Modo dibujo: guardar forma si es suficientemente grande
+      if (drawModeOn.value) {
+        const dx = e.x - drawStartX.value;
+        const dy = e.y - drawStartY.value;
+        if (drawShapeMode.value === 1) { // circle
+          const r = Math.sqrt(dx * dx + dy * dy);
+          if (r > 8) runOnJS(saveShape)(drawStartX.value - r, drawStartY.value - r, r * 2, r * 2);
+        } else if (drawShapeMode.value === 2) { // cone
+          const len = Math.sqrt(dx * dx + dy * dy);
+          if (len > 8) runOnJS(saveShape)(drawStartX.value, drawStartY.value, len, Math.atan2(dy, dx));
+        } else { // rect
+          const x = Math.min(drawStartX.value, e.x);
+          const y = Math.min(drawStartY.value, e.y);
+          const w = Math.abs(dx);
+          const h = Math.abs(dy);
+          if (w > 8 && h > 8) runOnJS(saveShape)(x, y, w, h);
+        }
+        runOnJS(setDrawPreview)(null);
+        return;
+      }
       isPanActive.value = false;
       if (isDragging.value) {
         const cId = dragCombatantId.value;
@@ -333,15 +496,24 @@ export default function MapCanvas({
   const pinchGesture = Gesture.Pinch()
     .onStart(() => {
       'worklet';
-      if (bgModeOn.value) savedBgS.value = bgScale.value;
-      else savedScale.value = scale.value;
+      if (bgModeOn.value) {
+        savedBgS.value = bgScale.value;
+      } else {
+        savedScale.value = scale.value;
+        savedTX.value    = translateX.value;
+        savedTY.value    = translateY.value;
+      }
     })
     .onUpdate((e) => {
       'worklet';
       if (bgModeOn.value) {
         bgScale.value = Math.max(0.1, Math.min(5, savedBgS.value * e.scale));
       } else {
-        scale.value = Math.max(0.15, Math.min(6, savedScale.value * e.scale));
+        const newScale = Math.max(0.15, Math.min(6, savedScale.value * e.scale));
+        const ratio    = newScale / savedScale.value;
+        translateX.value = e.focalX - (e.focalX - savedTX.value) * ratio;
+        translateY.value = e.focalY - (e.focalY - savedTY.value) * ratio;
+        scale.value      = newScale;
       }
     });
 
@@ -350,11 +522,12 @@ export default function MapCanvas({
     .maxDistance(10)
     .onStart((e) => {
       'worklet';
-      // Ignorar si: no es DM, bgMode activo, o el usuario ya está haciendo pan
-      if (!isDm || bgModeOn.value || isPanActive.value) return;
+      if (drawModeOn.value || bgModeOn.value || isPanActive.value) return;
+      if (!isDm && !myCombatantId) return;
       const { col, row } = screenToGrid(e.x, e.y);
       const token = tokens.find(t => t.col === col && t.row === row && !t.is_defeated);
       if (!token) return;
+      if (!isDm && token.combatant_id !== myCombatantId) return;
       isDragging.value      = true;
       dragCombatantId.value = token.combatant_id;
       dragCol.value = col;
@@ -404,6 +577,10 @@ export default function MapCanvas({
         <View style={styles.toolButtons}>
           <TouchableOpacity style={styles.toolBtn} onPress={fitToScreen}>
             <Text style={styles.toolBtnText}>⊡</Text>
+          </TouchableOpacity>
+          {/* Botón de modo dibujo — disponible para todos los miembros */}
+          <TouchableOpacity style={[styles.toolBtn, drawMode && styles.toolBtnActive]} onPress={toggleDrawMode}>
+            <Text style={styles.toolBtnText}>✏</Text>
           </TouchableOpacity>
           {isDm && (onUpdateSettings || onUpdateBackground) && (
             <TouchableOpacity style={[styles.toolBtn, showControls && styles.toolBtnActive]} onPress={() => setShowControls(v => !v)}>
@@ -504,15 +681,70 @@ export default function MapCanvas({
 
           {/* Capa 2: grid + tokens (Skia canvas transparente) */}
           <Canvas style={styles.canvas}>
-            {/* Grid */}
+            {/* Marcas de área — debajo del grid para que las líneas sean visibles sobre el relleno */}
+            {shapes.map((s) =>
+              s.shape_type === 'circle' ? (
+                <Group key={s.id}>
+                  <Circle cx={s.x + s.w / 2} cy={s.y + s.h / 2} r={Math.min(s.w, s.h) / 2} color={s.color} />
+                  <Circle cx={s.x + s.w / 2} cy={s.y + s.h / 2} r={4} color="rgba(255,255,255,0.9)" />
+                </Group>
+              ) : s.shape_type === 'cone' ? (
+                <Group key={s.id}>
+                  <Path path={makeConeSquaresPath(s.x, s.y, s.w, s.h, G, grid_cols, grid_rows)} color={s.color} />
+                  <Circle cx={s.x} cy={s.y} r={4} color="rgba(255,255,255,0.9)" />
+                </Group>
+              ) : (
+                <RoundedRect key={s.id} x={s.x} y={s.y} width={s.w} height={s.h} r={4} color={s.color} />
+              )
+            )}
+
+            {/* Preview de dibujo — también debajo del grid */}
+            {drawPreview && (
+              drawShape === 'circle' ? (
+                <Group>
+                  <Circle
+                    cx={drawPreview.x + drawPreview.w / 2}
+                    cy={drawPreview.y + drawPreview.h / 2}
+                    r={Math.min(drawPreview.w, drawPreview.h) / 2}
+                    color={drawColor}
+                  />
+                  <Circle
+                    cx={drawPreview.x + drawPreview.w / 2}
+                    cy={drawPreview.y + drawPreview.h / 2}
+                    r={4}
+                    color="rgba(255,255,255,0.9)"
+                  />
+                </Group>
+              ) : drawShape === 'cone' ? (
+                <Group>
+                  <Path path={makeConeSquaresPath(drawPreview.x, drawPreview.y, drawPreview.w, drawPreview.h, G, grid_cols, grid_rows)} color={drawColor} />
+                  <Circle cx={drawPreview.x} cy={drawPreview.y} r={4} color="rgba(255,255,255,0.9)" />
+                </Group>
+              ) : (
+                <RoundedRect
+                  x={drawPreview.x} y={drawPreview.y}
+                  width={drawPreview.w} height={drawPreview.h}
+                  r={4} color={drawColor}
+                />
+              )
+            )}
+
+            {/* Grid — doble trazo: oscuro visible en fondos claros, claro en fondos oscuros */}
             <Group>
               {Array.from({ length: grid_cols + 1 }, (_, i) => (
-                <Line key={`v${i}`} p1={vec(i * G, 0)} p2={vec(i * G, canvasH)} color={GRID_COLOR} strokeWidth={1} />
+                <Line key={`vd${i}`} p1={vec(i * G, 0)} p2={vec(i * G, canvasH)} color={GRID_COLOR_DARK}  strokeWidth={1.5} />
               ))}
               {Array.from({ length: grid_rows + 1 }, (_, i) => (
-                <Line key={`h${i}`} p1={vec(0, i * G)} p2={vec(canvasW, i * G)} color={GRID_COLOR} strokeWidth={1} />
+                <Line key={`hd${i}`} p1={vec(0, i * G)} p2={vec(canvasW, i * G)} color={GRID_COLOR_DARK}  strokeWidth={1.5} />
+              ))}
+              {Array.from({ length: grid_cols + 1 }, (_, i) => (
+                <Line key={`vl${i}`} p1={vec(i * G, 0)} p2={vec(i * G, canvasH)} color={GRID_COLOR_LIGHT} strokeWidth={1} />
+              ))}
+              {Array.from({ length: grid_rows + 1 }, (_, i) => (
+                <Line key={`hl${i}`} p1={vec(0, i * G)} p2={vec(canvasW, i * G)} color={GRID_COLOR_LIGHT} strokeWidth={1} />
               ))}
             </Group>
+
 
             {/* Sombra de destino durante arrastre */}
             {dragging && snapPos && (
@@ -585,9 +817,46 @@ export default function MapCanvas({
                 </Group>
               );
             })}
+
           </Canvas>
         </Animated.View>
       </GestureDetector>
+
+      {/* Paleta de dibujo — sobre el canvas, fuera del GestureDetector para no perder los toques */}
+      {drawMode && (
+        <View style={[styles.drawPalette, { position: 'absolute', top: trayH, left: 0, right: 0, zIndex: 20, elevation: 20 }]}>
+          <TouchableOpacity
+            style={[styles.shapeBtn, drawShape === 'rect' && styles.shapeBtnActive]}
+            onPress={() => { setDrawShape('rect'); drawShapeMode.value = 0; }}
+          >
+            <Text style={styles.shapeBtnText}>▭</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.shapeBtn, drawShape === 'circle' && styles.shapeBtnActive]}
+            onPress={() => { setDrawShape('circle'); drawShapeMode.value = 1; }}
+          >
+            <Text style={styles.shapeBtnText}>○</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.shapeBtn, drawShape === 'cone' && styles.shapeBtnActive]}
+            onPress={() => { setDrawShape('cone'); drawShapeMode.value = 2; }}
+          >
+            <Text style={styles.shapeBtnText}>△</Text>
+          </TouchableOpacity>
+          <View style={styles.paletteDivider} />
+          {DRAW_COLORS.map((c) => (
+            <TouchableOpacity
+              key={c}
+              style={[styles.colorSwatch, { backgroundColor: c }, drawColor === c && styles.colorSwatchActive]}
+              onPress={() => setDrawColor(c)}
+            />
+          ))}
+          <View style={styles.paletteDivider} />
+          <TouchableOpacity style={styles.clearShapesBtn} onPress={onClearMyShapes}>
+            <Text style={styles.clearShapesBtnText}>🗑</Text>
+          </TouchableOpacity>
+        </View>
+      )}
 
       {/* Chat flash overlay */}
       {flashMessages.length > 0 && (
@@ -699,4 +968,29 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.75)', paddingHorizontal: 14, paddingVertical: 7, borderRadius: 10,
   },
   dragHintText: { color: '#FCD34D', fontSize: 13, fontWeight: '600' },
+
+  // ── Modo dibujo ──────────────────────────────────────────────────────────
+  drawPalette: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(15,12,41,0.85)',
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+    gap: 5,
+    flexWrap: 'wrap',
+  },
+  shapeBtn: {
+    width: 30, height: 30,
+    borderRadius: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.1)',
+  },
+  shapeBtnActive:    { backgroundColor: 'rgba(109,40,217,0.6)' },
+  shapeBtnText:      { color: '#fff', fontSize: 16 },
+  paletteDivider:    { width: 1, height: 20, backgroundColor: 'rgba(255,255,255,0.2)', marginHorizontal: 2 },
+  colorSwatch:       { width: 22, height: 22, borderRadius: 4 },
+  colorSwatchActive: { borderWidth: 2, borderColor: '#fff' },
+  clearShapesBtn:    { width: 30, height: 30, alignItems: 'center', justifyContent: 'center' },
+  clearShapesBtnText: { fontSize: 16 },
 });

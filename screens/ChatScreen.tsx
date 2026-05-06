@@ -36,7 +36,6 @@ import { resolveAction } from '../lib/systems';
 import { RollableAction } from '../lib/systems/types';
 import { chatStyles as s } from '../components/chat/chatStyles';
 import { RootStackParamList } from '../App';
-import { useSessionRoster } from '../hooks/useSessionRoster';
 import { useSessionEncounters } from '../hooks/useSessionEncounters';
 import EncounterBuilderModal from '../components/chat/EncounterBuilderModal';
 
@@ -57,12 +56,9 @@ export default function ChatScreen({ navigation, route }: Props) {
   const [directedCharacter, setDirectedCharacter] = useState<Character | null>(null);
   const [groupRollVisible, setGroupRollVisible] = useState(false);
   const [drawerVisible, setDrawerVisible] = useState(false);
-  // 'active' = cambiar personaje activo, 'session_npc' = añadir NPC a sesión, 'roster' = añadir personaje al bestiario
-  const [charPickerTarget, setCharPickerTarget] = useState<'active' | 'session_npc' | 'roster'>('active');
+  const [charPickerTarget, setCharPickerTarget] = useState<'active' | 'session_npc'>('active');
   const [monsterPickerVisible, setMonsterPickerVisible] = useState(false);
   const [monsterPickerLoading, setMonsterPickerLoading] = useState(false);
-  // Modo del picker de monstruos: 'session' = añadir al combate / 'roster' = añadir al bestiario
-  const [monsterPickerTarget, setMonsterPickerTarget] = useState<'session' | 'roster'>('session');
   const [pendingMonster, setPendingMonster] = useState<MonsterEntry | null>(null);
   const [encounterBuilderVisible, setEncounterBuilderVisible] = useState(false);
   const [pendingMonsterName, setPendingMonsterName] = useState('');
@@ -118,11 +114,11 @@ export default function ChatScreen({ navigation, route }: Props) {
   // ── Combat ────────────────────────────────────────────────────────────────
   const {
     encounter, combatants, activeCombatant, characterMap,
-    startCombat, endCombat, nextTurn, prevTurn, updateHp, delayAfter, consumeSpell,
+    startCombat, endCombat, nextTurn, prevTurn, updateHp, delayAfter, addCombatantMidCombat, consumeSpell,
   } = useCombat(sessionId, isDm);
 
   // ── Mapa ──────────────────────────────────────────────────────────────────
-  const { map, tokens: mapTokens, mapLoading, moveToken, placeOwnToken, createMap, addTokensForCombatants, updateMapSettings, updateBackground } = useMap({
+  const { map, tokens: mapTokens, shapes, mapLoading, moveToken, placeOwnToken, createMap, addTokensForCombatants, updateMapSettings, updateBackground, addShape, removeShape, clearMyShapes } = useMap({
     sessionId,
     isDm,
     combatants,
@@ -135,8 +131,10 @@ export default function ChatScreen({ navigation, route }: Props) {
     ? combatants.find(c => c.character_id === activeCharacter.id)?.id
     : undefined;
 
-  // ── Bestiario de sesión ───────────────────────────────────────────────────
-  const { roster, addToRoster, removeFromRoster } = useSessionRoster(sessionId);
+  // NPCs del DM que aún no están en el encuentro activo
+  const availableCombatants = encounter
+    ? dmNpcs.filter(n => !combatants.some(c => c.character_id === n.id))
+    : [];
 
   // ── Encuentros preparados ─────────────────────────────────────────────────
   const { encounters, saveEncounter, deleteEncounter } = useSessionEncounters(sessionId);
@@ -198,17 +196,8 @@ export default function ChatScreen({ navigation, route }: Props) {
     setTimeout(() => openDirectedRollFor(member), 260);
   }
   function drawerThenGroupRoll() { closeDrawer(); setTimeout(() => setGroupRollVisible(true), 260); }
-  function drawerThenAddNpc() { closeDrawer(); setTimeout(() => { setMonsterPickerTarget('session'); setMonsterPickerVisible(true); }, 260); }
-  function drawerThenAddToRoster() { closeDrawer(); setTimeout(() => { setMonsterPickerTarget('roster'); setMonsterPickerVisible(true); }, 260); }
-  function handleAddToSessionFromRoster(monster: MonsterEntry) {
-    closeDrawer();
-    setTimeout(() => { setPendingMonster(monster); setPendingMonsterName(monster.name); }, 260);
-  }
+  function drawerThenAddNpc() { closeDrawer(); setTimeout(() => setMonsterPickerVisible(true), 260); }
   function drawerThenManageEncounters() { closeDrawer(); setTimeout(() => setEncounterBuilderVisible(true), 260); }
-  function drawerThenCharToRoster() {
-    closeDrawer();
-    setTimeout(() => { setCharPickerTarget('roster'); setPickerVisible(true); }, 260);
-  }
 
   /** Despliega un encuentro completo: crea cada instancia como personaje y la añade a la sesión. */
   async function handleDeployEncounter(enc: import('../hooks/useSessionEncounters').PreparedEncounter) {
@@ -457,6 +446,8 @@ export default function ChatScreen({ navigation, route }: Props) {
           onEndCombat={endCombat}
           onUpdateHp={updateHp}
           onAct={handleCombatAct}
+          availableCombatants={availableCombatants}
+          onAddCombatant={(char) => addCombatantMidCombat(char, true)}
         />
       )}
 
@@ -477,6 +468,11 @@ export default function ChatScreen({ navigation, route }: Props) {
               onUpdateBackground={isDm ? updateBackground : undefined}
               onPickBackground={isDm && map ? () => pickAndUploadMapBackground(map.id) : undefined}
               recentMessages={messages}
+              shapes={shapes}
+              onAddShape={addShape}
+              onRemoveShape={removeShape}
+              onClearMyShapes={() => map && clearMyShapes(map.id)}
+              currentUserId={user?.id ?? ''}
             />
           ) : isDm ? (
             <View style={tabStyles.mapEmpty}>
@@ -561,11 +557,6 @@ export default function ChatScreen({ navigation, route }: Props) {
         onRenameNpc={renameDmNpc}
         onNpcRoll={drawerThenNpcRoll}
         onNpcSheet={drawerThenSheet}
-        roster={roster}
-        onAddToRoster={drawerThenAddToRoster}
-        onAddCharacterToRoster={drawerThenCharToRoster}
-        onRemoveFromRoster={removeFromRoster}
-        onAddToSessionFromRoster={handleAddToSessionFromRoster}
         encounters={encounters}
         onManageEncounters={drawerThenManageEncounters}
         onDeployEncounter={handleDeployEncounter}
@@ -581,11 +572,6 @@ export default function ChatScreen({ navigation, route }: Props) {
           setPickerVisible(false);
           if (charPickerTarget === 'session_npc') {
             if (id) addDmNpc(id);
-          } else if (charPickerTarget === 'roster') {
-            if (id) {
-              const char = myCharacters.find((c) => c.id === id);
-              if (char) addToRoster({ id: char.id, name: char.name, system_id: char.system_id, data: char.data as Record<string, unknown> });
-            }
           } else {
             pickActiveCharacter(id);
           }
@@ -599,13 +585,8 @@ export default function ChatScreen({ navigation, route }: Props) {
         loading={monsterPickerLoading}
         onPick={async (monster: MonsterEntry) => {
           setMonsterPickerVisible(false);
-          if (monsterPickerTarget === 'roster') {
-            addToRoster(monster);
-          } else {
-            // Pedir nombre personalizado antes de crear
-            setPendingMonster(monster);
-            setPendingMonsterName(monster.name);
-          }
+          setPendingMonster(monster);
+          setPendingMonsterName(monster.name);
         }}
         onClose={() => setMonsterPickerVisible(false)}
       />

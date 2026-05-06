@@ -339,6 +339,64 @@ BEGIN
 END;
 $$;
 
+-- ── Tabla: map_shapes ─────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS map_shapes (
+  id         UUID  PRIMARY KEY DEFAULT gen_random_uuid(),
+  map_id     UUID  NOT NULL REFERENCES maps(id) ON DELETE CASCADE,
+  user_id    UUID  NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  shape_type TEXT  NOT NULL DEFAULT 'rect',
+  color      TEXT  NOT NULL DEFAULT 'rgba(239,68,68,0.45)',
+  x          REAL  NOT NULL,
+  y          REAL  NOT NULL,
+  w          REAL  NOT NULL,
+  h          REAL  NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+ALTER TABLE map_shapes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE map_shapes REPLICA IDENTITY FULL;
+
+DROP POLICY IF EXISTS "members_read_map_shapes" ON map_shapes;
+CREATE POLICY "members_read_map_shapes" ON map_shapes FOR SELECT
+  USING (EXISTS (
+    SELECT 1 FROM maps m
+    JOIN session_members sm ON sm.session_id = m.session_id
+    WHERE m.id = map_shapes.map_id
+      AND sm.user_id = auth.uid()
+      AND sm.status  = 'accepted'
+  ));
+
+DROP POLICY IF EXISTS "members_insert_map_shapes" ON map_shapes;
+CREATE POLICY "members_insert_map_shapes" ON map_shapes FOR INSERT
+  WITH CHECK (
+    auth.uid() = user_id
+    AND EXISTS (
+      SELECT 1 FROM maps m
+      JOIN session_members sm ON sm.session_id = m.session_id
+      WHERE m.id = map_shapes.map_id
+        AND sm.user_id = auth.uid()
+        AND sm.status  = 'accepted'
+    )
+  );
+
+DROP POLICY IF EXISTS "members_delete_map_shapes" ON map_shapes;
+CREATE POLICY "members_delete_map_shapes" ON map_shapes FOR DELETE
+  USING (
+    auth.uid() = user_id
+    OR EXISTS (
+      SELECT 1 FROM maps m
+      JOIN session_members sm ON sm.session_id = m.session_id
+      WHERE m.id = map_shapes.map_id
+        AND sm.user_id = auth.uid()
+        AND sm.role    = 'dm'
+        AND sm.status  = 'accepted'
+    )
+  );
+
+DO $$ BEGIN
+  ALTER PUBLICATION supabase_realtime ADD TABLE map_shapes;
+EXCEPTION WHEN duplicate_object THEN null; END $$;
+
 -- ── RPC: set_token_visibility ─────────────────────────────────────────────────
 -- El DM oculta/muestra un token (fog of war por token).
 

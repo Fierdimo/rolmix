@@ -12,7 +12,6 @@ import {
 import { Character, SessionMember } from '../../lib/types';
 import { getSystem } from '../../lib/systems';
 import { chatStyles as s } from './chatStyles';
-import { MonsterEntry } from './MonsterPickerModal';
 import { PreparedEncounter } from '../../hooks/useSessionEncounters';
 
 interface Props {
@@ -46,12 +45,6 @@ interface Props {
   onRenameNpc: (characterId: string, newName: string) => void;
   onNpcRoll: (character: Character) => void;
   onNpcSheet: (characterId: string) => void;
-  // Bestiario de sesión (monstruos preparados por el DM)
-  roster: MonsterEntry[];
-  onAddToRoster: () => void;
-  onAddCharacterToRoster: () => void;
-  onRemoveFromRoster: (monsterId: string) => void;
-  onAddToSessionFromRoster: (monster: MonsterEntry) => void;
   // Encuentros preparados
   encounters: PreparedEncounter[];
   onManageEncounters: () => void;
@@ -69,7 +62,6 @@ export default function SessionDrawer({
   onDirectedRoll, onViewPlayerSheet, onGroupRoll,
   combatActive, onStartCombat,
   dmNpcs, onAddNpc, onRemoveNpc, onRenameNpc, onNpcRoll, onNpcSheet,
-  roster, onAddToRoster, onAddCharacterToRoster, onRemoveFromRoster, onAddToSessionFromRoster,
   encounters, onManageEncounters, onDeployEncounter,
   drawerAnim, onClose,
 }: Props) {
@@ -85,7 +77,7 @@ export default function SessionDrawer({
     setEditingNpcId(null);
   }
 
-  const showCharSection = hasAcceptedAccess || isDm;
+  const showCharSection = hasAcceptedAccess && !isDm;
 
   return (
     <Modal
@@ -248,43 +240,6 @@ export default function SessionDrawer({
                   <TouchableOpacity style={[s.drawerBtn, { marginBottom: 16 }]} onPress={onManageEncounters}>
                     <Text style={s.drawerBtnText}>🗺  Gestionar encuentros</Text>
                   </TouchableOpacity>
-                  {/* ── Bestiario de sesión ─────────────── */}
-                  <Text style={s.drawerSectionTitle}>Bestiario de sesión</Text>
-                  {roster.length === 0 ? (
-                    <Text style={[s.emptyLabel, { marginBottom: 8 }]}>Sin monstruos preparados aún.</Text>
-                  ) : (
-                    roster.map((m) => (
-                      <View key={m.id} style={s.memberRow}>
-                        <View style={{ flex: 1 }}>
-                          <Text style={s.memberName} numberOfLines={1}>{m.name}</Text>
-                          <Text style={s.memberMeta}>
-                            CR {m.data.cr as number} · {m.data.type as string}
-                          </Text>
-                        </View>
-                        <View style={s.memberActions}>
-                          <TouchableOpacity
-                            style={s.acceptButton}
-                            onPress={() => onAddToSessionFromRoster(m)}
-                          >
-                            <Text style={s.acceptButtonText}>Añadir</Text>
-                          </TouchableOpacity>
-                          <TouchableOpacity
-                            style={s.rejectButton}
-                            onPress={() => onRemoveFromRoster(m.id)}
-                          >
-                            <Text style={s.rejectButtonText}>✕</Text>
-                          </TouchableOpacity>
-                        </View>
-                      </View>
-                    ))
-                  )}
-                  <TouchableOpacity style={[s.drawerBtn, { marginBottom: 6 }]} onPress={onAddToRoster}>
-                    <Text style={s.drawerBtnText}>＋  Preparar monstruo</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={[s.drawerBtn, { marginBottom: 12 }]} onPress={onAddCharacterToRoster}>
-                    <Text style={s.drawerBtnText}>＋  Añadir personaje guardado</Text>
-                  </TouchableOpacity>
-
                   {/* NPCs/monstruos del DM */}
                   <Text style={s.drawerSectionTitle}>NPCs en partida</Text>
                   {dmNpcs.map((npc) => (

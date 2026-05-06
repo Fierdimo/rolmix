@@ -11,10 +11,12 @@ interface Props {
   characterMap: Record<string, Character>;
   isDm: boolean;
   myCharacterId?: string | null;
+  availableCombatants?: Character[];
   onPrevTurn: () => void;
   onNextTurn: () => void;
   onEndCombat: () => void;
   onUpdateHp: (combatantId: string, delta: number) => void;
+  onAddCombatant?: (character: Character) => void;
   /** El DM o el jugador activo piden realizar una acción. */
   onAct: (combatant: Combatant) => void;
 }
@@ -97,13 +99,16 @@ export default function CombatTrackerPanel({
   characterMap,
   isDm,
   myCharacterId,
+  availableCombatants = [],
   onPrevTurn,
   onNextTurn,
   onEndCombat,
   onUpdateHp,
+  onAddCombatant,
   onAct,
 }: Props) {
   const [editingHp, setEditingHp] = useState<Combatant | null>(null);
+  const [summonPickerVisible, setSummonPickerVisible] = useState(false);
 
   function canActNow(c: Combatant): boolean {
     if (c.is_defeated) return false;
@@ -191,6 +196,11 @@ export default function CombatTrackerPanel({
           <TouchableOpacity style={s.nextBtn} onPress={onNextTurn}>
             <Text style={s.nextBtnText}>Siguiente ▶</Text>
           </TouchableOpacity>
+          {availableCombatants.length > 0 && (
+            <TouchableOpacity style={s.summonBtn} onPress={() => setSummonPickerVisible(true)}>
+              <Text style={s.summonBtnText}>＋</Text>
+            </TouchableOpacity>
+          )}
         </View>
       )}
 
@@ -202,6 +212,37 @@ export default function CombatTrackerPanel({
           onApply={(delta) => onUpdateHp(editingHp.id, delta)}
           onClose={() => setEditingHp(null)}
         />
+      )}
+
+      {/* Picker de invocación mid-combat */}
+      {summonPickerVisible && (
+        <Modal transparent animationType="fade" onRequestClose={() => setSummonPickerVisible(false)}>
+          <TouchableOpacity style={ms.backdrop} activeOpacity={1} onPress={() => setSummonPickerVisible(false)} />
+          <View style={ms.container}>
+            <View style={[ms.card, { maxHeight: 360 }]}>
+              <Text style={ms.title}>Añadir al combate</Text>
+              <FlatList
+                data={availableCombatants}
+                keyExtractor={(c) => c.id}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    style={s.summonItem}
+                    onPress={() => {
+                      setSummonPickerVisible(false);
+                      onAddCombatant?.(item);
+                    }}
+                  >
+                    <Text style={s.summonItemName} numberOfLines={1}>{item.name}</Text>
+                    <Text style={s.summonItemMeta}>HP {item.data.hp_max ?? '?'}</Text>
+                  </TouchableOpacity>
+                )}
+              />
+              <TouchableOpacity style={ms.cancelBtn} onPress={() => setSummonPickerVisible(false)}>
+                <Text style={ms.cancelBtnText}>Cancelar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
       )}
     </View>
   );
@@ -322,6 +363,25 @@ const s = StyleSheet.create({
     alignItems: 'center',
   },
   nextBtnText: { color: '#6d28d9', fontSize: 13, fontWeight: '600' },
+  summonBtn: {
+    backgroundColor: 'rgba(109,40,217,0.14)',
+    borderRadius: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    alignItems: 'center',
+  },
+  summonBtnText: { color: '#6d28d9', fontSize: 16, fontWeight: '700' },
+  summonItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 10,
+    paddingHorizontal: 4,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(109,40,217,0.10)',
+  },
+  summonItemName: { color: '#1e1b3a', fontSize: 14, fontWeight: '600', flex: 1 },
+  summonItemMeta: { color: '#6b7280', fontSize: 12 },
 });
 
 // Estilos del modal de edición de HP
